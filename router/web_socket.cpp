@@ -66,32 +66,34 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         //Serial.print("WS_rcv:");
         //Serial.println(textMsg);        
         
-        DynamicJsonBuffer jsonBuffer(128);
-        JsonObject& root = jsonBuffer.parseObject(textMsg);
+        //DynamicJsonBuffer jsonBuffer(128);
+        DynamicJsonDocument doc(1024);
+        auto error = deserializeJson(doc, textMsg);
+       //JsonObject& root = doc.parseObject(textMsg);
 
         // Test if parsing succeeds.
-        if (root.success()) {         
+        if (!error) {         
           String msg;
            
-          if(root.containsKey("DEVICES")){    
+          if(doc.containsKey("DEVICES")){    
             String msg = UDP_devListToJson();   
             Serial.println("WS6: " + msg);
             wsServer.broadcastTXT(msg); 
           }
           
-          if(root.containsKey("APLIST")){  
+          if(doc.containsKey("APLIST")){  
             String APList = "{\"APLIST\":\"" + WIFIC_getApList() + "\"}";
             //Serial.println("WS4: " + APList);  
             wsServer.sendTXT(num, APList);   
           }
           
-          if(root.containsKey("STATUS")){  
+          if(doc.containsKey("STATUS")){  
             msg = "{\"STATUS\":\"" + HTTP_getStatus() + "\"}";
             //Serial.println("WS5: " + msg);              
             wsServer.broadcastTXT(msg);   
           }
 
-          if(root.containsKey("CURRENT")){
+          if(doc.containsKey("CURRENT")){
             /* Forward to currently active device */
             wsClient.sendTXT(payload);
           }                      
@@ -116,6 +118,3 @@ void WS_init(){
 void WS_ServerBroadcast(String msg){
   wsServer.broadcastTXT(msg);
 }
-
-
-

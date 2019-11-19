@@ -38,6 +38,10 @@
 
 #define UDP_PORT                (4210)  /* local port to listen on */
 #define EXT_IP_CHK_INTERVAL     (120)   /* How often to check external IP in seconds */
+#define DNS_PORT                53
+
+#define AP_NAME_PREFIX          "OC_router_"
+
 /* default email setup */
 #define SMTP_PORT               (465)
 #define SMTP_SERVER             "smtp.gmail.com"

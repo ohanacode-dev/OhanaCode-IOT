@@ -4,9 +4,8 @@
 #include <DNSServer.h>
 #include "web_socket.h"
 #include "config.h"
+#include "hub.h"
 
-extern void MAIN_setStatusMsg(String msg);
-extern String MAIN_getStatusMsg(void);
 
 static char myApName[32] = {0};    /* Array to form AP name based on read MAC */
 static char st_ssid[SSID_SIZE];    /* SSID to connect to */

@@ -8,6 +8,16 @@
 static unsigned long externalIPTimeout = 0;
 static String externalIP = "";
 
+static String statusMessage = "";         /* This is set and requested from other modules. */
+
+void MAIN_setStatusMsg(String msg){
+  statusMessage = msg;
+}
+
+String MAIN_getStatusMsg(void){
+  return statusMessage;
+}
+
 void checkExternalIP( void ){
   if(((externalIPTimeout == 0) && (millis() > 10000)) ||
       ((millis() - externalIPTimeout) > (EXT_IP_CHK_INTERVAL * 1000))){

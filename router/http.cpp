@@ -576,7 +576,7 @@ static void saveWiFi(void){
   }
 
   if(ssid.length() > 3){
-    WIFIC_stationtMode(); 
+    WIFIC_stationMode(); 
   }else{    
     WIFIC_APMode();
   }
@@ -738,6 +738,3 @@ void HTTP_init(void){
   
   webServer.begin();
 }
-
-
-

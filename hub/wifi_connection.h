@@ -17,6 +17,5 @@ extern void WIFIC_setStIP(IPAddress stationIP);
 extern void WIFIC_process(void);
 extern bool WIFIC_checkValidIp(IPAddress IP);
 extern char* WIFIC_getDeviceName(void);
-extern bool WIFIC_IPIsLocal(IPAddress clientIP);
 
 #endif
