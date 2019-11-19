@@ -1,7 +1,7 @@
 #include <ArduinoJson.h>
 #include <WebSocketsServer.h>
 #include "wifi_connection.h"
-#include "udp_scan.h"
+#include "scan.h"
 #include "http.h"
 #include "hub.h"
 

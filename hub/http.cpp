@@ -11,7 +11,7 @@
 #include <pgmspace.h>
 #include <FS.h>
 #include "http.h"
-#include "udp_scan.h"
+#include "scan.h"
 #include "wifi_connection.h"
 #include "web_socket.h"
 #include "config.h"

@@ -7,7 +7,7 @@
  */
 
 #include "http.h"
-#include "udp_scan.h"
+#include "scan.h"
 #include "web_socket.h"
 #include "wifi_connection.h"
 #include "config.h"
@@ -32,7 +32,7 @@ void setup(void) {
   WIFIC_init();
   HTTP_init();
   WS_init();  
-  UDPSCAN_init(); 
+  SCAN_init(); 
 }
 
 
@@ -42,7 +42,7 @@ void loop(void) {
   }else{
     HTTP_process();  
     WS_process();
-    UDPSCAN_process();  
+    SCAN_process();  
     WIFIC_process();   
   }
 }
