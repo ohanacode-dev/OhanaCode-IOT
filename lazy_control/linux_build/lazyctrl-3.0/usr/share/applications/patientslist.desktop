@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=LazyCtrl
+Comment='PC multimedia remote controller'
+Categories=Utility;
+Exec=/opt/lazyctrl/lazyctrl
+StartupNotify=false
+Terminal=false
+Path=/opt/lazyctrl/lazyctrl
+Icon=/opt/lazyctrl/icon.png
+Name[en_US]=lazyctrl

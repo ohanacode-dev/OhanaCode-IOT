@@ -1,0 +1,20 @@
+If the device keep resetting, check out the cause in therminal after reboot.
+
+1: normal boot
+2: reset pin
+3: software reset
+4: watchdog reset
+
+D1 Mini pinnout is noted on the board as D0, D1, D2,... Board manager libary from:
+http://arduino.esp8266.com/stable/package_esp8266com_index.json 
+defines these , but some versions of the ESP library do not define them correctly, so replace them according to datasheet:
+
+D0 = 16
+D1 = 5
+D2 = 4
+D3 = 0
+D4 = 2
+D5 = 14
+D6 = 12
+D7 = 13
+D8 = 15

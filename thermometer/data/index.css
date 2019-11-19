@@ -1,0 +1,24 @@
+body{
+background-color: white; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; 
+}
+.contain{
+width: 100%;
+}
+.center_div{
+margin:0 auto; max-width: 400px;position:relative;
+}
+.btn_cfg{
+border:0;border-radius:0.3rem;color:#fff;line-height:1.4rem;font-size:0.8rem;margin:1ch;height:2rem;width:15ch;background-color:#ff3300;
+}
+h1{
+text-align: center;font-size:1.5rem;
+}
+#temp{
+text-align: center;font-size:9em;padding: 0; margin:0;font-weight:bold;color:#1fa3ec;
+}
+p{
+text-align:center;
+}
+#logo{
+display:block;margin:0 0;width:4em;height:4em;
+}

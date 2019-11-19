@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">UjagagaIOTBrowser</string>
+    <string name="all_off">All Off</string>
+    <string name="rescan">Rescan</string>
+    <string name="about">About</string>
+    <string name="connected_to">Connected to %1$s</string>
+    <string name="no_wifi_connection">No WiFi connection.</string>
+
+</resources>

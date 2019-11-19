@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0">
+    <title>Ohana WiFi LED Control</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="shortcut icon" href="">
+</head>
+<body>
+<div class="contain">
+  <div class="center_div">
+	<img id="logo" src="" alt="Logo">
+    <h1>Ohana WiFi LED Control</h1>      
+    <div id='cpick'></div>  
+		<div class="row">  
+			<div id='samp'>        
+			  <div id='sampc'>
+				<input type="color" id='choose' onchange="setColor(this.value);"> 
+			  </div>          
+			</div>
+		</div> 
+    <input type="range" min="0" max="8" value="8" class="slider" id="opac">
+  </div>
+  <hr>
+  <p id='status'></p>  
+  <br><button class="btn_cfg" type="button" onclick="location.href='/select_ap.html';">Configure wifi</button>
+  <br/>
+</div>
+<script src="index.js"></script>
+</body></html>
