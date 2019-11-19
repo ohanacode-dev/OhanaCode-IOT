@@ -1,6 +1,7 @@
 **OhanaCode-IOT**
 
 This is my personal Internet Of Things set of projects. It is intended as a low budget home automation system. I am building my own WiFi controlled devices and controlling them through their own web interface. Most devices can be an access point or a client device on a WiFi network. After it connects it gets difficult to find its IP address, so I also provided an Android app to list all devices on the same network. Every device responds to an UDP broadcast string "ujagaga ping" via TCP socket. There is also an implemented Over The Air update. Most projects are build using Arduino studio and an **ESP8266** device. I am using **Wemos D1 mini** and **ESP-12** devices. ESP-01 is possible to use, for most projects but without the OTA update due to insufficient flash size.
+NOTE: this is still work in progress. I have refactored some of the projects to use a filesystem on ESP8266 flash memory for storing web interface files. Most of the projects are functional, but I still want to improove them.
 
 ---
 
@@ -60,7 +61,7 @@ A thermometer project expanded with a relay driving capability.
 
 ---
 
-## IOTBrowser
+## OC IOT Browser
 
 An Android application to list and provide a quick access to all **Ohana-IOT** devices on the same network.
 
