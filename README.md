@@ -1,15 +1,23 @@
 **OhanaCode-IOT**
 
-This is my personal Internet Of Things set of projects. It is intended as a low budget home automation system. I am building my own WiFi controlled devices and controlling them through their own web interface. Most devices can be an access point or a client device on a WiFi network. After it connects it gets difficult to find its IP address, so I also provided an Android app to list all devices on the same network. Every device responds to an UDP broadcast string "ujagaga ping" via TCP socket. There is also an implemented Over The Air update. Most projects are build using Arduino studio and an **ESP8266** device. I am using **Wemos D1 mini** and **ESP-12** devices. ESP-01 is possible to use, for most projects but without the OTA update due to insufficient flash size.
+This is my personal Internet Of Things set of projects. It is intended as a low budget home automation system. 
+I am building my own WiFi controlled devices and controlling them through their own web interface. 
+Most devices can act as an access point or a client device on a WiFi network. After it connects to your home network, 
+it gets difficult to find its IP address if it is dynamically alocated, so I also provided an Android app to list all devices on the same network. 
+Every device responds to an UDP broadcast string "ujagaga ping" via TCP socket. 
+There is also an implemented Over The Air update. 
+Most projects are build using Arduino studio and an **ESP8266** device. I am using **Wemos D1 mini** and **ESP-12** devices. ESP-01 is possible to use for most projects, but without the OTA update due to insufficient flash size.
 NOTE: this is still work in progress. I have refactored some of the projects to use a filesystem on ESP8266 flash memory for storing web interface files. Most of the projects are functional, but I still want to improove them.
 
 ---
 
 ## Using the code
 
-Every devide has an Arduino sketch in it's own folder, so open the sketch in **Arduino studio** and set the proper board and parameters for your board, compile and program. 
+Every device has an Arduino sketch in it's own folder, so open the sketch in **Arduino studio** and set the proper board and parameters for your board, compile and program. 
 For the web interface some projects use SPIFFS library to upload HTML, CSS, JS files to virtual file system in the SPI flash. To upload these files, you need **Arduino ESP8266 filesystem uploader**. It integrates in your Arduino studio and adds an entry in the **Tools** menu. To install it, follow instructions from: https://github.com/esp8266/arduino-esp8266fs-plugin
-After that you might want to open the **serial monitor** to see the debug messages for more info. You can then connect to devices access point, use your browser to control and configure it. Project is still in development. I believe that the LED_lamp and LED_lamp_RGB have reached their final state and are ready for use. Other projects are usable, but will be refactored a lot. Reffer to each projects **readme** for current status. 
+After that you might want to open the **serial monitor** to see the debug messages for more info. 
+You can then connect to devices access point, use your browser to control and configure it. 
+Project is still in development. I believe that the LED_lamp and LED_lamp_RGB lazy_control and OC-IOT-Browser have reached their final state and are ready for use. Other projects are usable, but will be refactored a lot. Reffer to each projects **readme** for current status. 
 
 ---
 

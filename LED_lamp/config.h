@@ -19,7 +19,7 @@
 
 /* 19 characters maximum. When we append MAC addr, it will be 31. 
 The device fails to create an AP if total AP name is longer than 31 character. */
-#define AP_NAME_PREFIX          "ujagaga_led_"
+#define AP_NAME_PREFIX          "OC_led_"
 
 /* wemos d1 mini has inverted onboeard LED, so if you are using it, uncomment this. 
 * Also, general ESP8266 module has fewer pins so different ones are used. */

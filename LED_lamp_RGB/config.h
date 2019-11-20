@@ -21,7 +21,7 @@
 
 /* 19 characters maximum. When we append MAC addr, it will be 31. 
 The device fails to create an AP if total AP name is longer than 31 character. */
-#define AP_NAME_PREFIX          "ujagaga_led_rgb_"    
+#define AP_NAME_PREFIX          "OC_rgb_"    
 
 #define LED_G_PIN                     (0)    /* D3 */  
 #define LED_R_PIN                     (4)    /* D2 */  
