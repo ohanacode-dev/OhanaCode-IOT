@@ -21,7 +21,7 @@
 /* 19 characters maximum. When we append MAC addr, it will be 31. 
 The device fails to create an AP if total AP name is longer than 31 character. */
 #define AP_NAME_PREFIX          "OC_hub_"
-#define MAX_DEV_COUNT           (10)  /**/
+#define MAX_DEV_COUNT           (20)  /**/
 /* Device types we can remotelly control */
 #define DEVT_LED_DIMMER_LAMP    (1)
 #define DEVT_THERMOMETER        (2)

@@ -1,9 +1,0 @@
-Package: lazyctrl
-Version: 3.0
-Section: base
-Priority: optional
-Architecture: all
-Depends: xdotool, sox
-Maintainer: Rada Berar <ujagaga@gmail.com>
-Homepage: 
-Description: PC multimedia remote controller

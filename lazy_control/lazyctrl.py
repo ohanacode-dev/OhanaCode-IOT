@@ -112,6 +112,7 @@ elif 'windows' in OS_PLATFORM:
     MEDIA = 'media_key'
 
 
+DEV_ID = "90"
 BROADCAST_PORT = 4210
 IP = None
 port = 0
@@ -627,7 +628,7 @@ def thread_beacon():
                     print("Responding via UDP with: ", MAC)
                     broadcast_receiver.sendto(MAC.encode(), (sender_addr, sender_port))
                 else:
-                    print("Responding via TCP with: ", MAC)
+                    print("Responding via TCP with: ", MAC + ":" + DEV_ID)
 
                 last_ping_timestamp = time()
         except:

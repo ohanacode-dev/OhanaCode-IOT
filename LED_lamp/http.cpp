@@ -84,7 +84,7 @@ String HTTP_getFeatures( void ){
   response += WiFi.macAddress();
   response += ":";
   response += DEV_ID;
-  response += "\",\"MODEL\":\"ujagaga WiFi LED\"";
+  response += "\",\"MODEL\":\"OC WiFi LED\"";
   response += ",\"CURRENT\":";
   response += String(LED_getCurrentVal());  
   response += "}"; 

@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 cd ..
-ver="3.0"
+ver="3.1"
 
 # building standalone app
 pyinstaller -F ./lazyctrl.py

@@ -7,53 +7,77 @@
 #include <ESP8266WiFi.h>
 #include "config.h"
 
+#define NO_RESPONSE_MAX_COUNT       (5u)    /* Number of consecutive pings for which we did not get device response, to consider device offline */
 
 struct devProfile {
-  String devMac;
-  String devIp;  
-  int devId;
+  String mac;
+  String ip;  
+  uint8_t id;
+  uint8_t noResponseCount;
 };
 
 static WiFiUDP Udp;                             /* UDP object used for sending the ping message. */
 WiFiServer server(PING_RX_PORT);                /* tcp server for receiving the response */
-devProfile deviceList[MAX_DEV_COUNT];
-static uint8_t devCount = 0;
+devProfile deviceList[MAX_DEV_COUNT] = {{"", "", 0, 0}};
 static char incomingPacket[255];                /* buffer for incoming packets */
 static unsigned long pingTimestamp = 0;         /* Timestamp of the last reply, so we can implement the reply timeout. */
 static const char ping_msg[] = "ujagaga ping"; 
+
 
 void SCAN_init(){
   server.begin();
   Serial.printf("Listenning UDP on port %d\n\r", PING_RX_PORT);
 }
 
-void devCountClear(void){
-  devCount = 0;
-  deviceList[devCount].devMac = "";
-  deviceList[devCount].devIp = "";
-  deviceList[devCount].devId = 0;
+void devListClear(void){
+  for(int i = 0; i< MAX_DEV_COUNT; i++){
+    if((deviceList[i].mac.length() > 3) && (deviceList[i].noResponseCount > NO_RESPONSE_MAX_COUNT)){
+      // This device was not heard from for too long. Probably offline.
+      deviceList[i].mac = "";      
+    }
+  } 
 }
 
 int SCAN_getDevListId(String deviceMAC){
-  for(int i = 0; i< devCount; i++){
-    if(deviceList[i].devMac.equals(deviceMAC)){
+  for(int i = 0; i< MAX_DEV_COUNT; i++){
+    if(deviceList[i].mac.equals(deviceMAC)){
       return i;
     }
   } 
   return -1;
 }
 String SCAN_getDeviceIPByIndex(uint8_t index){  
-  return deviceList[index].devIp;
+  return deviceList[index].ip;
 }
 
 void devListAppend(String deviceMAC, String deviceIP, int deviceId){
-  if(SCAN_getDevListId(deviceMAC) < 0){
-    if(devCount < MAX_DEV_COUNT){
-      deviceList[devCount].devMac = deviceMAC;
-      deviceList[devCount].devIp = deviceIP;
-      deviceList[devCount].devId = deviceId;
-      devCount++;
+  Serial.print("Apend:");
+  Serial.print(deviceMAC);
+  Serial.print(":");
+  Serial.print(deviceId);
+  Serial.print(":");
+  Serial.println(deviceIP);
+          
+  int firsFreeId = -1;
+  
+  for(int i = 0; i< MAX_DEV_COUNT; i++){
+    if((deviceList[i].mac.length() < 5) && (firsFreeId < 0)){
+      firsFreeId = i;
     }
+    
+    if(deviceList[i].mac.equals(deviceMAC)){
+      deviceList[i].noResponseCount = 0;
+      return;
+    }   
+  } 
+  
+  // This device was not previously recorded
+  if(firsFreeId >= 0){
+    // There is some free space;
+    deviceList[firsFreeId].mac = deviceMAC;
+    deviceList[firsFreeId].ip = deviceIP;
+    deviceList[firsFreeId].id = deviceId;
+    deviceList[firsFreeId].noResponseCount = 0;
   }
 }
 
@@ -63,14 +87,40 @@ void pingDevices(void){
     
     pingTimestamp = millis();
     
-    devCountClear();
+    devListClear();
     
     IPAddress broadcastIP = WiFi.localIP();
     broadcastIP[3] = 255;
-  
+
+    // In a noisy environment, UDP packages get lost, so reppeat it few times
     Udp.beginPacket(broadcastIP, PING_TX_PORT);
     Udp.write(ping_msg);
     Udp.endPacket(); 
+
+    delay(1);
+
+    Udp.beginPacket(broadcastIP, PING_TX_PORT);
+    Udp.write(ping_msg);
+    Udp.endPacket(); 
+
+    delay(1);
+    
+    Udp.beginPacket(broadcastIP, PING_TX_PORT);
+    Udp.write(ping_msg);
+    Udp.endPacket(); 
+        
+    delay(1);
+    
+    Udp.beginPacket(broadcastIP, PING_TX_PORT);
+    Udp.write(ping_msg);
+    Udp.endPacket(); 
+
+    delay(1);
+    
+    Udp.beginPacket(broadcastIP, PING_TX_PORT);
+    Udp.write(ping_msg);
+    Udp.endPacket(); 
+
   }
 }
 
@@ -86,6 +136,7 @@ void SCAN_process(){
       {
         String deviceMAC = client.readStringUntil('\n');
         String deviceIp = client.remoteIP().toString();  
+        int deviceId = 0;
         client.stop();  
         
           /* Check if in MAC format */
@@ -93,10 +144,10 @@ void SCAN_process(){
               && (deviceMAC.charAt(11) == ':') && (deviceMAC.charAt(14) == ':') && (deviceMAC.charAt(17) == ':')){
             deviceMAC.replace(":", "");
            
-            int deviceId = deviceMAC.substring(12).toInt();
+            deviceId = deviceMAC.substring(12).toInt();
             deviceMAC = deviceMAC.substring(0, 12);            
                   
-            devListAppend(deviceMAC, deviceIp, deviceId);          
+            devListAppend(deviceMAC, deviceIp, deviceId);                      
         }else{
           Serial.print("FAIL:");
           Serial.println(deviceMAC);
