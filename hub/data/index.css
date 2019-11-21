@@ -30,7 +30,10 @@ text-align: center;font-size:1.5rem;
 position:absolute;right:-7.5rem;bottom:8rem; width:16rem;height:5%;
 }
 #logo{
-display:block;margin:0 0;width:2em;height:2em;float:left;
+display:block;margin:0 0;width:2em;height:2em;
+position: absolute;
+top: 5px;
+left: 0;
 }
 
 #btn_container{
@@ -41,8 +44,12 @@ display:block;margin:0 0;width:2em;height:2em;float:left;
 }
 
 .btnElement{
-	width: 100px;
-	float: left; 	
+	width: 25%;
+	float: left; 
+	margin-bottom: 10px;	
+}
+.btnElement:nth-child(5){
+	clear: both;
 }
 
 .btnElement p{
@@ -50,6 +57,7 @@ display:block;margin:0 0;width:2em;height:2em;float:left;
 	max-width: 90px;
 	overflow: hidden;
 	text-align: center;
+	font-size: 13px;
 }
 
 
@@ -128,4 +136,57 @@ display:block;margin:0 0;width:2em;height:2em;float:left;
   	top: 15px; 	
 	left: 29px;
 	z-index: 2;
+}
+
+.mode_btn{
+	width: 36px;
+	height: 32px;
+	padding: 0;
+	position: absolute;
+	right: 0;
+	top: 2px;	
+	background-color: #210D03;
+	overflow: hidden;
+	display: inline-block;
+}
+
+.mode_btn::after{
+	width: 4px;
+	height: 100%;
+	content: "";
+	background-color: #210D03;
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 14px;
+	z-index: 2;
+}
+
+.mode_btn div{
+	display: block;
+	content: "";
+	width: 32px;
+	height: 14px;
+	margin-bottom: 4px;
+	background-color: #EDEBD1;
+	position: relative;
+	transition: height 1s;
+}
+.tip{
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, 0);
+	background-color: ;
+	border-radius: 0.5em;
+	box-shadow: 0 0 15px white;
+	height: 1em;
+	max-width: 98%;
+	padding: 0.5em;
+	text-align: center;
+	font-size: 1.5em;
+	transition: visibility 2s;
+	z-index: 100;
+	visibility: hidden;
 }
