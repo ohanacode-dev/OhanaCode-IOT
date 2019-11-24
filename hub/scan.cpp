@@ -8,17 +8,22 @@
 #include "config.h"
 
 #define NO_RESPONSE_MAX_COUNT       (5u)    /* Number of consecutive pings for which we did not get device response, to consider device offline */
+#define MAX_IP_LEN                  (15u)
+
 
 struct devProfile {
-  String mac;
-  String ip;  
+  char mac[MAX_MAC_LEN + 1];
+  char ip[MAX_IP_LEN + 1];  
   uint8_t id;
   uint8_t noResponseCount;
+  uint8_t state;
 };
+
 
 static WiFiUDP Udp;                             /* UDP object used for sending the ping message. */
 WiFiServer server(PING_RX_PORT);                /* tcp server for receiving the response */
-devProfile deviceList[MAX_DEV_COUNT] = {{"", "", 0, 0}};
+static devProfile deviceList[MAX_DEV_COUNT] = {{"", "", 0, 0}};
+
 static char incomingPacket[255];                /* buffer for incoming packets */
 static unsigned long pingTimestamp = 0;         /* Timestamp of the last reply, so we can implement the reply timeout. */
 static const char ping_msg[] = "ujagaga ping"; 
@@ -31,23 +36,29 @@ void SCAN_init(){
 
 void devListClear(void){
   for(int i = 0; i< MAX_DEV_COUNT; i++){
-    if((deviceList[i].mac.length() > 3) && (deviceList[i].noResponseCount > NO_RESPONSE_MAX_COUNT)){
+    if(deviceList[i].noResponseCount > NO_RESPONSE_MAX_COUNT){
       // This device was not heard from for too long. Probably offline.
-      deviceList[i].mac = "";      
+      deviceList[i].mac[0] = 0;      
     }
   } 
 }
 
-int SCAN_getDevListId(String deviceMAC){
-  for(int i = 0; i< MAX_DEV_COUNT; i++){
-    if(deviceList[i].mac.equals(deviceMAC)){
-      return i;
+int SCAN_getDevId(String deviceMAC){
+  for(int i = 0; i < MAX_DEV_COUNT; i++){
+    if(deviceList[i].mac[0] != 0){
+        String mac = String(deviceList[i].mac);
+
+        if(mac.equals(deviceMAC)){
+            return i;
+        }
     }
+    
   } 
   return -1;
 }
+
 String SCAN_getDeviceIPByIndex(uint8_t index){  
-  return deviceList[index].ip;
+  return String(deviceList[index].ip);
 }
 
 void devListAppend(String deviceMAC, String deviceIP, int deviceId){
@@ -61,11 +72,11 @@ void devListAppend(String deviceMAC, String deviceIP, int deviceId){
   int firsFreeId = -1;
   
   for(int i = 0; i< MAX_DEV_COUNT; i++){
-    if((deviceList[i].mac.length() < 5) && (firsFreeId < 0)){
+    if((deviceList[i].mac[0] == 0) && (firsFreeId < 0)){
       firsFreeId = i;
     }
     
-    if(deviceList[i].mac.equals(deviceMAC)){
+    if(String(deviceList[i].mac).equals(deviceMAC)){
       deviceList[i].noResponseCount = 0;
       return;
     }   
@@ -74,8 +85,10 @@ void devListAppend(String deviceMAC, String deviceIP, int deviceId){
   // This device was not previously recorded
   if(firsFreeId >= 0){
     // There is some free space;
-    deviceList[firsFreeId].mac = deviceMAC;
-    deviceList[firsFreeId].ip = deviceIP;
+    deviceMAC.toCharArray( deviceList[firsFreeId].mac, MAX_MAC_LEN);
+    deviceList[firsFreeId].mac[MAX_MAC_LEN] = 0;
+    deviceIP.toCharArray(deviceList[firsFreeId].ip, MAX_IP_LEN);
+    deviceList[firsFreeId].ip[MAX_IP_LEN] = 0;
     deviceList[firsFreeId].id = deviceId;
     deviceList[firsFreeId].noResponseCount = 0;
   }
@@ -155,4 +168,22 @@ void SCAN_process(){
       }
     }
   }  
+}
+
+
+
+String SCAN_getDevList(void){
+  String response = "{devs:";  
+
+  for(int i = 0; i < MAX_DEV_COUNT; i++){
+    devProfile dev = deviceList[i];
+
+    if(dev.mac[0] != 0){
+        response += "{ip:" + String(dev.ip) + ", label:" + getLabel(String(dev.mac)) + ", state:" + String(dev.state) + "},";
+    }
+    response += "}";
+    
+  }
+
+  return response;
 }
