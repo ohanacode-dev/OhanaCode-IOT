@@ -6,6 +6,7 @@
 #include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
 #include "config.h"
+#include "dev_labels.h"
 
 #define NO_RESPONSE_MAX_COUNT       (5u)    /* Number of consecutive pings for which we did not get device response, to consider device offline */
 #define MAX_IP_LEN                  (15u)
@@ -28,6 +29,15 @@ static char incomingPacket[255];                /* buffer for incoming packets *
 static unsigned long pingTimestamp = 0;         /* Timestamp of the last reply, so we can implement the reply timeout. */
 static const char ping_msg[] = "ujagaga ping"; 
 
+bool SCAN_isDevPresent(String devMac){
+  for(int i = 0; i< MAX_DEV_COUNT; i++){
+    if(String(deviceList[i].mac).equals(devMac)){
+      return true;
+    }
+  }
+
+  return false;
+}
 
 void SCAN_init(){
   server.begin();
@@ -179,7 +189,7 @@ String SCAN_getDevList(void){
     devProfile dev = deviceList[i];
 
     if(dev.mac[0] != 0){
-        response += "{ip:" + String(dev.ip) + ", label:" + getLabel(String(dev.mac)) + ", state:" + String(dev.state) + "},";
+        response += "{ip:" + String(dev.ip) + ", label:" + DEVLABEL_get(String(dev.mac), dev.id) + ", state:" + String(dev.state) + "},";
     }
     response += "}";
     

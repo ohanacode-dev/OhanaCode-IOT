@@ -1,4 +1,6 @@
 #include <EEPROM.h>
+#include "config.h"
+#include "scan.h"
 
 struct devTypeName{
   uint8_t id;
@@ -13,45 +15,105 @@ static const devTypeName devNames[] = {
   { 5, "LED RGB"}
 };
 
+static void writeDevMac(int addr, String devMac){
+  int len = devMac.length();
+  if(len > MAX_MAC_LEN){
+    len = MAX_MAC_LEN;
+  }
+  
+  for(int i = 0; i < MAX_MAC_LEN; ++i){
+    if(i < len){
+      EEPROM.write(addr + i, devMac.charAt(i));
+    }else{
+      EEPROM.write(addr + i, 0);
+    }    
+  }
+}
+
+static void writeDevLabel(int addr, String devLabel){
+  int len = devLabel.length();
+  if(len > MAX_LABEL_LEN){
+    len = MAX_LABEL_LEN;
+  }
+  
+  for(int i = 0; i < MAX_LABEL_LEN; ++i){
+    if(i < len){
+      EEPROM.write(addr + i, devLabel.charAt(i));
+    }else{
+      EEPROM.write(addr + i, 0);
+    }
+  }
+}
+
+static String readDevMac(int addr){
+  char mac[MAX_MAC_LEN + 1] = {0};
+  
+  for(int i = 0; i < MAX_MAC_LEN; ++i){
+    mac[i] = EEPROM.read(addr + i);
+    
+    if(mac[i] == 0xff){
+      mac[i] = 0;
+      break;
+    }
+  }
+
+  return String(mac);
+}
+
+static String readDevLabel(int addr){
+  char label[MAX_LABEL_LEN + 1] = {0};
+  
+  for(int i = 0; i < MAX_LABEL_LEN; ++i){
+    label[i] = EEPROM.read(addr + i);
+    
+    if(label[i] == 0xff){
+      label[i] = 0;
+      break;
+    }
+  }
+
+  return String(label);
+}
+
+int getUnusedDevAddr(void){
+ 
+  for(int i = 0; i < MAX_DEV_COUNT; ++i){
+    int macAddr = LABELS_ADDR + (i * (MAX_MAC_LEN + MAX_LABEL_LEN));
+    String mac = readDevMac(macAddr);  
+
+    if(!SCAN_isDevPresent(mac)){
+      return macAddr;
+    }
+  }
+
+  return -1;
+}
+
 String DEVLABEL_get(String devMac, uint8_t devType){
   ESP.wdtFeed();
    /* Read settings from EEPROM */
   EEPROM.begin(EEPROM_SIZE);
 
+  String label;
+  bool devFound = false;
+
   for(int i = 0; i < MAX_DEV_COUNT; ++i){
-    char mac[MAX_MAC_LEN + 1] = {0};
-    String label = "";
-    bool devFound = false;
     int macAddr = LABELS_ADDR + (i * (MAX_MAC_LEN + MAX_LABEL_LEN));
-
-    // Copy MAC from EEPROM
-    for(int i = 0; i < MAX_MAC_LEN; ++i){
-      mac[i] = EEPROM.read(macAddr + i);
-      if(mac[i] == 0xff){
-        mac[i] = 0;
-      }
-    }
-
-    if(String(mac).equals(devMac)){
-      // Found requested device.
+    String mac = readDevMac(macAddr);    
+    
+    if(mac.equals(devMac)){
+      // Found requested device.      
       devFound = true;
-      int labelAddr = macAddr + MAX_MAC_LEN;
-
-      for(int l = 0; l < MAX_LABEL_LEN; ++l){
-        uint8_t temp = EEPROM.read(labelAddr + l);
-        if(uint8_t temp == 0xff){
-          uint8_t temp = 0;
-        }
-
-        label.setCharAt(l, temp);
-      }        
+      label = readDevLabel(macAddr + MAX_MAC_LEN);
+  
+      break;
     }
   }
 
   if(!devFound){
     // No label found for this device. Get device type.
     for(int i = 0; i < 5; ++i){
-      if(String(devNames[i].id).equals(devType)){
+      if(devNames[i].id == devType){
         label = String(devNames[i].name);
       }     
     }
@@ -70,24 +132,20 @@ void DEVLABEL_set(String devMac, String devLabel){
   bool macFoundFlag = false;
 
   for(int i = 0; i < MAX_DEV_COUNT; ++i){
-    char mac[MAX_MAC_LEN + 1] = {0};
     int macAddr = LABELS_ADDR + (i * (MAX_MAC_LEN + MAX_LABEL_LEN));
-
-    for(int e = 0; e < MAX_MAC_LEN; ++e){
-      mac[e] = EEPROM.read(macAddr + e);
-    }
-
-    int labelAddr = macAddr + MAX_MAC_LEN;
-    if((mac[0] > 0) && String(mac).equals(devMac)){
+    String mac = readDevMac(macAddr);  
+          
+    if(mac.equals(devMac)){
       // Found the device.
-      for(int e = 0; e < MAX_LABEL_LEN; ++e){
-        EEPROM.write(labelAddr + e, devLabel.charAt(e));
-      }      
+      int labelAddr = macAddr + MAX_MAC_LEN;
+
+      writeDevLabel(labelAddr, devLabel);
 
       macFoundFlag = true;
+      break;
     }
     
-    if((firstFree < 0) && (EEPROM.read(addr) == 0)){
+    if((firstFree < 0) && ((EEPROM.read(macAddr) == 0) || (EEPROM.read(macAddr) == 0xff))){
       firstFree = macAddr;
     }
   }
@@ -96,15 +154,16 @@ void DEVLABEL_set(String devMac, String devLabel){
     // Requested MAC address was not found
     if(firstFree >= 0){
       // There is free space. Add a new one.
-      for(int e = 0; e < MAX_MAC_LEN; ++e){
-        EEPROM.write(firstFree + e), devMac.charAt(e));
-      } 
-
-      for(int e = 0; e < MAX_LABEL_LEN; ++e){
-        EEPROM.write(firstFree + MAX_MAC_LEN + e), devLabel.charAt(e));
-      }   
+      writeDevMac(firstFree, devMac);
+      writeDevLabel(firstFree + MAX_MAC_LEN, devLabel);
+      
     }else{
-      //TODO: check unused devices and replace data.
+      // No free space. Find an unused device and replace data.
+      int unusedAddr = getUnusedDevAddr();
+      if(unusedAddr > 0){
+        writeDevMac(unusedAddr, devMac);
+        writeDevLabel(unusedAddr + MAX_MAC_LEN, devLabel);
+      }
     }
     
   }
