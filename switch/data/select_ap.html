@@ -11,12 +11,14 @@
 	<div class="center_div">
 		<h1 id='ttl'>Networks found:</h1>
 		<div id='vm'><p>Please wait...</p></div>
-		<form method='get' action='wifisave'>
+		
+		<form method='get' action='wifisave'>	
+			<input type="checkbox" id="dap" onclick="updateDap();"> Disable AP mode (STATION mode only).	
 			<button type='button' onclick='refresh();'>Rescan</button><br/><br/>
 			<input id='s' name='s' length=32 placeholder='SSID (Leave blank for AP mode)'><br>      
 			<input id='p' name='p' length=32 placeholder='password'><br>
 			<input id='a' name='a' length=16 placeholder='static IP address (optional)'><br>       
-			<br>
+			<br>			
 			<button type='submit'>save</button>
 		</form>
 	</div>

@@ -55,6 +55,22 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         String statusMsg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";               
         wsServer.broadcastTXT(statusMsg);   
       }
+
+      if(root.containsKey("DAP")){
+        String dapRequest = root["DAP"];
+        if(dapRequest.equals("0")){
+          WIFIC_disableApMode(false);
+        }else{
+          WIFIC_disableApMode(true);
+        }
+        
+        String APDisabledStatus = "0";
+        if(WIFIC_APDisabled()){
+          APDisabledStatus = "1";
+        }
+        String dapMsg = "{\"DAP\":\"" + APDisabledStatus + "\"}";               
+        wsServer.broadcastTXT(dapMsg);   
+      }
     }      
   }   
 }

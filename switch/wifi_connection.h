@@ -17,5 +17,7 @@ extern void WIFIC_setStIP(IPAddress stationIP);
 extern void WIFIC_process(void);
 extern bool WIFIC_checkValidIp(IPAddress IP);
 extern char* WIFIC_getDeviceName(void);
+extern void WIFIC_disableApMode(bool doDisable);
+extern bool WIFIC_APDisabled();
 
 #endif

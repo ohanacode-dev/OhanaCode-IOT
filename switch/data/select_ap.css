@@ -38,3 +38,6 @@ width:100%;height:50vh;overflow-y:auto;margin-bottom:1em;
 a, a:link, a:visited, a:hover, a:active {
   color: #66ff66;  
 }
+#dap{
+  width: 1em;
+}
