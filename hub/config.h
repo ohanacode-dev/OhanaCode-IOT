@@ -35,5 +35,6 @@ The device fails to create an AP if total AP name is longer than 31 character. *
 #define DEVT_THERMOSTAT03       (3)
 #define DEVT_THERMOSTAT04       (4)
 #define DEVT_LED_RGB_LAMP       (5)
+#define DEVT_SWITCH    		(6)
 
 #endif

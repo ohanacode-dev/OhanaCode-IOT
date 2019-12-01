@@ -1,0 +1,97 @@
+body{
+background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; Color: #EDEBD1;
+}
+.contain{
+width: 100%; min-height: 100vh;
+}
+.center_div{
+margin:0 auto; max-width: 400px;position:relative;
+}
+.btn_cfg{
+border:0;border-radius:0.3rem;color:#fff;line-height:1.4rem;
+font-size:0.8rem;margin:1ch;height:2rem;width:15ch;background-color:#ff3300;
+}
+h1{
+text-align: center;font-size:1.5rem;
+}
+#logo{
+display:block;margin:0 0;width:2em;height:2em;position: absolute;
+top: 5px;
+left: 0;
+}
+.btnElement{
+	clear: both;
+	width: 100%;
+	height: auto;
+	position: relative;
+	display: inline-block;
+	margin-bottom: 100px;
+}
+
+.lightBtnOff, .lightBtnOn{
+	width: 200px;  
+	height: 200px;
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+
+.lightBtnOff::before, .lightBtnOff::after, .lightBtnOff span,
+.lightBtnOn::before, .lightBtnOn::after, .lightBtnOn span{
+	display: block;
+   	content: "";
+   	position: absolute;
+}
+
+.lightBtnOff::before, .lightBtnOn::before{
+	width: 160px;
+	height: 160px;
+	background: black;
+	border-radius: 50%;
+	top: 20px;
+	left: 20px;
+}
+
+.lightBtnOff::before{
+	border: 2px solid #ACABA4; 
+}
+
+.lightBtnOn::before{
+	border: 2px solid white;
+	box-shadow: 0 0 20px white;
+}
+
+.lightBtnOff::after, .lightBtnOn::after{
+	width: 89px;
+	height: 89px;
+	top: 50px;
+	left: 50px;
+	border-radius: 50%;
+}
+
+.lightBtnOff::after{
+	background: black;
+	border: 6px solid #8a8a5c;
+}
+
+.lightBtnOn::after{
+	background: black;
+	border: 6px solid #66ff66;
+}
+
+.lightBtnOff span, .lightBtnOn span{
+	width: 8px;
+	height: 40px;	
+	border: 6px solid black;
+	top: 40px;
+	left: 90px;
+	z-index: 2;
+}
+.lightBtnOff span{	
+	background: #8a8a5c;
+}
+
+.lightBtnOn span{
+	background: #66ff66;
+}
