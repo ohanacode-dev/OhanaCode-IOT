@@ -11,7 +11,6 @@
 #define NO_RESPONSE_MAX_COUNT       (5u)    /* Number of consecutive pings for which we did not get device response, to consider device offline */
 #define MAX_IP_LEN                  (15u)
 
-
 struct devProfile {
   char mac[MAX_MAC_LEN + 1];
   char ip[MAX_IP_LEN + 1];  
@@ -20,31 +19,14 @@ struct devProfile {
   uint8_t state;
 };
 
-
 static WiFiUDP Udp;                             /* UDP object used for sending the ping message. */
 WiFiServer server(PING_RX_PORT);                /* tcp server for receiving the response */
 static devProfile deviceList[MAX_DEV_COUNT] = {{"", "", 0, 0}};
-
 static char incomingPacket[255];                /* buffer for incoming packets */
 static unsigned long pingTimestamp = 0;         /* Timestamp of the last reply, so we can implement the reply timeout. */
 static const char ping_msg[] = "ujagaga ping"; 
 
-bool SCAN_isDevPresent(String devMac){
-  for(int i = 0; i< MAX_DEV_COUNT; i++){
-    if(String(deviceList[i].mac).equals(devMac)){
-      return true;
-    }
-  }
-
-  return false;
-}
-
-void SCAN_init(){
-  server.begin();
-  Serial.printf("Listenning UDP on port %d\n\r", PING_RX_PORT);
-}
-
-void devListClear(void){
+static void devListClear(void){
   for(int i = 0; i< MAX_DEV_COUNT; i++){
     if(deviceList[i].noResponseCount > NO_RESPONSE_MAX_COUNT){
       // This device was not heard from for too long. Probably offline.
@@ -53,25 +35,7 @@ void devListClear(void){
   } 
 }
 
-int SCAN_getDevId(String deviceMAC){
-  for(int i = 0; i < MAX_DEV_COUNT; i++){
-    if(deviceList[i].mac[0] != 0){
-        String mac = String(deviceList[i].mac);
-
-        if(mac.equals(deviceMAC)){
-            return i;
-        }
-    }
-    
-  } 
-  return -1;
-}
-
-String SCAN_getDeviceIPByIndex(uint8_t index){  
-  return String(deviceList[index].ip);
-}
-
-void devListAppend(String deviceMAC, String deviceIP, int deviceId){
+static void devListAppend(String deviceMAC, String deviceIP, int deviceId){
   Serial.print("Apend:");
   Serial.print(deviceMAC);
   Serial.print(":");
@@ -104,7 +68,7 @@ void devListAppend(String deviceMAC, String deviceIP, int deviceId){
   }
 }
 
-void pingDevices(void){  
+static void pingDevices(void){  
   if((millis() - pingTimestamp) > PING_REPPEAT_TIMEOUT){
     Serial.println("UDP ping");
     
@@ -147,6 +111,38 @@ void pingDevices(void){
   }
 }
 
+bool SCAN_isDevPresent(String devMac){
+  for(int i = 0; i< MAX_DEV_COUNT; i++){
+    if(String(deviceList[i].mac).equals(devMac)){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void SCAN_init(){
+  server.begin();
+  Serial.printf("Listenning UDP on port %d\n\r", PING_RX_PORT);
+}
+
+int SCAN_getDevId(String deviceMAC){
+  for(int i = 0; i < MAX_DEV_COUNT; i++){
+    if(deviceList[i].mac[0] != 0){
+      String mac = String(deviceList[i].mac);
+
+      if(mac.equals(deviceMAC)){
+          return i;
+      }
+    }    
+  } 
+  return -1;
+}
+
+String SCAN_getDeviceIPByIndex(uint8_t index){  
+  return String(deviceList[index].ip);
+}
+
 void SCAN_process(){
   pingDevices();
 
@@ -179,8 +175,6 @@ void SCAN_process(){
     }
   }  
 }
-
-
 
 String SCAN_getDevList(void){
   String response = "{devs:";  

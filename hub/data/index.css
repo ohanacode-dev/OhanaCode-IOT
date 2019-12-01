@@ -166,12 +166,17 @@ left: 0;
 	display: block;
 	content: "";
 	width: 32px;
-	height: 14px;
+	height: 4px;
 	margin-bottom: 4px;
 	background-color: #EDEBD1;
 	position: relative;
 	transition: height 1s;
 }
+
+.details div{
+	height: 14px;
+}
+
 .tip{
 	position: absolute;
 	bottom: 0;
