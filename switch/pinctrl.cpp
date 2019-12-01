@@ -30,7 +30,7 @@ void PINCTRL_write(int val)
   
   if(level <= 0){
     currentPinVal = 0;
-    #ifdef USE_D1_MINI
+    #ifdef INVERT_OUTPUT
       /* Wemos D1 MNI onboard LED is reversed polarized. */
       digitalWrite(SWITCHPIN, HIGH);
     #else
@@ -39,7 +39,7 @@ void PINCTRL_write(int val)
   }
   if(level > 0){
     currentPinVal = 100;
-    #ifdef USE_D1_MINI
+    #ifdef INVERT_OUTPUT
     /* Wemos D1 MNI onboard LED is reversed polarized. */
       digitalWrite(SWITCHPIN, LOW);
     #else

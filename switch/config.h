@@ -23,16 +23,10 @@ The device fails to create an AP if total AP name is longer than 31 character. *
 
 /* wemos d1 mini has inverted onboeard LED, so if you are using it, uncomment this. 
 * Also, general ESP8266 module has fewer pins so different ones are used. */
-#define USE_D1_MINI  
+//-#define INVERT_OUTPUT  
 
-
-#ifdef USE_D1_MINI
-#define SWITCHPIN                     (2)    /* D4 */           
-#define SENSPIN                       (5)    /* D1 */
-#else
-#define SWITCHPIN                        (2)    /* 1=>UART TX, 2=>gpio2 */
-#define SENSPIN                       (3)    /* Touch sensor pin: 3=>Rx */
-#endif
+#define SWITCHPIN                     (15)    /* 1=>UART TX, 2=>gpio2 */
+#define SENSPIN                       (5)    /* Touch sensor pin: 3=>Rx */
 
 #define DEBOUNCE_TIMEOUT              (100u)
 #define LONG_TOUCH_TIMEOUT            (500u)
