@@ -50,7 +50,7 @@ void LED_write(int val)
     level = 1023;
   }    
 
-#ifdef USE_D1_MINI
+#ifdef INVERT_OUTPUT
   /* Wemos D1 MNI onboard LED is reversed polarized. */
   analogWrite(LEDPIN, 1023 - level);
 #else
