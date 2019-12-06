@@ -1,5 +1,5 @@
 body{
-background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; Color: #EDEBD1;
+background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; color: #EDEBD1 ;
 }
 .contain{
 width: 100%;
@@ -17,6 +17,7 @@ input{
 width:95%;
 background-color: black;
 border: 2px solid #210D03;
+color: #EDEBD1;
 }
 body{
 text-align: left;
@@ -38,6 +39,4 @@ width:100%;height:50vh;overflow-y:auto;margin-bottom:1em;
 a, a:link, a:visited, a:hover, a:active {
   color: #66ff66;  
 }
-#dap{
-  width: 1em;
-}
+

@@ -15,26 +15,6 @@ static unsigned long connectionTimeoutCheck = 0;
 static IPAddress stationIP;
 static IPAddress apIP(192, 168, 1, 1);
 static DNSServer dnsServer;
-static bool disableAPMode = false;
-
-void WIFIC_disableApMode(bool doDisable){ 
-  disableAPMode = doDisable && connectedToAPFlag;
-
-  EEPROM.begin(EEPROM_SIZE);
-    
-  if(disableAPMode){
-    EEPROM.write(DISABLE_AP_FLAG_ADDR, 1);
-  }else{
-    EEPROM.write(DISABLE_AP_FLAG_ADDR, 0);
-  }
-  
-  EEPROM.commit();
-  EEPROM.end();
-}
-
-bool WIFIC_APDisabled(){
-  return disableAPMode;
-}
 
 char* WIFIC_getDeviceName(void){
   return myApName;
@@ -95,9 +75,6 @@ String WIFIC_getApList(void){
 
 /* Initiates a local AP */
 void WIFIC_APMode(void){ 
-  if(disableAPMode){
-    return;
-  }
   String wifi_statusMessage;
   
   if(String(st_ssid).length() > 2){   
@@ -319,8 +296,6 @@ void WIFIC_init(void){
   stationIP[1] = EEPROM.read(STATION_IP_ADDR + 1);
   stationIP[2] = EEPROM.read(STATION_IP_ADDR + 2);
   stationIP[3] = EEPROM.read(STATION_IP_ADDR + 3);
-
-  disableAPMode = (EEPROM.read(DISABLE_AP_FLAG_ADDR) > 0);
    
   EEPROM.end();
 

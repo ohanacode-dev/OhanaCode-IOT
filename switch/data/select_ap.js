@@ -19,24 +19,8 @@ cn.onmessage=function(e){
 			document.getElementById('ttl').innerHTML='No networks found.'
 		} 
 	}
-	if(data.hasOwnProperty('DAP')){
-		if(data.DAP == "0"){
-			document.getElementById('dap').checked = false;
-		}else{
-			document.getElementById('dap').checked = true;
-		}
-	}
 };
 function refresh(){
 	document.getElementById('vm').innerHTML='Please wait...'
 	cn.send('{"APLIST":""}');
-}
-
-function updateDap()
-{
-  if (document.getElementById('dap').checked) {
-	cn.send('{"DAP":"1"}');
-  } else {
-	cn.send('{"DAP":"0"}');
-  }
 }

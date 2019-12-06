@@ -36,7 +36,6 @@ void setup(void) {
   HTTP_init();
   WS_init();  
   UDPPING_init(); 
-  WIFIC_disableApMode(false);
 }
 
 
