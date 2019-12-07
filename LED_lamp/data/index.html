@@ -11,23 +11,21 @@
   <div class="center_div">
 	<img id="logo" src="" alt="Logo">
     <h1>Ohana WiFi LED Control</h1>      
-    <button class="btn_b btn2" type="button" onclick="setLevel(0);">OFF</button><br>
-    <button class="btn_b btn1" type="button" onclick="setLevel(10);">1</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(20);">2</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(30);">3</button><br>
-    <button class="btn_b btn1" type="button" onclick="setLevel(40);">4</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(50);">5</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(60);">6</button><br>
-    <button class="btn_b btn1" type="button" onclick="setLevel(70);">7</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(80);">8</button>
-    <button class="btn_b btn1" type="button" onclick="setLevel(90);">9</button><br>
-    <button class="btn_b btn2" type="button" onclick="setLevel(100);">ON</button>
-    <meter id="m" value="" min="0" max="100"></meter> 
+    <div class="btnElement">
+        
+      <div class="lightBtnOn" id="tgl" onclick="toggle();">
+          <span></span>                
+      </div> 
+      <p class='plain-angle-outlet'>100</p>
+      <div class='plain-angle-input default-input'></div>               
+    </div>  
   </div>
   <hr>
   <p id='status'></p>  
   <br><button class="btn_cfg" type="button" onclick="location.href='/select_ap.html';">Configure wifi</button>
   <br/>
 </div>
+<script src="angle-input.js"></script>
 <script src="index.js"></script>
+
 </body></html>
