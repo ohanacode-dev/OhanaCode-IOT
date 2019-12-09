@@ -1,13 +1,13 @@
 var oldAngle = 0;
 var savedLevel = 0;
-var cn=new WebSocket('ws://'+location.hostname+':81/');
+
 var input = document.querySelector('.plain-angle-input');
 var outlet = document.querySelector('.plain-angle-outlet');
 
 var options = {
 	max: 185,       // maximum value
 	min: 0,         // minimum value
-	step: 5,        // [min, min+step, ..., max]
+	step: 2,        // [min, min+step, ..., max]
 	name: 'angle',  // used for <input name>
   };
 
@@ -15,7 +15,7 @@ var angle = AngleInput(input, options);
   
 input.oninput = function(e) {
 	
-	var pwr = Math.round(((180 - angle()) * 100) / 170);
+	var pwr = Math.round(((180 - angle()) * 20) / 170) * 5;
 	if(pwr > 100){
 		pwr = 100;
 	}
@@ -32,7 +32,7 @@ input.oninput = function(e) {
 }
 
 input.onchange = function(e) {
-	var pwr = Math.round(((180 - angle()) * 100) / 170);
+	var pwr = Math.round(((180 - angle()) * 20) / 170) * 5;
 	if(pwr > 100){
 		pwr = 100;
 	}
@@ -47,7 +47,7 @@ input.onchange = function(e) {
 	}	
 }
 
-
+var cn=new WebSocket('ws://'+location.hostname+':81/');
 cn.onopen=function(){
 	cn.send('{"CURRENT":"","STATUS":""}');    
 };
