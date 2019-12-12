@@ -1,5 +1,7 @@
 var oldAngle = 0;
 var savedLevel = 0;
+var current = 0;
+var sliderChgTimestamp;
 
 var input = document.querySelector('.plain-angle-input');
 var outlet = document.querySelector('.plain-angle-outlet');
@@ -39,9 +41,9 @@ input.onchange = function(e) {
 	if(pwr < 0){
 		pwr = 0;
 	}
-	if(oldAngle != angle()){
-		console.log("ch");
+	if(oldAngle != angle()){		
 		oldAngle = angle();
+		console.log("ch to:" + pwr);
 		outlet.innerText = pwr;
 		setLevel(pwr);
 	}	
@@ -62,9 +64,16 @@ cn.onmessage=function(e){
 			document.getElementById('tgl').classList.remove('lightBtnOff');
 			document.getElementById('tgl').classList.add('lightBtnOn');
 			savedLevel = data.CURRENT;
+		}	
+		
+		if((Math.floor(Date.now() / 1000) - sliderChgTimestamp) > 1){
+			if(data.CURRENT > 0){
+				var newAngle = 180 - ((data.CURRENT *170) / 100);
+				angle(newAngle); 
+			}
+		}else{
+			sliderChgTimestamp = Math.floor(Date.now()) / 1000;
 		}
-
-		angle(data.CURRENT); 
 	} 
 	
 	if(data.hasOwnProperty('STATUS')){       
@@ -82,13 +91,15 @@ function toggle(){
 	if(savedLevel == 0){
 		savedLevel = 100;
 	}
-	
-	var level;
-	if(angle == 0){
-		level = savedLevel;
+
+	if(current == 0){
+		current = savedLevel;
 	}else{
-		level = 0;
+		current = 0;
 	}
 
-	cn.send('{"CURRENT":' + level + '}');
+	// console.log("Sending:" + current);
+	sliderChgTimestamp = Math.floor(Date.now() / 1000);
+
+	cn.send('{"CURRENT":' + current + '}');
 }

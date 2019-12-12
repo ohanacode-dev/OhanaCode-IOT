@@ -37,7 +37,7 @@ left: 0;
 	margin-left: auto;
 	margin-right: auto;
 	margin-top: 70px;	
-	z-index: 3;
+	z-index: 100;
 	/* border: 1px solid white; */
 	border-radius: 50%;
 }
@@ -116,6 +116,7 @@ left: 0;
 	left: 0;
 	right: 0;
 	margin: auto;
+	z-index: 0;
   }
   
   .default-input:focus {	
