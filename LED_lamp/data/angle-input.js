@@ -160,6 +160,8 @@
         updateWithEvent(e, true);
         $all.removeEventListener('mousemove', duringTracking, false);
         $all.removeEventListener('mouseup', endTracking, false);
+        $all.removeEventListener('touchmove', duringTracking, false);
+        $all.removeEventListener('touchend', endTracking, false);
       }
 
       function duringTracking(e) {
@@ -168,6 +170,8 @@
 
       $all.addEventListener('mousemove', duringTracking, false);
       $all.addEventListener('mouseup', endTracking, false);
+      $all.addEventListener('touchmove', duringTracking, false);
+      $all.addEventListener('touchend', endTracking, false);
     }
 
     function Angle(deg) {
@@ -182,12 +186,14 @@
     function attach() {
       $dom.addEventListener('focus', beginKeyboardInput, false);
       $dom.addEventListener('mousedown', beginTracking, false);
+      $dom.addEventListener('touchdown', beginTracking, false);
       return Angle;
     }
 
     function detach() {
       $dom.removeEventListener('focus', beginKeyboardInput, false);
       $dom.removeEventListener('mousedown', beginTracking, false);
+      $dom.removeEventListener('touchdown', beginTracking, false);
       return Angle;
     }
 
