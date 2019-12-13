@@ -26,9 +26,7 @@ input.oninput = function(e) {
 	}	
 	
 	if(oldAngle != angle()){
-		console.log("in");
-		oldAngle = angle();
-		outlet.innerText = pwr;
+		oldAngle = angle();		
 		setLevel(pwr);
 	}	
 }
@@ -43,8 +41,6 @@ input.onchange = function(e) {
 	}
 	if(oldAngle != angle()){		
 		oldAngle = angle();
-		console.log("ch to:" + pwr);
-		outlet.innerText = pwr;
 		setLevel(pwr);
 	}	
 }
@@ -65,6 +61,8 @@ cn.onmessage=function(e){
 			document.getElementById('tgl').classList.add('lightBtnOn');
 			savedLevel = data.CURRENT;
 		}	
+
+		outlet.innerText = data.CURRENT;
 		
 		if((Math.floor(Date.now() / 1000) - sliderChgTimestamp) > 1){
 			if(data.CURRENT > 0){
@@ -80,11 +78,13 @@ cn.onmessage=function(e){
 	  document.getElementById('status').innerHTML=data.STATUS;       
 	}	
 	  
-	document.getElementById('logo').src="/logo.png";
-	
+	document.getElementById('logo').src="/logo.png";	
 };
+
 function setLevel(lev){  
 	cn.send('{"CURRENT":' + lev + '}');
+	current = lev;
+	sliderChgTimestamp = Math.floor(Date.now() / 1000);
 }
 
 function toggle(){  
@@ -97,9 +97,5 @@ function toggle(){
 	}else{
 		current = 0;
 	}
-
-	// console.log("Sending:" + current);
-	sliderChgTimestamp = Math.floor(Date.now() / 1000);
-
 	cn.send('{"CURRENT":' + current + '}');
 }

@@ -13,17 +13,16 @@
     <h1>Ohana WiFi LED Control</h1>      
     <div class="btnElement">
       <div class="lightBtnOn" id="tgl" onclick="toggle();">
-          <span></span>                
+          <span></span>                         
       </div> 
-      <div class='plain-angle-input default-input'></div>  
-      <p class='plain-angle-outlet'>100</p>
-                
+      <p class='plain-angle-outlet'>100</p> 
+      <div class='plain-angle-input default-input'></div>
     </div>  
   </div>
-  <hr>
-  <p id='status'></p>  
-  <br><button class="btn_cfg" type="button" onclick="location.href='/select_ap.html';">Configure wifi</button>
-  <br/>
+  <div id="bottom">
+    <p id='status'></p>  
+    <br><button class="btn_cfg" type="button" onclick="location.href='/select_ap.html';">Configure wifi</button>
+  </div>
 </div>
 <script src="angle-input.js"></script>
 <script src="index.js"></script>
