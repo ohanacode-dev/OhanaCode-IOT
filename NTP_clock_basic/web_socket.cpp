@@ -1,9 +1,9 @@
 #include <ArduinoJson.h>
 #include <WebSocketsServer.h>
 #include "wifi_connection.h"
-#include "udp.h"
+#include "udp_ping.h"
 #include "http.h"
-#include "NTP_clock.h"
+#include "NTP_clock_basic.h"
 #include "ntp.h"
 
 WebSocketsServer wsServer = WebSocketsServer(81);
@@ -59,7 +59,8 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
          
         String bcMsg = "{\"TIMEZONE\":" + String(NTP_getTimeZone()) + "}";               
         wsServer.broadcastTXT(bcMsg);              
-      }
+      }   
+
       if(root.containsKey("DLSAVE")){
         String dlsave = root["DLSAVE"];
         if(dlsave.length() > 0){
@@ -81,7 +82,3 @@ void WS_init(){
   wsServer.begin(); 
   wsServer.onEvent(serverEvent);  
 }
-
-
-
-

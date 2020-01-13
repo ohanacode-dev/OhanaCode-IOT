@@ -16,6 +16,10 @@ static IPAddress stationIP;
 static IPAddress apIP(192, 168, 1, 1);
 static DNSServer dnsServer;
 
+char* WIFIC_getDeviceName(void){
+  return myApName;
+}
+
 IPAddress WIFIC_getApIp(void){
   return apIP;
 }
@@ -107,7 +111,7 @@ void WIFIC_APMode(void){
 }
 
 
-void WIFIC_stationtMode(void){ 
+void WIFIC_stationMode(void){ 
   if(connectedToAPFlag){
     WiFi.disconnect();
   }
@@ -219,7 +223,6 @@ void WIFIC_setStIP(IPAddress newStationIP){
 }
 
 
-
 /* Timeout to check if configured AP exists and try to connect to it */
 static bool connectivityTimeoutPassed(void){
   unsigned long timeSinceBoot = millis();
@@ -234,6 +237,7 @@ static bool connectivityTimeoutPassed(void){
 }
 
 void WIFIC_process(void){
+  ESP.wdtFeed();
   /* Handle AP and STA connecting */
   if((String(st_ssid).length() > 2)){
     if(connectedToAPFlag){
@@ -250,7 +254,7 @@ void WIFIC_process(void){
       //Serial.println("Timeout!");
       /* Try again */
       if(checkApPresent()){
-        WIFIC_stationtMode();
+        WIFIC_stationMode();
       }         
     } 
   }  
@@ -303,7 +307,7 @@ void WIFIC_init(void){
   WiFi.setAutoConnect(false);
   
   if(checkApPresent()){
-    WIFIC_stationtMode();   
+    WIFIC_stationMode();   
   }else{
     WIFIC_APMode(); 
   }  

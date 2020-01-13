@@ -1,0 +1,28 @@
+body{
+background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; Color: #EDEBD1;
+}
+.contain{
+width: 100%; 
+}
+.center_div{
+margin:0 auto; max-width: 400px;position:relative;min-height: 60vh;
+}
+.btn_cfg{
+border:0;border-radius:0.3rem;color:#fff;line-height:1.4rem;
+font-size:0.8rem;margin:1ch;height:2rem;width:15ch;background-color:#ff3300;
+}
+h1{
+text-align: center;font-size:1.5rem;
+}
+#logo{
+display:block;margin:0 0;width:2em;height:2em;position: absolute;
+top: 5px;
+left: 0;
+}
+#bottom{
+	border-top: 1px solid white;
+	position: absolute;
+	bottom: 10px;
+	width: 95vw;
+}
+#time{font-size:6rem;color:#1fa3ec;}
