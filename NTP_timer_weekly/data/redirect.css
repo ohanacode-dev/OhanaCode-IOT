@@ -1,0 +1,9 @@
+body{
+background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; Color: #EDEBD1;
+}
+.contain{
+width: 100%;
+}
+.center_div{
+margin:0 auto; max-width: 400px;position:relative;
+}
