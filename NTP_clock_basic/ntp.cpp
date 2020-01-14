@@ -15,6 +15,8 @@ static int useDaylightSavings;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 0, 60000);
 
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
 static bool IsDayLightSaving(void)
 {
     //January, february, and december are out.
@@ -56,20 +58,14 @@ void NTP_process()
   timeClient.update();
   if(broadcasted != timeClient.getFormattedTime()){
     broadcasted = timeClient.getFormattedTime();
-    String timeStatus = "{\"CURRENT\":\"" + broadcasted + "\"}";  
-    WS_ServerBroadcast(timeStatus); 
-    
 
     unsigned long localTime = timeClient.getEpochTime();
 
     setTime(localTime);
 
-    Serial.print("DATE:");
-    Serial.println(day());
-//    Serial.print(" MONTH:");
-//    Serial.print(month());
-//    Serial.print(" YEAR:");
-//    Serial.println(year());
+    String timeStatus = "{ \"CURRENT\":\"" + broadcasted + "|" + String(daysOfTheWeek[timeClient.getDay()]) + 
+    "," + String(day()) + "."  + String(month()) + "."  + String(year()) + "\", \"DLSAVE\":" + String(useDaylightSavings) + "}";  
+    WS_ServerBroadcast(timeStatus); 
   } 
 }
 

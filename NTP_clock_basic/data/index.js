@@ -5,8 +5,10 @@ var cn=new WebSocket('ws://'+location.hostname+':81/');
   cn.onmessage=function(e){
     var data=JSON.parse(e.data);
     console.log(data);
-    if(data.hasOwnProperty('CURRENT')){       
-      document.getElementById('time').innerHTML=data.CURRENT;       
+    if(data.hasOwnProperty('CURRENT')){ 
+      var timeDate =  data.CURRENT.split("|");     
+      document.getElementById('time').innerHTML=timeDate[0]; 
+      document.getElementById('date').innerHTML=timeDate[1];  
     } 
     if(data.hasOwnProperty('STATUS')){       
       document.getElementById('status').innerHTML=data.STATUS;       
