@@ -95,7 +95,7 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         String msg = root["SCHEDULE"];        
        
         uint8_t schedule[14] = {0};
-        
+       
         if(msg.length() == 42){ 
           char SchList[49] = {0};
           msg.toCharArray(SchList, 42);

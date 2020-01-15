@@ -25,5 +25,8 @@ left: 0;
 	bottom: 10px;
 	width: 95vw;
 }
-#time{font-size:6rem;color:#1fa3ec;}
+#time{font-size:4rem;color:#1fa3ec;}
 #date{font-size:2rem;color:#1fa3ec;}
+select{
+	max-width: 95%;
+}
