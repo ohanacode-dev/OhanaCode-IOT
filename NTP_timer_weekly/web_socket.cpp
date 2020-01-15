@@ -36,7 +36,7 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
   ESP.wdtFeed();
   
   if(type == WStype_TEXT){
-    //Serial.printf("[%u] get Text: %s\r\n", num, payload);
+    Serial.printf("[%u] get Text: %s\r\n", num, payload);
     char textMsg[length];
     for(int i = 0; i < length; i++){
       textMsg[i] = payload[i];          
@@ -100,7 +100,7 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
           char SchList[49] = {0};
           msg.toCharArray(SchList, 42);
           
-          Serial.println(SchList);
+//          Serial.println(SchList);
           
           for(int i = 0; i < 7; i++){           
             int dataOffset = i * 6; 

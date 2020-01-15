@@ -9,7 +9,7 @@ margin:0 auto; max-width: 400px;position:relative;min-height: 60vh;
 }
 .btn_cfg{
 border:0;border-radius:0.3rem;color:#fff;line-height:1.4rem;
-font-size:0.8rem;margin:1ch;height:2rem;width:15ch;background-color:#ff3300;
+font-size:0.8rem;margin:2px;height:2rem;width:15ch;background-color:#ff3300;
 }
 button{
 width:100%;border:0;border-radius:0.3rem;color:black;line-height:2.4rem;
@@ -25,10 +25,14 @@ left: 0;
 }
 #bottom{
 	border-top: 1px solid white;
-	position: absolute;
-	bottom: 10px;
+	position: fixed;
+	bottom: 2px;
 	width: 95vw;
+	background-color: #210D03;
+	opacity: 0.9;
 }
+#bottom p{ margin-bottom: 3px;}
+
 #time{font-size:3rem;color:#1fa3ec;}
 #date{font-size:1rem;color:#1fa3ec;}
 .schday{
@@ -42,3 +46,5 @@ left: 0;
 .schday input{
 	width: 4em;
 }
+
+select{	max-width: 95%;}

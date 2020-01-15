@@ -37,7 +37,8 @@ void loop(void) {
   HTTP_process();
   WS_process();
   UDPPING_process();
-  WIFIC_process(); 
-  NTP_process();
+  WIFIC_process();   
+  NTP_process();  
+  SCH_process();  
   ESP.wdtFeed();
 }
