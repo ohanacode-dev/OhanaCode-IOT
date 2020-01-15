@@ -17,6 +17,20 @@ void WS_ServerBroadcast(String msg){
   wsServer.broadcastTXT(msg);
 }
 
+static uint8_t charToNum(char* digits){
+  uint8_t result = 0;
+
+  if((digits[0] > 47) && (digits[0] < 58)){
+    result = (digits[0] - 48) * 10;
+  }
+
+  if((digits[1] > 47) && (digits[1] < 58)){
+    result += digits[1] - 48;
+  }
+  
+  return result;
+}
+
 static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 { 
   ESP.wdtFeed();
@@ -78,23 +92,27 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       }
 
       if(root.containsKey("SCHEDULE")){
-        String SchList = root["SCHEDULE"];
-
-        uint8_t schedule[14];
-        if(SchList.length() == 42){
+        String msg = root["SCHEDULE"];        
+       
+        uint8_t schedule[14] = {0};
+        
+        if(msg.length() == 42){ 
+          char SchList[49] = {0};
+          msg.toCharArray(SchList, 42);
           
-          for(int i = 0; i < 7; i++){
-            String fromTime = SchList.substring(i * 2, (i * 2) + 2);
-            String toTime = SchList.substring((i * 2) + 2 + 1, (i * 2) + 4 + i);
-            schedule[i * 2] = (uint8_t)fromTime.toInt();
-            schedule[(i * 2) + 1] = (uint8_t)toTime.toInt();
+          Serial.println(SchList);
+          
+          for(int i = 0; i < 7; i++){           
+            int dataOffset = i * 6; 
+            
+            uint8_t fromTime = charToNum(&SchList[dataOffset]);  
+            uint8_t toTime = charToNum(&SchList[dataOffset + 3]);
+            
+            schedule[i * 2] = fromTime;
+            schedule[(i * 2) + 1] = toTime;
           }
 
           SCH_update(schedule);
-        }else if(SchList.length() > 1){
-          Serial.print("Error: wrong schedule length.");
-          Serial.println(SchList.length());
-          Serial.println(SchList);
         }
 
         SCH_get(schedule);
