@@ -1,4 +1,5 @@
 var cn=new WebSocket('ws://'+location.hostname+':81/');
+var enabled = false;
 
 cn.onopen=function(){
   cn.send('{"CURRENT":"","STATUS":"","TIMEZONE":"","SCHEDULE":""}');   
@@ -9,18 +10,33 @@ cn.onmessage=function(e){
   console.log(data);   
   
   if(data.hasOwnProperty('CURRENT')){ 
-    var timeDate =  data.CURRENT.split("|");     
+    var timeDate =  data.CURRENT.split("|");   
+      
     document.getElementById('time').innerHTML=timeDate[0]; 
-    document.getElementById('date').innerHTML=timeDate[1];  
+    document.getElementById('date').innerHTML=timeDate[1];     
   } 
   if(data.hasOwnProperty('STATUS')){       
     document.getElementById('status').innerHTML=data.STATUS;       
+  }
+  if(data.hasOwnProperty('ENABLED')){   
+    var result = data.ENABLED.split(',')
+    
+    enabled = parseInt(result[0]) > 0;
+    var enBtn = document.getElementById('etgl_btn');
+
+    if(enabled){        
+      enBtn.innerHTML="Force off";
+    }else{
+      enBtn.innerHTML="Force on";
+    }
+    
+    document.getElementById('useSch').checked=parseInt(result[1]);
   }
   if(data.hasOwnProperty('TIMEZONE')){       
     document.getElementById('tz').value=data.TIMEZONE;       
   }
   if(data.hasOwnProperty('DLSAVE')){       
-    document.getElementById('ds').checked=data.DLSAVE;       
+    document.getElementById('ds').checked=parseInt(data.DLSAVE);       
   }
 
   if(data.hasOwnProperty('SCHEDULE')){        
@@ -84,6 +100,24 @@ var msg = '{"SCHEDULE":"'
 + '"}';
 
 console.log("Sending" + msg);
-cn.send(msg);
+  cn.send(msg);
 }
   
+function toggle(){
+  var data = '{"ENABLED":';
+
+  if(enabled){
+    data += '"1,';
+  }else{
+    data += '"0,';
+  }
+
+  if(document.getElementById('useSch').checked == true){
+    data += '1"}';
+  }else{
+    data += '0"}';
+  }
+
+  cn.send(data);
+}
+

@@ -8,6 +8,19 @@
 
 
 static String statusMessage = ""; 
+static volatile int currentState = 0;
+
+int MAIN_getState(){
+  return currentState;
+}
+
+void MAIN_setState(int newState){
+  if(newState > 0){
+     currentState = 1;
+  }else{
+    currentState = 0;
+  } 
+}
 
 void MAIN_setStatusMsg(String msg){
   statusMessage = msg;

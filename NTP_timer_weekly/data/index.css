@@ -11,10 +11,14 @@ margin:0 auto; max-width: 400px;position:relative;min-height: 60vh;
 border:0;border-radius:0.3rem;color:#fff;line-height:1.4rem;
 font-size:0.8rem;margin:2px;height:2rem;width:15ch;background-color:#ff3300;
 }
-button{
+#schsave{
 width:100%;border:0;border-radius:0.3rem;color:black;line-height:2.4rem;
 font-size:1.2rem;height:40px;background-color:#8a8a5c;
 }
+#etgl_btn{
+	width:100%;border:0;border-radius:0.3rem;color:black;line-height:2.4rem;
+	font-size:1.2rem;height:40px;background-color: gray;
+	}
 h1{
 text-align: center;font-size:1.5rem;
 }
@@ -35,16 +39,14 @@ left: 0;
 
 #time{font-size:3rem;color:#1fa3ec;}
 #date{font-size:1rem;color:#1fa3ec;}
-.schday{
-	width: 100%;
-}
+.schday{width: 100%;}
 
-.schday span{
-	float:right;
-}
+.schday span{float:right;}
 
 .schday input{
 	width: 4em;
 }
 
 select{	max-width: 95%;}
+.temp{width: 100%;}
+.temp input{width:4em; padding-left:2em;}

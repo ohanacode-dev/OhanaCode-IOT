@@ -137,6 +137,15 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         wsServer.broadcastTXT(schMsg); 
         
       }
+
+//      if(root.containsKey("ENABLE")){
+//        String val = root["ENABLE"];
+//        if(val.length() > 0){          
+//              
+//          Serial.println(val);
+//        }
+//            
+//      }
     }      
   }   
 }

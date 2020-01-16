@@ -10,7 +10,7 @@
 static char myApName[32] = {0};    /* Array to form AP name based on read MAC */
 static char st_ssid[SSID_SIZE];    /* SSID to connect to */
 static char st_pass[WIFI_PASS_SIZE];    /* Password for the requested SSID */
-static bool connectedToAPFlag; 
+static volatile bool connectedToAPFlag; 
 static unsigned long connectionTimeoutCheck = 0;
 static IPAddress stationIP;
 static IPAddress apIP(192, 168, 1, 1);

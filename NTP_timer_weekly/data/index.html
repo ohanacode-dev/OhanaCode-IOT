@@ -13,7 +13,7 @@
     <h1>Ohana WiFi NTP Clock</h1>      
     <p id="time">--:--:--</p>
     <p id="date">.</p>
-    <br>
+    <br>    
     <select id="tz" onchange="setZone();">
       <option value="-12">(GMT-12:00) International Date Line West</option>
       <option value="-11">(GMT-11:00) Midway Island, Samoa</option>
@@ -99,19 +99,27 @@
       <option value="13">(GMT+13:00) Nuku'alofa</option>
     </select>
     <input type="checkbox" id="ds" onclick="setDs()">Use daylight savings<br>
+    <br> <br> 
+    <button id="etgl_btn" onclick="toggle();">Force on</button>  
+    <p class="temp">Temp:<input id='temp' type="number"></p>  
+    <br><br>
 
+    <input type="checkbox" id="useSch" onclick="useSchedule()">Enable schedule<br>  
+    <fieldset>
+      <legend>Schedule:</legend>      
+      <p class="schday">Sunday:<span><input id='d0_start' type="number"> to <input id='d0_stop' type="number"></span></p>	
+      <p class="schday">Monday:<span><input id='d1_start' type="number"> to <input id='d1_stop' type="number"></span></p>	
+      <p class="schday">Tuesday:<span><input id='d2_start' type="number"> to <input id='d2_stop' type="number"></span></p>	
+      <p class="schday">Wednesday:<span><input id='d3_start' type="number"> to <input id='d3_stop' type="number"></span></p>	
+      <p class="schday">Thursday:<span><input id='d4_start' type="number"> to <input id='d4_stop' type="number"></span></p>	
+      <p class="schday">Friday:<span><input id='d5_start' type="number"> to <input id='d5_stop' type="number"></span></p>	
+      <p class="schday">Sathurday:<span><input id='d6_start' type="number"> to <input id='d6_stop' type="number"></span></p>
     
-    <p class="schday">Sunday:<span><input id='d0_start' type="number"> to <input id='d0_stop' type="number"></span></p>	
-    <p class="schday">Monday:<span><input id='d1_start' type="number"> to <input id='d1_stop' type="number"></span></p>	
-    <p class="schday">Tuesday:<span><input id='d2_start' type="number"> to <input id='d2_stop' type="number"></span></p>	
-    <p class="schday">Wednesday:<span><input id='d3_start' type="number"> to <input id='d3_stop' type="number"></span></p>	
-    <p class="schday">Thursday:<span><input id='d4_start' type="number"> to <input id='d4_stop' type="number"></span></p>	
-    <p class="schday">Friday:<span><input id='d5_start' type="number"> to <input id='d5_stop' type="number"></span></p>	
-    <p class="schday">Sathurday:<span><input id='d6_start' type="number"> to <input id='d6_stop' type="number"></span></p>
-  
-    <br>
-    <button onclick="scheduleSave();">save schedule</button>    
-    
+      <br>
+      <button id="schsave" onclick="scheduleSave();">save schedule</button>    
+    </fieldset>    
+    <br><br><br><br><br><br><br><br>
+
   </div>
   <div id="bottom">
     <p id='status'></p>  

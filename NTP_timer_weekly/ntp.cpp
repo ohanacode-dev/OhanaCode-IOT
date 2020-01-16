@@ -6,7 +6,7 @@
 #include <EEPROM.h>
 #include "ntp.h"
 #include <Time.h>
-
+#include "NTP_timer_weekly.h"
 
 int timezone = 0;
 String broadcasted = "";
@@ -62,9 +62,21 @@ void NTP_process()
     unsigned long localTime = timeClient.getEpochTime();
 
     setTime(localTime);
-
+  
     String timeStatus = "{ \"CURRENT\":\"" + broadcasted + "|" + String(daysOfTheWeek[timeClient.getDay()]) + 
-    "," + String(day()) + "."  + String(month()) + "."  + String(year()) + "\", \"DLSAVE\":" + String(useDaylightSavings) + "}";  
+    "," + String(day()) + "."  + String(month()) + "."  + String(year()) +
+    "\", \"DLSAVE\":\"" + String(useDaylightSavings) + 
+    "\", \"ENABLED\":\"";
+
+    int currentState = MAIN_getState();
+    if( currentState > 0){
+      timeStatus += "1";
+    }else{
+      timeStatus += "0";
+    }
+
+    timeStatus += "\"}";
+    
     WS_ServerBroadcast(timeStatus); 
   } 
 }
