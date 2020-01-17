@@ -10,7 +10,7 @@
 
 int timezone = 0;
 String broadcasted = "";
-static int useDaylightSavings;
+static bool useDaylightSavings;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 0, 60000);
@@ -43,8 +43,10 @@ void NTP_init()
   /* Read timezone settings from EEPROM */
   EEPROM.begin(EEPROM_SIZE);
   timezone = EEPROM.read(TIMEZONE_ADDR);
-  useDaylightSavings = EEPROM.read(DAYSAVE_ADDR);
+  int dlsVal = EEPROM.read(DAYSAVE_ADDR);
   EEPROM.end();
+
+  useDaylightSavings = dlsVal > 0;
 
   if((useDaylightSavings > 0) && IsDayLightSaving()){
     timeClient.setTimeOffset((timezone + 1) * SECONDS_PER_HOUR);
@@ -66,10 +68,9 @@ void NTP_process()
     String timeStatus = "{ \"CURRENT\":\"" + broadcasted + "|" + String(daysOfTheWeek[timeClient.getDay()]) + 
     "," + String(day()) + "."  + String(month()) + "."  + String(year()) +
     "\", \"DLSAVE\":\"" + String(useDaylightSavings) + 
-    "\", \"ENABLED\":\"";
+    "\", \"ACTIVE\":\"";
 
-    int currentState = MAIN_getState();
-    if( currentState > 0){
+    if( MAIN_getActivated()){
       timeStatus += "1";
     }else{
       timeStatus += "0";
@@ -106,12 +107,17 @@ int NTP_getTimeZone(){
   return timezone;
 }
 
-void NTP_setDayLightSavings(int dls)
+void NTP_setDayLightSavings(String dls)
 { 
   /* Adjust time zone */
-  useDaylightSavings = dls;
+  int dlsVal = 0;
+  useDaylightSavings = dls.length() > 0;
 
-  if((useDaylightSavings > 0) && IsDayLightSaving()){
+  if(useDaylightSavings){
+    dlsVal = 1;
+  }
+
+  if(useDaylightSavings && IsDayLightSaving()){
     timeClient.setTimeOffset((timezone + 1) * SECONDS_PER_HOUR);
   }else{
     timeClient.setTimeOffset(timezone * SECONDS_PER_HOUR);
@@ -119,13 +125,16 @@ void NTP_setDayLightSavings(int dls)
 
   /* Save to EEPROM */
   EEPROM.begin(EEPROM_SIZE);  
-  EEPROM.write(DAYSAVE_ADDR, useDaylightSavings); 
+  EEPROM.write(DAYSAVE_ADDR, dlsVal); 
   EEPROM.commit();
   EEPROM.end();
 
 }
 
-int NTP_getDayLightSavings(void)
+String NTP_getDayLightSavings(void)
 {
-  return useDaylightSavings;
+  if(useDaylightSavings){
+    return "1";
+  }
+  return "0";
 }

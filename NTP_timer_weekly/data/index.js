@@ -1,13 +1,13 @@
 var cn=new WebSocket('ws://'+location.hostname+':81/');
-var enabled = false;
+var activated = false;
 
 cn.onopen=function(){
-  cn.send('{"CURRENT":"","STATUS":"","TIMEZONE":"","SCHEDULE":""}');   
+  cn.send('{"CURRENT":"","STATUS":"","TIMEZONE":"","SCHEDULE":"","SCHENABLED":""}');   
 };
 
 cn.onmessage=function(e){  
-  var data=JSON.parse(e.data);
-  console.log(data);   
+  console.log(e);   
+  var data=JSON.parse(e.data);  
   
   if(data.hasOwnProperty('CURRENT')){ 
     var timeDate =  data.CURRENT.split("|");   
@@ -18,19 +18,20 @@ cn.onmessage=function(e){
   if(data.hasOwnProperty('STATUS')){       
     document.getElementById('status').innerHTML=data.STATUS;       
   }
-  if(data.hasOwnProperty('ENABLED')){   
-    var result = data.ENABLED.split(',')
+  if(data.hasOwnProperty('ACTIVE')){   
+    var result = data.ACTIVE.split(',')
     
-    enabled = parseInt(result[0]) > 0;
+    activated = parseInt(result[0]) > 0;
     var enBtn = document.getElementById('etgl_btn');
 
-    if(enabled){        
+    if(activated){        
       enBtn.innerHTML="Force off";
     }else{
       enBtn.innerHTML="Force on";
     }
-    
-    document.getElementById('useSch').checked=parseInt(result[1]);
+  }
+  if(data.hasOwnProperty('SCHENABLED')){  
+    document.getElementById('useSch').checked=parseInt(data.SCHENABLED);
   }
   if(data.hasOwnProperty('TIMEZONE')){       
     document.getElementById('tz').value=data.TIMEZONE;       
@@ -68,12 +69,11 @@ function setZone(){
   var e = document.getElementById("tz");
   var tz = e.options[e.selectedIndex].value;
   var dls = e.options[e.selectedIndex].getAttribute('dlSave');
-  cn.send('{"TIMEZONE":' + tz + ', "DLSAVE":' + dls + '}');
+  cn.send('{"TIMEZONE":"' + tz + '", "DLSAVE":"' + dls + '"}');
 }  
 
 function setDs(){
-  var e = document.getElementById("ds");
-  if(e.checked == true){
+  if(document.getElementById("ds").checked == true){
     cn.send('{"DLSAVE":1}');
   }else{
     cn.send('{"DLSAVE":0}');  
@@ -104,20 +104,18 @@ console.log("Sending" + msg);
 }
   
 function toggle(){
-  var data = '{"ENABLED":';
-
-  if(enabled){
-    data += '"1,';
+  if(activated){
+    cn.send('{"ACTIVE":"0"}');
   }else{
-    data += '"0,';
+    cn.send('{"ACTIVE":"1"}');
   }
+}
 
+function scheduleSet(){
   if(document.getElementById('useSch').checked == true){
-    data += '1"}';
+    cn.send('{"SCHENABLED":"1"}');
   }else{
-    data += '0"}';
-  }
-
-  cn.send(data);
+    cn.send('{"SCHENABLED":"0"}');
+  }  
 }
 

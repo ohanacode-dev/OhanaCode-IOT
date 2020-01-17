@@ -15,7 +15,9 @@
 #define DAYSAVE_SIZE            (1)
 #define SCHEDULE_ADDR           (DAYSAVE_ADDR + DAYSAVE_SIZE)
 #define SCHEDULE_SIZE           (14)
-#define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE + TIMEZONE_SIZE + DAYSAVE_SIZE + SCHEDULE_SIZE)   
+#define SCHENABLE_ADDR          (SCHEDULE_ADDR + SCHEDULE_SIZE)
+#define SCHENABLE_SIZE          (1)
+#define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE + TIMEZONE_SIZE + DAYSAVE_SIZE + SCHEDULE_SIZE + SCHENABLE_SIZE)   
 
 #define LARGE_TIMEOUT           (120)   /* Used to check if configured AP appeared and connect to it if possible */ 
 #define PING_RX_PORT            (4210u)  /* local port to listen on */

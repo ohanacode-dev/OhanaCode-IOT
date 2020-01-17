@@ -16,7 +16,7 @@ extern void NTP_process();
 extern String NTP_getTimeString(); 
 extern int NTP_getTimeZone();
 extern void NTP_setTimeZone(int zone);
-extern void NTP_setDayLightSavings(int dls);
-extern int NTP_getDayLightSavings(void);
+extern void NTP_setDayLightSavings(String dls);
+extern String NTP_getDayLightSavings(void);
 
 #endif

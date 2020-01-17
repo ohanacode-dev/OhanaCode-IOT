@@ -3,6 +3,7 @@
 
 static uint8_t schedule[SCHEDULE_SIZE] = {0};
 static bool scheduleChangedFlag = false;
+static volatile bool scheduleEnabled = false;
 
 void SCH_init(){
   
@@ -14,7 +15,7 @@ void SCH_init(){
       schedule[i] = 24;
     }
   }  
-  
+  scheduleEnabled = EEPROM.read(SCHENABLE_ADDR) > 0;
   EEPROM.end();
 }
 
@@ -38,9 +39,25 @@ void SCH_process(){
     for(int i = 0; i < SCHEDULE_SIZE; i++){
       EEPROM.write(SCHEDULE_ADDR + i, schedule[i]); 
     }  
+
+    int enableVal = 0;
+    if(scheduleEnabled){
+      enableVal = 1;
+    }
+    EEPROM.write(SCHENABLE_ADDR, enableVal); 
+    
     EEPROM.commit();
     EEPROM.end();
   }
 
   scheduleChangedFlag = false;
+}
+
+bool SCH_getEnabled(){
+  return scheduleEnabled;
+}
+
+void SCH_setEnabled(bool ena){
+  scheduleEnabled = ena;
+  scheduleChangedFlag = true;
 }

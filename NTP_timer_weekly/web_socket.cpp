@@ -6,6 +6,7 @@
 #include "NTP_timer_weekly.h"
 #include "ntp.h"
 #include "schedule.h"
+#include "NTP_timer_weekly.h"
 
 WebSocketsServer wsServer = WebSocketsServer(81);
 
@@ -13,8 +14,8 @@ void WS_process(){
   wsServer.loop();   
 }
 
-void WS_ServerBroadcast(String msg){
-  wsServer.broadcastTXT(msg);
+void WS_ServerBroadcast(String msg){ 
+  wsServer.broadcastTXT(msg);  
 }
 
 static uint8_t charToNum(char* digits){
@@ -36,7 +37,7 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
   ESP.wdtFeed();
   
   if(type == WStype_TEXT){
-    Serial.printf("[%u] get Text: %s\r\n", num, payload);
+//    Serial.printf("[%u] get Text: %s\r\n", num, payload);
     char textMsg[length];
     for(int i = 0; i < length; i++){
       textMsg[i] = payload[i];          
@@ -47,7 +48,9 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
 
     // Test if parsing succeeds.
     if (!error) {
-      JsonObject root = doc.as<JsonObject>();    
+      JsonObject root = doc.as<JsonObject>();   
+
+      String broadcastResponse = "{";
       
       if(root.containsKey("ID")){
         String features = HTTP_getFeatures();
@@ -55,13 +58,14 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       }
       
       if(root.containsKey("APLIST")){  
-        String APList = "{\"APLIST\":\"" + WIFIC_getApList() + "\"}";
-        wsServer.sendTXT(num, APList);   
+        String APList = WIFIC_getApList();
+        String msg = "{\"APLIST\":\"" + APList + "\"}";
+        wsServer.sendTXT(num, msg);   
       }
       
       if(root.containsKey("STATUS")){  
-        String statusMsg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";               
-        wsServer.broadcastTXT(statusMsg);   
+        String statusMsg = MAIN_getStatusMsg(); 
+        broadcastResponse += "\"STATUS\":\"" + statusMsg + "\",";
       }
 
       if(root.containsKey("TIMEZONE")){
@@ -69,26 +73,24 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         if(zoneStr.length() > 0){
           /* Setting time zone */
         
-          int zone = root["TIMEZONE"];
+          int zone = zoneStr.toInt();
   
           NTP_setTimeZone(zone);
         }
-         
-        String bcMsg = "{\"TIMEZONE\":" + String(NTP_getTimeZone()) + "}";               
-        wsServer.broadcastTXT(bcMsg);              
+
+        zoneStr = String(NTP_getTimeZone());
+        broadcastResponse += "\"TIMEZONE\":\"" + zoneStr + "\",";           
       }   
 
       if(root.containsKey("DLSAVE")){
-        String dlsave = root["DLSAVE"];
-        if(dlsave.length() > 0){
-          /* Setting daylight savings */        
-          int dls = root["DLSAVE"];
-  
-          NTP_setDayLightSavings(dls);
+        String dlSave = root["DLSAVE"];
+        if(dlSave.length() > 0){
+          /* Setting daylight savings */    
+          NTP_setDayLightSavings(dlSave);
         }
-         
-        String bcMsg = "{\"DLSAVE\":" + String(NTP_getDayLightSavings()) + "}";               
-        wsServer.broadcastTXT(bcMsg);              
+
+        dlSave = NTP_getDayLightSavings();
+        broadcastResponse += "\"DLSAVE\":\"" + dlSave + "\"";               
       }
 
       if(root.containsKey("SCHEDULE")){
@@ -97,10 +99,8 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         uint8_t schedule[14] = {0};
        
         if(msg.length() == 42){ 
-          char SchList[49] = {0};
+          char SchList[43] = {0};
           msg.toCharArray(SchList, 42);
-          
-//          Serial.println(SchList);
           
           for(int i = 0; i < 7; i++){           
             int dataOffset = i * 6; 
@@ -116,7 +116,7 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         }
 
         SCH_get(schedule);
-        String schMsg = "{\"SCHEDULE\":\"";   
+        String schMsg = "\"SCHEDULE\":\"";   
 
         for(int i = 0; i < 7; i++){
           String val = String(schedule[i * 2]);
@@ -132,20 +132,56 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
           schMsg += val + ",";
         }
 
-        schMsg += "\"}";
+        schMsg += "\",";
         
-        wsServer.broadcastTXT(schMsg); 
+        broadcastResponse += schMsg;
         
       }
 
-//      if(root.containsKey("ENABLE")){
-//        String val = root["ENABLE"];
-//        if(val.length() > 0){          
-//              
-//          Serial.println(val);
-//        }
-//            
-//      }
+      if(root.containsKey("SCHENABLED")){
+        String val = root["SCHENABLED"];
+        if(val.length() > 0){ 
+          int intVal = val.toInt();
+          bool newVal = intVal > 0;
+          SCH_setEnabled(newVal);
+        }           
+
+        broadcastResponse += "\"SCHENABLED\":\"";
+        if(SCH_getEnabled()){
+          broadcastResponse += "1";
+        }else{
+          broadcastResponse += "0";
+        }
+
+        broadcastResponse += "\",";
+      }
+
+      if(root.containsKey("ACTIVE")){
+        String val = root["ACTIVE"];
+//        if(val.length() > 0){ 
+//          int intVal = val.toInt();
+//          bool newVal = intVal > 0;
+//          MAIN_setActivated(newVal);
+//        }           
+
+        broadcastResponse += "\"ACTIVE\":\"";
+        if(MAIN_getActivated()){
+          broadcastResponse += "1";
+        }else{
+          broadcastResponse += "0";
+        }
+
+        broadcastResponse += "\",";
+      }
+
+      // Remove last comma
+      int bcMsgLen = broadcastResponse.length();
+      broadcastResponse.remove(bcMsgLen - 1);
+      broadcastResponse += "}";
+
+      if(broadcastResponse.length() > 4){
+        wsServer.broadcastTXT(broadcastResponse); 
+      }
     }      
   }   
 }
