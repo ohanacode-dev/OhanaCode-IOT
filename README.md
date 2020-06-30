@@ -71,7 +71,7 @@ A thermometer project expanded with a relay driving capability.
 
 ---
 
-## OC IOT Browser
+## IOTBrowser
 
 An Android application to list and provide a quick access to all **Ohana-IOT** devices on the same network.
 
