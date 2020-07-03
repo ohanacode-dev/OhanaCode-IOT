@@ -555,6 +555,7 @@ class MyServer(BaseHTTPRequestHandler):
                 except IOError:
                     self.send_error(404, 'File Not Found: %s' % self.path)
 
+
 def get_ip():
 
     ipaddr = ""
@@ -624,7 +625,7 @@ def thread_beacon():
 
             if (MSG_PING in msg.decode("utf-8")) and ((time() - last_ping_timestamp) > 0.100):
                 if not send_tcp_response(sender_addr, MAC.encode()):
-                	# No TCP server available. Maybe an older app expecting UDP response.
+                    # No TCP server available. Maybe an older app expecting UDP response.
                     print("Responding via UDP with: ", MAC)
                     broadcast_receiver.sendto(MAC.encode(), (sender_addr, sender_port))
                 else:

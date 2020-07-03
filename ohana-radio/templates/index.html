@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Ohana Radio</title>
+
+  <link rel="stylesheet" href="{{url_for('static', filename='css/custom.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/fonts.css')}}">
+</head>
+<body>
+  <div class="container">
+    <h1>Station list</h1>
+
+    <ol>
+      {% for stream_url in stream_list %}
+        <li {% if current == stream_url.id %}class="active_stream"{% endif %} >
+          {{ stream_url.name }}
+
+          {% if stream_url.name.startswith('Loading') %}
+            <script>
+              setTimeout(
+                  function(){ window.location.href = "/"; },
+                  5000
+              );
+            </script>
+          {% endif %}
+
+          <span>
+            {% if current == stream_url.id %}
+              <a href="/?action=stop"><i class="fa fa-stop"></i></a>
+            {% else %}
+              <a href="/?id={{ stream_url.id }}&action=play"><i class="fa fa-play"></i></a>
+            {% endif %}
+            <a href="/?id={{ stream_url.id }}&action=del"><i class="fa fa-trash"></i></a>
+          </span>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  {% if song_title %}
+    <p id="song_title">{{ song_title }}</p>
+  {% endif %}
+
+  <div id="multimedia_ctrl">
+    <a href="/?action=vol_up"><i class="fa fa-volume-up"></i></a><br>
+    <a href="/?action=vol_dn"><i class="fa fa-volume-down"></i></a><br>
+    <a href="/?action=mm_pause"><i class="fa fa-pause"></i></a><br>
+    <a href="/?action=mm_play"><i class="fa fa-play"></i></a><br>
+    <a href="/?action=mm_stop"><i class="fa fa-stop"></i></a><br>
+    <div id="add_station" onclick="add_url();"><span><i class="fa fa-plus-circle"></i></span></div>
+  </div>
+
+
+
+  <script type="text/javascript" src="{{url_for('static', filename='js/custom.js')}}"></script>
+</body>
+</html>
+
+
