@@ -11,12 +11,15 @@
 </head>
 <body>
   <div class="container">
-    <h1>Station list</h1>
+    <div id="title_row">
+      <a id="sort_cmd" href="/?action=sort"><i class="fa fa-sort-alpha-down"></i></a>
+      <h1>Station list</h1>
+    </div>
 
     <ol>
       {% for stream_url in stream_list %}
         <li {% if current == stream_url.id %}class="active_stream"{% endif %} >
-          {{ stream_url.name }}
+          <div class="url_name">{{ stream_url.name }}</div>
 
           {% if stream_url.name.startswith('Loading') %}
             <script>
@@ -27,7 +30,7 @@
             </script>
           {% endif %}
 
-          <span>
+          <span class="url_ctrl">
             {% if current == stream_url.id %}
               <a href="/?action=stop"><i class="fa fa-stop"></i></a>
             {% else %}

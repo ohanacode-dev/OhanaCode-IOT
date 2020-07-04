@@ -18,7 +18,8 @@ a:link, a:visited, a:hover, a:active {
 
 ol{
     margin: 0;
-    padding: 0 0 0 4em;
+    padding: 0 5px 0 5em;
+    color: black;
 }
 
 li {
@@ -27,10 +28,9 @@ li {
     height: 25px;
     border-radius: 10px;
     position: relative;
-    overflow: hidden;
 }
 
-li span {
+.url_ctrl {
     background: white;
     z-index: 13;
     position: absolute;
@@ -39,10 +39,15 @@ li span {
     border-radius: 10px;
 }
 
-li span a {
+.url_ctrl a {
     padding: 5px;
     margin: 10px;
     opacity: 0.8;
+}
+
+.url_name {
+    overflow: hidden;
+    height: 1.2em;
 }
 
 a:hover{
@@ -59,8 +64,8 @@ h1 {
     text-align: center;
     text-decoration: underline;
     margin: 0;
-    width: 98wv;
     padding: 0;
+    max-width: 70vw;
 }
 
 #song_title{
@@ -112,4 +117,19 @@ h1 {
 
 #add_station span:hover{
     opacity: 1;
+}
+
+#sort_cmd{
+    width: 1em;
+    font-size: 1.5em;
+    float: left;
+    margin-top: 10px;
+    margin-left: 0;
+}
+
+#title_row{
+    display: inline-block;
+    width: 95vw;
+    padding: 0 5px 0 5em;
+    padding-left: 4em;
 }

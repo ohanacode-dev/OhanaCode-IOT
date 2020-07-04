@@ -26,6 +26,7 @@ CMD_NEXT = "next"
 CMD_LIST = "playlist"
 CMD_DEL = "del"
 CMD_CURRENT = "current"
+CMD_MOVE = "move"
 
 KEY_PLAY = "XF86AudioPlay"
 KEY_PAUSE = "XF86AudioPause"
@@ -148,17 +149,43 @@ def thread_beacon():
     print("Ending ping responder thread\n")
 
 
-def load_cfg():
-    global url_list
-    global current
-
-    # Get playlist
+def get_playlist():
     cmd = ['mpc', CMD_LIST]
     ret_val = run_process(cmd)
     if ret_val.endswith('\n'):
         ret_val = ret_val[:-1]
-    new_url_list = ret_val.split('\n')
-    # print(new_url_list)
+    return ret_val.split('\n')
+
+
+def sort_playlist():
+    # Get playlist
+    url_list = get_playlist()
+
+    # Get sorted playlist
+    sorted_list = url_list.copy()
+    sorted_list.sort()
+
+    # Check actual positions compared to sorted
+    for i in range(0, len(sorted_list)):
+        current_id = url_list.index(sorted_list[i])
+
+        print('NAME: {}\n    CURRENT: {}\n    TARGET: {}'.format(sorted_list[i], current_id, i))
+
+        if current_id != i:
+            # move from current_id to position i. Note that mpc playlist index starts from 1.
+            cmd = ['mpc', CMD_MOVE, str(current_id + 1), str(i + 1)]
+            run_process(cmd)
+            url_list = get_playlist()
+
+
+def load_cfg():
+    global url_list
+    global current
+
+    sort_playlist()
+
+    # Get playlist
+    new_url_list = get_playlist()
 
     # Populate list to display
     url_list = []
@@ -196,11 +223,10 @@ def home():
         url = request.args.get('url', '').replace('"', '')
 
         if url != '':
-            cmd = ['mpc', CMD_PLAY]
-            run_process(cmd)
+
             cmd = ['mpc', CMD_ADD, url]
             run_process(cmd)
-            cmd = ['mpc', CMD_NEXT]
+            cmd = ['mpc', CMD_PLAY, str(len(url_list) + 1)]
             run_process(cmd)
 
             load_cfg()
@@ -239,11 +265,19 @@ def home():
     elif action == 'mm_stop':
         send_key(KEY_SPACE)
 
+    elif action == 'sort':
+        sort_playlist()
+        load_cfg()
+
     else:
         cur_cmd = ['mpc', CMD_CURRENT]
         current_text = run_process(cur_cmd)
+        print(current_text)
         if len(current_text) > 2:
-            song_title = current_text.split(':')[1]
+            try:
+                song_title = current_text.split(':')[1]
+            except:
+                song_title = current_text
         else:
             song_title = ''
 
@@ -263,7 +297,10 @@ def get_id():
     cur_cmd = ['mpc', CMD_CURRENT]
     current_text = run_process(cur_cmd)
     if len(current_text) > 2:
-        song_title = current_text.split(':')[1]
+        try:
+            song_title = current_text.split(':')[1]
+        except:
+            song_title = current_text
     else:
         song_title = ''
 
