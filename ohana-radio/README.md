@@ -1,4 +1,4 @@
-# ujagaga-radio, a Flask based python internet radio web interface #
+# ohana-radio, a Flask based python internet radio web interface #
 
 The idea is to enable controlling a central radio via any web enabled device (phone). This project is intended only for linux. 
 It is tested on Ubuntu20.
@@ -6,7 +6,7 @@ We are using Media Player Daemon to play an internet radio stream and Media Play
 
 ### Setting up ###
 
-The script uses xdotool to control volume, mpd and mpc to play a stream, python Flask to display the web interface. Install them all.
+The script uses xdotool to control volume, mpd and mpc to play a stream and python Flask to display the web interface. Install them all.
 
     sudo apt install mpd mpc xdotool python3-pip
     pip3 install flask
@@ -41,7 +41,7 @@ So my setting is:
         type		"alsa"
         name		"Generic_1" 
 
-Now restart mpd:
+Now restart your computer or try just the mpd service:
 
     sudo systemctl restart mpd.service
 
@@ -49,7 +49,7 @@ Try the mpd settings using:
 
     mpd --stdout --no-daemon --verbose
 
-If any errors are displayed, you need to solve them.
+If any errors are displayed, you need to solve them and restart the mpd service. For your conveniance, there is an mpd.conf example file in this folder.
 
 Test MPC:
 
@@ -61,22 +61,25 @@ Test MPC:
 Run the radio script:
 
     chmod +x radio.py
-    ./radio.py
+    sudo ./radio.py
 
-Currently the web interface will listen to port 8888, so to access it, use your computers IP address and the port 8888. On the same computer this will be 
-
-    http://localhost:8888
-
-If you wish to use it without the port, change the: WEB_PORT=8888 at the start of the script to: WEB_PORT=80 and then run the script as root. The address will now be 
+Currently the web interface will listen to port 80, so to access it, it must be ran as root. The address on the same computer is: 
 
     http://localhost
 
+From remote computer use:
+
+    http://192.168.x.x
+
+or what ever the IP address is.
+If you wish to use it without root priviledges, you need to change the port at the start of the ohana-radio.py script from WEB_PORT=80 to some other value like WEB_PORT=8888. To access it, use your computers IP address and the port 8888. On the same computer this will be 
+
+    http://localhost:8888
+
 or if it is on a remote computer: 
 
-    http://192.168.x.x 
+    http://192.168.x.x:8888 
     
-or what ever the IP address is.
-
 ## Contact ##
 
-* [My web page](http://www.radinaradionica.com)
+* [My web page](http://www.ohanacode-dev.com)

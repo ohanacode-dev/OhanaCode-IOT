@@ -159,30 +159,35 @@ def get_playlist():
 
 def sort_playlist():
     # Get playlist
-    url_list = get_playlist()
+    temp_list = get_playlist()
+    url_list = []
+    for item in temp_list:
+        url_list.append(item.replace('  ', ' '))
 
     # Get sorted playlist
     sorted_list = url_list.copy()
     sorted_list.sort()
 
+    print(sorted_list)
+
     # Check actual positions compared to sorted
     for i in range(0, len(sorted_list)):
         current_id = url_list.index(sorted_list[i])
-
-        print('NAME: {}\n    CURRENT: {}\n    TARGET: {}'.format(sorted_list[i], current_id, i))
 
         if current_id != i:
             # move from current_id to position i. Note that mpc playlist index starts from 1.
             cmd = ['mpc', CMD_MOVE, str(current_id + 1), str(i + 1)]
             run_process(cmd)
-            url_list = get_playlist()
+
+            temp_list = get_playlist()
+            url_list = []
+            for item in temp_list:
+                url_list.append(item.replace('  ', ' '))
 
 
 def load_cfg():
     global url_list
     global current
-
-    sort_playlist()
 
     # Get playlist
     new_url_list = get_playlist()

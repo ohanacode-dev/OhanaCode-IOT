@@ -59,13 +59,20 @@ a:hover{
     height: 23px;
 }
 
+#title_row{
+    display: inline-block;
+    width: 95%;
+    padding: 0 5px 0 5em;
+    padding-left: 4em;
+}
+
 h1 {
     font-size: 2em;
     text-align: center;
     text-decoration: underline;
     margin: 0;
     padding: 0;
-    max-width: 70vw;
+    max-width: 80%;
 }
 
 #song_title{
@@ -127,9 +134,3 @@ h1 {
     margin-left: 0;
 }
 
-#title_row{
-    display: inline-block;
-    width: 95vw;
-    padding: 0 5px 0 5em;
-    padding-left: 4em;
-}
