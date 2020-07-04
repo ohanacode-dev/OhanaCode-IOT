@@ -9,3 +9,7 @@ function add_url()
     }
 }
 
+setTimeout(
+    function(){ window.location.href = "/"; },
+    30000
+);

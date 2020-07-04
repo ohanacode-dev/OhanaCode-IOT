@@ -286,7 +286,11 @@ def home():
         else:
             song_title = ''
 
-        return render_template('index.html', stream_list=url_list, current=current, song_title=song_title)
+        ipaddress = 'http://' + get_ip()
+
+        if WEB_PORT != 80:
+            ipaddress += ':{}'.format(WEB_PORT)
+        return render_template('index.html', stream_list=url_list, current=current, song_title=song_title, ipaddress=ipaddress)
 
     return redirect(url_for('home'))
 
