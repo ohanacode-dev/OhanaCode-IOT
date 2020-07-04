@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
                 DeviceData item =  adapter.getItem(position);
 
+                Log.i("SELECT", item.mac);
+
                 String urlStr = "http://" + item.ip;
 
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr));
@@ -153,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /* Create the About dialog as a globally accessible object so we can close it when the app goes in the background */
-        final String aboutString = "Author: Rada Berar\ne-mail: ujagaga@gmail.com\n\n" +
-                "http://radinaradionica.com\n\nPersonal IOT project device locator via " +
+        final String aboutString = "Author: Rada Berar\ne-mail: rada.berar@ohanacode-dev.com\n\n" +
+                "http://ohanacode-dev.com\nhttp://radinaradionica.com\n\nPersonal IOT project device locator via " +
                 "UDP broadcast ping.\nTip: try long click on listed device to set label.";
 
         final SpannableString msg = new SpannableString(aboutString);

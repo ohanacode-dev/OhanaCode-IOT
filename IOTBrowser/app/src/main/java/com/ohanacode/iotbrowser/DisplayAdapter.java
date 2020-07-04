@@ -37,7 +37,6 @@ public class DisplayAdapter extends BaseAdapter {
 
     /* Extracts current value from device data string */
     private String getCurrent(String devData){
-        Log.i("....CURRENT data", devData);
         String retVal = "";
         int i;
         String[] props = devData.split("\n");
@@ -47,7 +46,6 @@ public class DisplayAdapter extends BaseAdapter {
 
             if(values[0].equals("CURRENT") && (values.length > 1)){
                 retVal = values[1];
-                Log.i("....CURRENT", retVal);
                 break;
             }
         }
@@ -56,7 +54,6 @@ public class DisplayAdapter extends BaseAdapter {
             retVal += " ";
         }
 
-        Log.i("....CURRENT final", retVal);
         return retVal;
     }
 
@@ -68,7 +65,6 @@ public class DisplayAdapter extends BaseAdapter {
     @Override
     public DeviceData getItem(int position) {
         String key = mKeyList.get(position);
-
 
         return mPropertyMap.get(key);
     }

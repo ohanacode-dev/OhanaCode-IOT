@@ -8,8 +8,8 @@ import threading
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
 from uuid import getnode as get_mac
 
-WEB_PORT = 8888
-#WEB_PORT = 80 	# Use this as root
+#WEB_PORT = 8888
+WEB_PORT = 80 	# Use this as root
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -49,7 +49,6 @@ port = 0
 MSG_PING = "ujagaga ping"
 FEATURES = '"MODEL":"Internet Radio Control","CTRL_URL":"/","CTRL_RANGE":"0 - 100"'
 stop_flag = False
-MAC = ""
 
 
 def run_process(command_list):
@@ -99,7 +98,6 @@ def send_tcp_response(sender_address, msg):
 
 def thread_beacon():
     global stop_flag
-    global MAC
 
     print("Starting ping responder thread\n")
     last_ping_timestamp = 0
@@ -268,6 +266,13 @@ def get_id():
         song_title = current_text.split(':')[1]
     else:
         song_title = ''
+
+    mac = "%012X" % get_mac()
+    MAC = ""
+    for i in range(0, 10, 2):
+        MAC += mac[i: i + 2] + ":"
+
+    MAC += mac[10: 12]
 
     return '{"MAC":"' + MAC + '",' + FEATURES + ',"CURRENT":"' + song_title + '"}'
 
