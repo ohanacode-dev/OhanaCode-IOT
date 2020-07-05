@@ -21,15 +21,6 @@
         <li {% if current == stream_url.id %}class="active_stream"{% endif %} >
           <div class="url_name">{{ stream_url.name }}</div>
 
-          {% if stream_url.name.startswith('Loading') %}
-            <script>
-              setTimeout(
-                  function(){ window.location.href = "/"; },
-                  5000
-              );
-            </script>
-          {% endif %}
-
           <span class="url_ctrl">
             {% if current == stream_url.id %}
               <a href="/?action=stop"><i class="fa fa-stop"></i></a>
@@ -49,14 +40,20 @@
 
   <div id="multimedia_ctrl">
     <div id="add_station" onclick="add_url();"><span><i class="fa fa-plus-circle"></i></span></div>
-    <a href="/?action=vol_up"><i class="fa fa-volume-up"></i></a><br>
-    <a href="/?action=vol_dn"><i class="fa fa-volume-down"></i></a><br>
-    <a href="/?action=mm_pause"><i class="fa fa-pause"></i></a><br>
-    <a href="/?action=mm_play"><i class="fa fa-play"></i></a><br>
-    <a href="/?action=mm_stop"><i class="fa fa-stop"></i></a><br>
+    <a href="/download_pls" download="playlist.m3u"><i class="fa fa-save"></i></a>
+
+    <form action = "/uploadpls" method = "POST" enctype = "multipart/form-data" id="pls_upload_frm">
+      <input type = "file" name = "file" id = "file_upload"/>
+      <label for = "file_upload" ><i class="fa fa-upload"></i></label>
+    </form>
+
+    <hr>
+    <a href="/?action=vol_up"><i class="fa fa-volume-up"></i></a>
+    <a href="/?action=vol_dn"><i class="fa fa-volume-down"></i></a>
+    <a href="/?action=mm_pause"><i class="fa fa-pause"></i></a>
+    <a href="/?action=mm_play"><i class="fa fa-play"></i></a>
+    <a href="/?action=mm_stop"><i class="fa fa-stop"></i></a>
   </div>
-
-
 
   <script type="text/javascript" src="{{url_for('static', filename='js/custom.js')}}"></script>
 </body>

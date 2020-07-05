@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request, render_template, send_from_directory, redirect, url_for
+from flask import Flask, request, render_template, send_from_directory, redirect, url_for, abort
 import os
 import subprocess
 import time
@@ -8,10 +8,12 @@ import threading
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
 from uuid import getnode as get_mac
 
-#WEB_PORT = 8888
-WEB_PORT = 80 	# Use this as root
+WEB_PORT = 8888
+#WEB_PORT = 80 	# Use this as root
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+PLS_PATH = os.path.join(os.path.expanduser('~'), '.mpd', 'playlists')
+PLS_NAME = 'playlist'
 
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
 app.secret_key = 'OCRadio1303153011SecretKey'
@@ -20,6 +22,7 @@ url_list = []
 current = 0
 CMD_PLAY = "play"
 CMD_STOP = "stop"
+CMD_PAUSE = "pause"
 CMD_CLEAR = "clear"
 CMD_ADD = "add"
 CMD_NEXT = "next"
@@ -27,6 +30,7 @@ CMD_LIST = "playlist"
 CMD_DEL = "del"
 CMD_CURRENT = "current"
 CMD_MOVE = "move"
+CMD_SAVE = "save"
 
 KEY_PLAY = "XF86AudioPlay"
 KEY_PAUSE = "XF86AudioPause"
@@ -198,7 +202,10 @@ def load_cfg():
         item = new_url_list[i]
         name = item.split(':')[0]
         if name.startswith('http'):
-            name = 'Loading...'
+            name = item.split('//')[1].split(':')[0].upper().replace('STREAMING', '').replace('STREAM', '').replace('..', '.')
+            if name.startswith('.'):
+                name = name[1:]
+
 
         data = {"name": name, "href": item, "id": len(url_list) + 1}
         url_list.append(data)
@@ -228,13 +235,14 @@ def home():
         url = request.args.get('url', '').replace('"', '')
 
         if url != '':
+            playlist = get_playlist()
+            print('ADD:', url)
+            print(playlist)
 
-            cmd = ['mpc', CMD_ADD, url]
-            run_process(cmd)
-            cmd = ['mpc', CMD_PLAY, str(len(url_list) + 1)]
-            run_process(cmd)
-
-            load_cfg()
+            if url not in playlist:
+                cmd = ['mpc', CMD_ADD, url]
+                run_process(cmd)
+                load_cfg()
 
     elif action == 'del':
         if (id > 0) and (id <= len(url_list)):
@@ -293,6 +301,52 @@ def home():
         return render_template('index.html', stream_list=url_list, current=current, song_title=song_title, ipaddress=ipaddress)
 
     return redirect(url_for('home'))
+
+
+@app.route('/uploadpls', methods=['POST'])
+def uploadpls():
+    f = request.files['file']
+    if f:
+        content = f.read().decode('utf-8')
+
+        url_list = []
+        for line in content.split('\n'):
+            if line.startswith('http'):
+                url_list.append(line)
+
+        if len(url_list) > 0:
+            # Clear current playlist
+            cmd = ['mpc', CMD_CLEAR]
+            run_process(cmd)
+
+            for url in url_list:
+                cmd = ['mpc', CMD_ADD, url]
+                run_process(cmd)
+
+            cmd = ['mpc', CMD_PLAY, str(len(url_list) + 1)]
+            run_process(cmd)
+
+            load_cfg()
+
+    return redirect(url_for('home'))
+
+
+@app.route('/download_pls', methods=['GET'])
+def download_pls():
+    file_path = os.path.join(PLS_PATH, PLS_NAME + '.m3u')
+
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
+    # Save current playlist
+    cmd = ['mpc', CMD_SAVE, PLS_NAME]
+    run_process(cmd)
+
+    if os.path.isfile(file_path):
+        return send_from_directory(PLS_PATH, PLS_NAME + '.m3u')
+    else:
+        print('Not found:', os.path.join(PLS_PATH, PLS_NAME + '.m3u'))
+        abort(404)
 
 
 @app.route('/favicon.ico')
