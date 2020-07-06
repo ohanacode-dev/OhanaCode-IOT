@@ -14,7 +14,7 @@ setTimeout(
         if(allowRefresh){
             window.location.href = "/";
         }
-    }, 30000
+    }, 6000
 );
 
 document.getElementById("file_upload").onchange = function() {

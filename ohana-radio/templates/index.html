@@ -39,12 +39,13 @@
   {% endif %}
 
   <div id="multimedia_ctrl">
-    <div id="add_station" onclick="add_url();"><span><i class="fa fa-plus-circle"></i></span></div>
-    <a href="/download_pls" download="playlist.m3u"><i class="fa fa-save"></i></a>
+    <div id="add_station" onclick="add_url();"><span title="Add new stream url"><i class="fa fa-plus-circle"></i></span></div>
+    <a href="/savepls" title="Save playlist"><i class="fa fa-save"></i></a>
+    <a href="/downloadpls" download="playlist.m3u" title="Download playlist"><i class="fa fa-download"></i></a>
 
     <form action = "/uploadpls" method = "POST" enctype = "multipart/form-data" id="pls_upload_frm">
       <input type = "file" name = "file" id = "file_upload"/>
-      <label for = "file_upload" ><i class="fa fa-upload"></i></label>
+      <label for = "file_upload"  title="Upload playlist"><i class="fa fa-upload"></i></label>
     </form>
 
     <hr>

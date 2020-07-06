@@ -8,7 +8,7 @@ import threading
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
 from uuid import getnode as get_mac
 
-WEB_PORT = 8888
+WEB_PORT = 8000
 #WEB_PORT = 80 	# Use this as root
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -31,6 +31,7 @@ CMD_DEL = "del"
 CMD_CURRENT = "current"
 CMD_MOVE = "move"
 CMD_SAVE = "save"
+CMD_LOAD = "load"
 
 KEY_PLAY = "XF86AudioPlay"
 KEY_PAUSE = "XF86AudioPause"
@@ -331,8 +332,8 @@ def uploadpls():
     return redirect(url_for('home'))
 
 
-@app.route('/download_pls', methods=['GET'])
-def download_pls():
+@app.route('/downloadpls', methods=['GET'])
+def downloadpls():
     file_path = os.path.join(PLS_PATH, PLS_NAME + '.m3u')
 
     if os.path.isfile(file_path):
@@ -347,6 +348,22 @@ def download_pls():
     else:
         print('Not found:', os.path.join(PLS_PATH, PLS_NAME + '.m3u'))
         abort(404)
+
+
+@app.route('/savepls', methods=['GET'])
+def savepls():
+    file_path = os.path.join(PLS_PATH, PLS_NAME + '.m3u')
+
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
+    # Save current playlist
+    cmd = ['mpc', CMD_SAVE, PLS_NAME]
+    run_process(cmd)
+
+    load_cfg()
+
+    return redirect(url_for('home'))
 
 
 @app.route('/favicon.ico')
@@ -378,6 +395,11 @@ def get_id():
 
 
 if __name__ == '__main__':
+    cmd = ['mpc', CMD_CLEAR]
+    run_process(cmd)
+    cmd = ['mpc', CMD_LOAD, PLS_NAME]
+    run_process(cmd)
+
     load_cfg()
     t_beacon = threading.Thread(target=thread_beacon)
     t_beacon.start()
