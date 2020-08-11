@@ -22,6 +22,10 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
+<<<<<<< HEAD:IOTBrowser/app/src/androidTest/java/com/ohanacode/iotbrowser/ExampleInstrumentedTest.java
         assertEquals("com.ohanacode.iotbrowser", appContext.getPackageName());
+=======
+        assertEquals("com.ohanacode.ociotbrowser", appContext.getPackageName());
+>>>>>>> New IOT app version:OC-IOT-Browser/app/src/androidTest/java/com/ohanacode-dev/oc-iot-browser/ExampleInstrumentedTest.java
     }
 }
