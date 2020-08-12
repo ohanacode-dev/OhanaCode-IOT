@@ -60,8 +60,8 @@ Test MPC:
 
 Run the radio script:
 
-    chmod +x radio.py
-    sudo ./radio.py
+    chmod +x ohana-radio.py
+    sudo ./ohana-radio.py
 
 Currently the web interface will listen to port 80, so to access it, it must be ran as root. The address on the same computer is: 
 
