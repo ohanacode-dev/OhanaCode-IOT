@@ -14,7 +14,7 @@ BTN_NEXT = 23
 BTN_PREV = 19
 BTN_PAUSE = 21
 
-pause_timestamp = 0
+btn_timestamp = 0
 
 
 def run_process(command_list):
@@ -83,6 +83,11 @@ def play_mpc():
     run_process(cmd)
 
 
+def play_mpc_number(number):
+    cmd = ['mpc', 'play', str(number)]
+    run_process(cmd)
+
+
 def tgl_mpc():
     current, total = get_current()
 
@@ -99,25 +104,54 @@ play_mpc()
 try:
     while True:
         if not GPIO.input(BTN_NEXT):
-            next_station()
+            btn_timestamp = time.time()
+
+            longPressFlag = False
             while not GPIO.input(BTN_NEXT):
                 time.sleep(0.1)
+                if time.time() - btn_timestamp > 2:
+                    # Long press. Play last.
+                    longPressFlag = True
+                    play_mpc_number(1)
+                    time.sleep(0.1)
+                    previous_station()
+                    while not GPIO.input(BTN_NEXT):
+                        pass
+
+            if not longPressFlag:
+                # Short press
+                next_station()
 
         elif not GPIO.input(BTN_PREV):
-            previous_station()
+            btn_timestamp = time.time()
+
+            longPressFlag = False
             while not GPIO.input(BTN_PREV):
                 time.sleep(0.1)
+                if time.time() - btn_timestamp > 2:
+                    # Long press. Play first.
+                    longPressFlag = True
+                    play_mpc_number(1)
+                    while not GPIO.input(BTN_NEXT):
+                        pass
+
+            if not longPressFlag:
+                # Short press
+                previous_station()
 
         elif not GPIO.input(BTN_PAUSE):
-            tgl_mpc()
-            pause_timestamp = time.time()
+            btn_timestamp = time.time()
 
             while not GPIO.input(BTN_PAUSE):
                 time.sleep(0.1)
-                if time.time() - pause_timestamp > 3:
+                if time.time() - btn_timestamp > 3:
+                    # Long press.Shutdown.
                     cmd = ['poweroff']
                     run_process(cmd)
                     exit(0)
+
+            # Short press
+            tgl_mpc()
 
         time.sleep(0.1)
 
