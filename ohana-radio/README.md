@@ -79,7 +79,83 @@ If you wish to use it without root priviledges, you need to change the port at t
 or if it is on a remote computer: 
 
     http://192.168.x.x:8888 
+
+An automated script, setupRadio.sh is also provided to help with the setup.
+
+## Setting up on a single board computer ##
+
+I used an OrangePi Zero to build an internet radio. On an Armbian OS it was enough to install mpc and mpd. No additional configuration was required. 
+Added an audio amplifier with a potentiometer for volume control. Used 3 push buttons connected to GPIO pins for previous, next and play/pause.
+My script to control the mpc functions via gpio is preset here as gpioctl.py. To start it, run: 
+```
+sudo apt install python3-dev
+pip3 install OrangePi.GPIO
+chmod +x gpiocmd.py
+sudo ./gpiocmd.py
+```
+
+A usefull way to run it is to add it to sudoers as:
+my_user_name	ALL=(ALL) NOPASSWD: path_to_gpiocmd.py
+Then you can run it at startup without a password
+
+## Streaming audio from another linux machine ##
+
+Tried using pulse audio to stream audio to my internet radio, but the bandwidth was too high. Instead I installed on my desktop computer icecast and darkice:
+```
+sudo apt-get install icecast2 darkice
+
+```
+
+Start the server:
+```
+service icecast2 start
+```
+
+Create a darkice configuration file /etc/darkice.cfg with following content (do check the password):
+```
+[general]
+duration = 0
+bufferSecs = 5
+reconnect = yes
+
+[input]
+device = default
+sampleRate = 44100
+bitsPerSample = 16
+channel = 2
+
+[icecast2-0]
+bitrateMode = abr
+format = vorbis
+bitrate = 96
+
+# Make sure your server 
+server = localhost
+port = 8000
+password = your_icecast_password
+mountPoint = defaultaudio.ogg
+name = Your stream name
+description = Streaming audio from my desktop
+url = http://localhost
+genre = my own
+public = yes
+localDumpFile = dump.ogg
+```
+
+Now start darkice:
+```
+darkice
+```
+
+On your internet radio add a playlist entry:
+http://<your_server_ip>:8000/defaultaudio.ogg
+
+
+To setup a streaming service on your comuter, you can also use my script: setupStreaming.sh
+NOTE: It is conveniant if you set your computer IP address to static so the URL does not change through router restart.
     
 ## Contact ##
 
-* [My web page](http://www.ohanacode-dev.com)
+* [My busines web page](http://www.ohanacode-dev.com)
+* [My personal web page](http://www.radinaradionica.com)
+
