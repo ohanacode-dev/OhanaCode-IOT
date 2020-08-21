@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Ohana Radio</title>
+
+  <link rel="stylesheet" href="{{url_for('static', filename='css/custom.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/fonts.css')}}">
+</head>
+<body>
+  <div class="container">
+    <div id="title_row">
+      <a id="sort_cmd" href="/?action=sort"><i class="fa fa-sort-alpha-down"></i></a>
+      <h1>Station list <span>({{ ipaddress }})</span></h1>
+    </div>
+
+    <ol>
+      {% for stream_url in stream_list %}
+        <li {% if current == stream_url.id %}class="active_stream"{% endif %} >
+          <div class="url_name">{{ stream_url.name }}</div>
+
+          <span class="url_ctrl">
+            {% if current == stream_url.id %}
+              <a href="/?action=stop"><i class="fa fa-stop"></i></a>
+            {% else %}
+              <a href="/?id={{ stream_url.id }}&action=play"><i class="fa fa-play"></i></a>
+            {% endif %}
+            <a href="/?id={{ stream_url.id }}&action=del"><i class="fa fa-trash"></i></a>
+          </span>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  {% if song_title %}
+    <p id="song_title">{{ song_title }}</p>
+  {% endif %}
+
+  <div id="multimedia_ctrl">
+    <div id="add_station" onclick="add_url();"><span title="Add new stream url"><i class="fa fa-plus-circle"></i></span></div>
+    <a href="/savepls" title="Save playlist"><i class="fa fa-save"></i></a>
+    <a href="/downloadpls" download="playlist.m3u" title="Download playlist"><i class="fa fa-download"></i></a>
+
+    <form action = "/uploadpls" method = "POST" enctype = "multipart/form-data" id="pls_upload_frm">
+      <input type = "file" name = "file" id = "file_upload"/>
+      <label for = "file_upload"  title="Upload playlist"><i class="fa fa-upload"></i></label>
+    </form>
+
+    <hr>
+    <a href="/?action=vol_up"><i class="fa fa-volume-up"></i></a>
+    <a href="/?action=vol_dn"><i class="fa fa-volume-down"></i></a>
+    <a href="/?action=mm_pause"><i class="fa fa-pause"></i></a>
+    <a href="/?action=mm_play"><i class="fa fa-play"></i></a>
+    <a href="/?action=mm_stop"><i class="fa fa-stop"></i></a>
+  </div>
+
+  <script type="text/javascript" src="{{url_for('static', filename='js/custom.js')}}"></script>
+</body>
+</html>
+
+
