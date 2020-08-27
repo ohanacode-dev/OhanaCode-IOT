@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">mm_control</string>
+    <string name="app_name">Ohana Multi Media Control</string>
+    <string name="scan">Scan</string>
+    <string name="about">About</string>
 </resources>

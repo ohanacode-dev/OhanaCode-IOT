@@ -15,7 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".KeyboardActivity"></activity>
+        <activity android:name=".ScanActivity"></activity>
+        <activity
+            android:name=".KeyboardActivity"
+            android:screenOrientation="sensorLandscape"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

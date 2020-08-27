@@ -185,11 +185,11 @@ def thread_beacon():
     for i in range(0, 10, 2):
         MAC += mac[i: i+2] + ":"
 
-    MAC += mac[10: 12]
+    MAC += mac[10: 12] + ":" + DEV_ID
 
     while not stop_flag:
         try:
-            (msg, (sender_addr, sender_port)) = broadcast_receiver.recvfrom(len(MSG_PING))
+            (msg, (sender_addr, sender_port)) = broadcast_receiver.recvfrom(24)
 
             print("Received:", msg, " From:", sender_addr, "Port:", sender_port)
 
@@ -198,7 +198,7 @@ def thread_beacon():
                     # No TCP server available. Maybe an older app expecting UDP response.
                     print("ERROR: No TCP connection!")
                 else:
-                    print("Responding via TCP with: ", MAC + ":" + DEV_ID)
+                    print("Responding via TCP with: ", MAC)
 
                 last_ping_timestamp = time()
         except:
@@ -210,7 +210,7 @@ def thread_beacon():
             try:
                 broadcast_receiver = socket(AF_INET, SOCK_DGRAM)
                 broadcast_receiver.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-                broadcast_receiver.settimeout(1)
+                broadcast_receiver.settimeout(20)
                 broadcast_receiver.bind(("", BROADCAST_PORT))
             except:
                 pass
@@ -237,7 +237,8 @@ def tcp_server():
                     data = connection.recv(16)
                     if data is not None:
                         print('received {}'.format(data))
-                        connection.sendall(parse_cmd(data).encode('utf-8'))
+                        connection.sendall(0)
+                        # connection.sendall(parse_cmd(data).encode('utf-8'))
                     else:
                         break
 

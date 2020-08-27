@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     tools:context=".KeyboardActivity">
 
@@ -104,16 +104,6 @@
             android:layout_gravity="top"
             android:layout_weight="1"
             android:text="0" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/Row_symbol1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row_digits">
 
         <Button
             android:id="@+id/btn_plus"
@@ -150,6 +140,16 @@
             android:layout_gravity="top"
             android:layout_weight="1"
             android:text="/" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Row_symbol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Row_digits">
 
         <Button
             android:id="@+id/btn_eq"
@@ -161,7 +161,7 @@
             android:text="=" />
 
         <Button
-            android:id="@+id/btn_semi"
+            android:id="@+id/btn_column"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -170,7 +170,7 @@
             android:text=":" />
 
         <Button
-            android:id="@+id/btn_column"
+            android:id="@+id/btn_semicol"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -187,43 +187,23 @@
             android:layout_weight="1"
             android:text="%" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/Row_symbol2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row_symbol1">
-
         <Button
-            android:id="@+id/btn_quote"
+            android:id="@+id/btn_lessthan"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:text='"' />
+            android:text="&lt;" />
 
         <Button
-            android:id="@+id/btn_underscore"
+            android:id="@+id/btn_morethan"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:text="_" />
-
-        <Button
-            android:id="@+id/btn_ampersand"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="!" />
+            android:text="&gt;" />
 
         <Button
             android:id="@+id/btn_question"
@@ -235,22 +215,13 @@
             android:text="?" />
 
         <Button
-            android:id="@+id/btn_left"
+            android:id="@+id/btn_quote"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:text="<" />
-
-        <Button
-            android:id="@+id/btn_right"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text=">" />
+            android:text='"' />
 
         <Button
             android:id="@+id/btn_tild"
@@ -261,151 +232,24 @@
             android:layout_weight="1"
             android:text="~" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/Row4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row3">
-
         <Button
-            android:id="@+id/btn_page_up"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="pgup" />
-
-        <Button
-            android:id="@+id/btn_page_udown"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="pgdn" />
-
-        <Button
-            android:id="@+id/btn_at"
+            android:id="@+id/btn_underscore"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:text="@" />
+            android:text="_" />
 
         <Button
-            android:id="@+id/btn_dot"
+            android:id="@+id/btn_exclamation"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:text="." />
+            android:text="!" />
 
-        <Button
-            android:id="@+id/btn_comma"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="," />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/Row3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row2">
-
-        <Button
-            android:id="@+id/btn_shift"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="CAPS" />
-
-        <Button
-            android:id="@+id/btn_z"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="z" />
-
-        <Button
-            android:id="@+id/btn_x"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="x" />
-
-        <Button
-            android:id="@+id/btn_c"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="c" />
-
-        <Button
-            android:id="@+id/btn_v"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="v" />
-
-        <Button
-            android:id="@+id/btn_b"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="b" />
-
-        <Button
-            android:id="@+id/btn_n"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="n" />
-
-        <Button
-            android:id="@+id/btn_m"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="m" />
-
-        <Button
-            android:id="@+id/btn_back"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_weight="1"
-            android:text="<-" />
     </LinearLayout>
 
     <LinearLayout
@@ -415,7 +259,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row_symbol2">
+        app:layout_constraintTop_toBottomOf="@id/Row_symbol">
 
         <Button
             android:id="@+id/btn_q"
@@ -524,7 +368,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:text="a" />
 
         <Button
@@ -596,104 +440,248 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:text="l" />
+
+        <Button
+            android:id="@+id/btn_dot"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="." />
+
+        <Button
+            android:id="@+id/btn_comma"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="," />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/LastRow"
+        android:id="@+id/Row3"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="bottom"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Row4">
-
-        <ImageButton
-            android:id="@+id/btn_arrow_left"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:rotation="90"
-            app:srcCompat="@android:drawable/arrow_down_float" />
-
-        <TableLayout
-            android:id="@+id/RowAdditional"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/btn_up_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/arrow_up_float" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/btn_down_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/arrow_down_float" />
-            </TableRow>
-
-        </TableLayout>
-
-        <ImageButton
-            android:id="@+id/btn_arrow_right"
-            style="@style/Widget.AppCompat.ImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:rotation="-90"
-            app:srcCompat="@android:drawable/arrow_down_float" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Row2">
 
         <Button
-            android:id="@+id/btn_vol_up"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="VOL+" />
-
-        <Button
-            android:id="@+id/btn_vol_dn"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="VOL-" />
-
-        <Button
-            android:id="@+id/btn_space"
+            android:id="@+id/btn_caps"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_weight="7"
-            android:text="SPACE" />
+            android:layout_weight="1"
+            android:text="CAPS"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_at"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="@" />
+
+        <Button
+            android:id="@+id/btn_z"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="z" />
+
+        <Button
+            android:id="@+id/btn_x"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="x" />
+
+        <Button
+            android:id="@+id/btn_c"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="c" />
+
+        <Button
+            android:id="@+id/btn_v"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="v" />
+
+        <Button
+            android:id="@+id/btn_b"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="b" />
+
+        <Button
+            android:id="@+id/btn_n"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="n" />
+
+        <Button
+            android:id="@+id/btn_m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_weight="1"
+            android:text="m" />
+
+        <ImageButton
+            android:id="@+id/btn_arrow_up"
+            style="@style/Widget.AppCompat.ImageButton"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:rotation="-90"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="#000000"
+            app:srcCompat="@android:drawable/ic_media_play" />
 
         <Button
             android:id="@+id/btn_enter"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_weight="4"
-            android:text="enter" />
+            android:layout_weight="1.6"
+            android:text="enter"
+            android:textSize="10sp"
+            android:textStyle="bold" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Row4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/Row3">
+
+        <Button
+            android:id="@+id/btn_vol_dn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="VOL-"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_vol_up"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="VOL+"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btn_play"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00FFFFFF"
+            android:scaleType="center"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <Button
+            android:id="@+id/btn_page_down"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="pgdn"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_page_up"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="pgup"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_space"
+            style="@android:style/Widget.Button"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="8" />
+
+        <ImageButton
+            android:id="@+id/btn_arrow_left"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:rotation="180"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="#000000"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <ImageButton
+            android:id="@+id/btn_arrow_down"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:rotation="90"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="#000000"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <ImageButton
+            android:id="@+id/btn_arrow_right"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:background="#00FFFFFF"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:tint="#000000"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <ImageButton
+            android:id="@+id/btn_backspace"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00FFFFFF"
+            android:tint="#000000"
+            app:srcCompat="@android:drawable/ic_input_delete" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
