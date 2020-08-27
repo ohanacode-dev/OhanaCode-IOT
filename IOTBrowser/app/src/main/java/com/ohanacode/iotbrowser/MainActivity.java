@@ -1,4 +1,3 @@
-<<<<<<< HEAD:IOTBrowser/app/src/main/java/com/ohanacode/iotbrowser/MainActivity.java
 package com.ohanacode.iotbrowser;
 
 import androidx.appcompat.app.AlertDialog;
@@ -6,10 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
-=======
-package com.ohanacode.ociotbrowser;
->>>>>>> New IOT app version:OC-IOT-Browser/app/src/main/java/com/ohanacode/ociotbrowser/MainActivity.java
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;

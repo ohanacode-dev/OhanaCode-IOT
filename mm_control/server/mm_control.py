@@ -5,7 +5,7 @@ import os
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
 from uuid import getnode as get_mac
 from command_executor import Cmd, CmdMod, execute_cmd, run_process
-from tcp_api import init as tcp_init
+from tcp_api import init as tcp_init, stop as tcp_stop
 
 WEB_PORT = 8080
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -302,4 +302,6 @@ if __name__ == '__main__':
     tcp_init()
 
     app.run('0.0.0.0', WEB_PORT, threaded=True, debug=False)
+    tcp_stop()
     stop_flag = True
+

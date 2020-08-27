@@ -1,8 +1,4 @@
-<<<<<<< HEAD:IOTBrowser/app/src/main/java/com/ohanacode/iotbrowser/DisplayAdapter.java
 package com.ohanacode.iotbrowser;
-=======
-package com.ohanacode.ociotbrowser;
->>>>>>> New IOT app version:OC-IOT-Browser/app/src/main/java/com/ohanacode/ociotbrowser/DisplayAdapter.java
 
 import android.util.Log;
 import android.view.LayoutInflater;

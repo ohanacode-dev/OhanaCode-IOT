@@ -1,4 +1,4 @@
-package com.ohanacode.iotbrowser;
+package com.ohanacode.mm_control;
 
 import android.content.Context;
 import android.net.DhcpInfo;

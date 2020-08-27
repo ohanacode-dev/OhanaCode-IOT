@@ -15,34 +15,17 @@ from json import dumps as strEscape
 from command_executor import Cmd, CmdMod, execute_cmd
 
 
-# if 'linux' in sys.platform:
-
-def cleanup_string(msg):
-    esc_seq = [['%20', ' '], ['%9E', 'ž'], ['%8E', 'Ž'], ['%9A', 'š'], ['%8A', 'Š'], ['%26%23269%3B', 'č'],
-               ['%26%23268%3B', 'Č'], ['%26%23263%3B', 'ć'], ['%26%23273%3B', 'đ'], ['%26%23272%3B', 'Đ'],
-               ['%26%23262%3B', 'Ć'], ['%27', "'"], ['%22', '"']]
-
-    for c in esc_seq:
-        while c[0] in msg:
-            msg = msg.replace(c[0], c[1])
-
-    return msg
-
-
-DEV_ID = "92"
+DEV_ID = "50"
 BROADCAST_PORT = 4210
 RX_PORT = 4213
 IP = None
-port = 0
 stop_flag = False
 MAC = ""
 current_window_title = ""
-APP_TITLE = "Lazy Control"
 MSG_PING = "ujagaga ping"
 last_shutdown_timestamp = 0
 last_cmd_timestamp = 0
 last_ping_timestamp = 0
-FEATURES = '"MODEL":"Multimedia Control"'
 
 
 if 'linux' in sys.platform:
@@ -63,46 +46,13 @@ def thread_window_title():
     global current_window_title
     global stop_flag
 
-    print("Starting window title thread\n")
+    print("Starting window title reader\n")
 
     while not stop_flag:
         current_window_title = strEscape(get_active_window_name(), ensure_ascii=True)
         sleep(1)
 
-    print("Ending window title thread\n")
-
-
-def thread_countdown():
-    global flag_shutdown_init
-    global last_shutdown_timestamp
-
-    print("Starting countdown monitor thread\n")
-
-    while not stop_flag:
-        if flag_shutdown_init:
-
-            try:
-                if OS_PLATFORM == 'linux':
-                    # system('play ' + current_path + '/theend.wav')
-                    run_async_process(['play', current_path + '/theend.wav'])
-                else:
-                    PlaySound(current_path + "\\theend.wav", SND_FILENAME)
-
-                box = CountDownBox()
-                box.mainloop()
-
-                if OS_PLATFORM == 'linux':
-                    run_async_process(['play', current_path + '/startup.wav'])
-                    # system('play ' + current_path + '/startup.wav')
-                else:
-                    PlaySound(current_path + "\\startup.wav", SND_FILENAME)
-            except:
-                pass
-
-            flag_shutdown_init = False
-
-        sleep(1)
-    print("Stopping countdown monitor thread\n")
+    print("Ending window title reader\n")
 
 
 def parse_cmd(cmdVal):
@@ -228,7 +178,7 @@ def thread_beacon():
     global MAC
     global last_ping_timestamp
 
-    print("Starting ping responder thread\n")
+    print("Starting ping responder\n")
 
     mac = "%012X" % get_mac()
     MAC = ""
@@ -239,7 +189,7 @@ def thread_beacon():
 
     while not stop_flag:
         try:
-            (msg, (sender_addr, sender_port)) = broadcast_receiver.recvfrom(24)
+            (msg, (sender_addr, sender_port)) = broadcast_receiver.recvfrom(len(MSG_PING))
 
             print("Received:", msg, " From:", sender_addr, "Port:", sender_port)
 
@@ -260,32 +210,33 @@ def thread_beacon():
             try:
                 broadcast_receiver = socket(AF_INET, SOCK_DGRAM)
                 broadcast_receiver.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-                broadcast_receiver.settimeout(20)
+                broadcast_receiver.settimeout(1)
                 broadcast_receiver.bind(("", BROADCAST_PORT))
             except:
                 pass
 
-    print("Ending ping responder thread\n")
+    print("Ending ping responder\n")
 
 
 def tcp_server():
     global RX_PORT
 
+    print("Starting TCP receiver\n")
     server = socket(AF_INET, SOCK_STREAM)
 
     try:
         server.bind((IP, RX_PORT))
         server.listen(1)
 
-        while True:
+        while not stop_flag:
             # Wait for a connection
             connection, client_address = server.accept()
             try:
                 # Receive the data in small chunks and retransmit it
-                while True:
+                while not stop_flag:
                     data = connection.recv(16)
-                    print('received {}'.format(data))
-                    if data:
+                    if data is not None:
+                        print('received {}'.format(data))
                         connection.sendall(parse_cmd(data).encode('utf-8'))
                     else:
                         break
@@ -293,15 +244,20 @@ def tcp_server():
             finally:
                 # Clean up the connection
                 connection.close()
+
     except Exception as e:
-        print("ERROR: {}".format(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print("\nERROR on line{}: {}".format(exc_tb.tb_lineno, e))
+
+    print("Ending TCP receiver\n")
 
 
-def init():
+def init(standalone=False):
     global stop_flag
+    global IP
 
     IP = get_ip()
-    while IP is None:
+    while IP is None and not stop_flag:
         sleep(5)
         IP = get_ip()
 
@@ -313,9 +269,22 @@ def init():
     t_window_title = threading.Thread(target=thread_window_title)
     t_window_title.start()
 
-    t_server = threading.Thread(target=tcp_server)
-    t_server.start()
+    if standalone:
+        tcp_server()
+    else:
+        t_server = threading.Thread(target=tcp_server)
+        t_server.start()
 
-    # tcp_server()
+
+def stop():
+    global stop_flag
+
     stop_flag = True
-    print("Closed tcp server")
+
+
+if __name__ == '__main__':
+    try:
+        init(True)
+    except KeyboardInterrupt:
+        stop()
+        print("Ending TCP receiver\n")
