@@ -1,16 +1,16 @@
 package com.ohanacode.mm_control;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -19,20 +19,26 @@ import java.util.List;
 public class ScanActivity extends AppCompatActivity {
 
     private final String TAG = "ScanActivity";
-    private ThreadedCommunication comms;
+    private ServerDiscovery comms;
     private Handler deviceProcessorHandler;
     private ListView lv;
     private List<String> deviceArrayList;
     ArrayAdapter<String> arrayAdapter;
+    private boolean scanInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+        {
+            actionBar.setTitle("Select server");
+        }
+
         lv = findViewById(R.id.DeviceList);
         deviceArrayList = new ArrayList<String>();
-        deviceArrayList.add("...Scanning...");
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, deviceArrayList );
 
         lv.setAdapter(arrayAdapter);
@@ -50,18 +56,33 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
-        // Initiate scan
-        comms = new ThreadedCommunication(this);
-        comms.discoverDevices();
+        // Setup scan button
+        Button refreshBtn = findViewById(R.id.button_scan);
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanNetworkForServer();
+            }
+        });
 
+        // Initiate scan
+        comms = new ServerDiscovery(this);
         deviceProcessorHandler = new Handler();
-        deviceProcessorHandler.postDelayed(deviceResponseProcessor, 500);
+        scanNetworkForServer();
     }
 
     @Override
     protected void onPause() {
         comms.stopTcpServer();
         super.onPause();
+    }
+
+    void scanNetworkForServer(){
+        if(!scanInProgress) {
+            scanInProgress = true;
+            comms.discoverDevices();
+            deviceProcessorHandler.postDelayed(deviceResponseProcessor, 500);
+        }
     }
 
     Runnable deviceResponseProcessor = new Runnable() {
@@ -75,6 +96,8 @@ public class ScanActivity extends AppCompatActivity {
                 Log.d(TAG, "FOUND server at:" + response.get(i));
             }
             arrayAdapter.notifyDataSetChanged();
+
+            scanInProgress = false;
         }
     };
 }

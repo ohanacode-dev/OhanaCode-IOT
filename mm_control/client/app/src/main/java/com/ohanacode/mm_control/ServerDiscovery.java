@@ -20,13 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ThreadedCommunication {
+public class ServerDiscovery {
 
     private final String TAG = "COMMS";
 
     private static final int RCV_SERVERPORT = 4211;
     private static final int PING_PORT = 4210;         /* Port on which to broadcast the ping message */
-    private static final int RX_PORT = 4213;
     private static final String pingMsg = "ujagaga ping";   /* Message to broadcast */
     private static final int SOCKET_TIMEOUT = 500;
     private ServerSocket serverSocket;
@@ -38,7 +37,7 @@ public class ThreadedCommunication {
     private List<String> deviceList = new ArrayList<>();
     private Handler deviceProcessorHandler;
 
-    public ThreadedCommunication(Context c){
+    public ServerDiscovery(Context c){
         context = c;
         startTcpServer();
     }

@@ -5,12 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,23 +19,14 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
     private final String TAG = "Main";
-
-    // Code types
-    private final short CODE_MOUSE = 3;
-    // Mouse clicks
-    private final short KEY_MOUSE_LEFT = 1;
-    private final short KEY_MOUSE_RIGHT = 2;
-
-    private ThreadedCommunication comms;
     public TextView TouchSurface;
     int lastX = 0;
     int lastY = 0;
     private AlertDialog aboutDialog;
-    private Handler deviceProcessorHandler;
     private int REQUEST_CODE = 13;
     String serverIP = "";
 
@@ -46,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        serverIP = readServerIp();
 
         // Setup touchpad surface
         TouchSurface = findViewById(R.id.textView_touch);
@@ -79,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent keyboardIntent = new Intent(MainActivity.this, KeyboardActivity.class);
+                keyboardIntent.putExtra("SERVER_IP", serverIP);
                 MainActivity.this.startActivity(keyboardIntent);
             }
         });
@@ -88,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Send left click
+                byte[] msg = new byte[3];
+                msg[0] = CommandData.CODE_SPECIAL;
+                msg[1] = CommandData.KEY_MOUSE_LEFT;
+                msg[2] = 0;
+
+                TcpClient sender = new TcpClient(MainActivity.this, serverIP);
+                sender.sendMsg(msg);
             }
         });
 
@@ -96,11 +95,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Send right click
+                byte[] msg = new byte[3];
+                msg[0] = CommandData.CODE_SPECIAL;
+                msg[1] = CommandData.KEY_MOUSE_RIGHT;
+                msg[2] = 0;
+
+                TcpClient sender = new TcpClient(MainActivity.this, serverIP);
+                sender.sendMsg(msg);
             }
         });
-
-        // TCP communication
-        comms = new ThreadedCommunication(this);
 
         /* Create the About dialog as a globally accessible object so we can close it when the app goes in the background */
         final String aboutString = "Author: Rada Berar\ne-mail: rada.berar@ohanacode-dev.com\n\n" +
@@ -113,22 +116,16 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage( msg )
                 .setTitle("About")
                 .create();
-
-        deviceProcessorHandler = new Handler();
-
     }
-
 
     @Override
     protected void onStop() {
-        comms.stopTcpServer();
         aboutDialog.dismiss();
         super.onStop();
     }
 
     @Override
     protected void onPause() {
-        comms.stopTcpServer();
         aboutDialog.dismiss();
         super.onPause();
     }
@@ -153,14 +150,8 @@ public class MainActivity extends AppCompatActivity {
             aboutDialog.show();
             ((TextView)aboutDialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
         }else if(item.getItemId() == R.id.scan){
-            comms.stopTcpServer();
-
             Intent scanIntent = new Intent(MainActivity.this, ScanActivity.class);
             startActivityForResult(scanIntent, REQUEST_CODE);
-
-
-//            comms.discoverDevices();
-//            deviceProcessorHandler.postDelayed(deviceResponseProcessor, 500);
         }
 
         return true;
@@ -171,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             if (data.hasExtra("selected")) {
                 serverIP = data.getExtras().getString("selected");
-                Log.i(TAG, "SELECTED:" + serverIP);
+//                Log.i(TAG, "SELECTED:" + serverIP);
+                saveServerIp(serverIP);
             }
         }
 
@@ -203,23 +195,27 @@ public class MainActivity extends AppCompatActivity {
         lastY = y;
 
         if((offset_X != 0) || (offset_Y != 0)){
-            short codeType = CODE_MOUSE;
+//            Log.i(TAG, "TOUCH OFFSET:" + offset_X + ", " + offset_Y);
+            byte[] msg = new byte[3];
+            msg[0] = CommandData.CODE_MOUSE;
+            msg[1] = (byte) (offset_X & 0xFF);
+            msg[2] = (byte) (offset_Y & 0xFF);
 
-            Log.i(TAG, "TOUCH OFFSET:" + offset_X + ", " + offset_Y);
-
+            TcpClient sender = new TcpClient(this, serverIP);
+            sender.sendMsg(msg);
         }
     }
 
-    Runnable deviceResponseProcessor = new Runnable() {
-        @Override
-        public void run() {
-            List<String> deviceList = comms.getDeviceList();
+    private void saveServerIp(String ipAddr){
+        SharedPreferences prefs = getSharedPreferences("srv_prefs", this.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
-            for(int i = 0; i < deviceList.size(); i++){
+        editor.putString("serverip", ipAddr);
+        editor.apply();
+    }
 
-                Log.d(TAG, "FOUND server at:" + deviceList.get(i));
-            }
-        }
-    };
-
+    public String readServerIp() {
+        SharedPreferences prefs = getSharedPreferences("srv_prefs", this.MODE_PRIVATE);
+        return prefs.getString("serverip", "");
+    }
 }
