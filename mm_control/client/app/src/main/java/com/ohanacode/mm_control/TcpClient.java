@@ -1,42 +1,78 @@
 package com.ohanacode.mm_control;
 
-import android.content.Context;
+import android.util.Log;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
-public class TcpClient {
+public class TcpClient{
 
     private final String TAG = "TCP_CLIENT";
+    private static TcpClient instance;
     private Socket socket;
-    private Context context;
 
     private static final int SERVERPORT = 4213;
     private static String SERVER_IP = "";
+    private static byte[] msg;
+    private Thread clientThread;
 
-    public TcpClient(Context c, String serverIP){
-        context = c;
-        SERVER_IP = serverIP;
-        new Thread(new ClientThread()).start();
+    private TcpClient()
+    {
+        // Constructor hidden because this is a singleton
     }
 
-    public void sendMsg(byte[] buf) {
+    public static TcpClient getInstance()
+    {
+        if (instance== null) {
+            synchronized(TcpClient.class) {
+                if (instance == null)
+                    instance = new TcpClient();
+            }
+        }
+        // Return the instance
+        return instance;
+    }
+
+    public void startSender(String serverIP){
+        endClient();
+        SERVER_IP = serverIP;
+        clientThread = new Thread(new ClientThread());
+        clientThread.start();
+    }
+
+    public void restartSender(){
+        endClient();
+        clientThread = new Thread(new ClientThread());
+        clientThread.start();
+    }
+
+    public boolean sendMsg(byte[] buf) {
         try {
             DataOutputStream s_out = new DataOutputStream( socket.getOutputStream());
+
+            byte[] startMsg = new byte[2];
+            startMsg[0] = CommandData.CODE_MSG_START1;
+            startMsg[1] = CommandData.CODE_MSG_START2;
+
+            s_out.write(startMsg);
             s_out.write(buf);
-//
-//            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())),true);
-//            out.println(message);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            Log.i(TAG, "Sending:" + buf[0] + ' ' + buf[1] + ' ' + buf[2]);
+            return true;
         } catch (Exception e) {
+            Log.e(TAG, "ERROR sending data:" + e.getMessage());
             e.printStackTrace();
+            return false;
         }
+    }
+
+    public void endClient(){
+        try {
+            clientThread.interrupt();
+        } catch (Exception e1) {}
+        try {
+            socket.close();
+        } catch (Exception e1) {}
     }
 
     class ClientThread implements Runnable {
@@ -45,11 +81,11 @@ public class TcpClient {
             try {
                 InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
                 socket = new Socket(serverAddr, SERVERPORT);
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (Exception e1) {
+                Log.e(TAG, "ERROR connecting:" + e1.getMessage());
             }
         }
+
+
     }
 }

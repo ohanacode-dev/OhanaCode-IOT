@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog aboutDialog;
     private int REQUEST_CODE = 13;
     String serverIP = "";
+    TcpClient sender;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         serverIP = readServerIp();
+        sender = TcpClient.getInstance();
+        sender.startSender(serverIP);
 
         // Setup touchpad surface
         TouchSurface = findViewById(R.id.textView_touch);
@@ -70,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent keyboardIntent = new Intent(MainActivity.this, KeyboardActivity.class);
-                keyboardIntent.putExtra("SERVER_IP", serverIP);
                 MainActivity.this.startActivity(keyboardIntent);
             }
         });
@@ -83,10 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
                 msg[1] = CommandData.KEY_MOUSE_LEFT;
-                msg[2] = 0;
 
-                TcpClient sender = new TcpClient(MainActivity.this, serverIP);
-                sender.sendMsg(msg);
+                sendTcpMsg(msg);
             }
         });
 
@@ -100,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 msg[1] = CommandData.KEY_MOUSE_RIGHT;
                 msg[2] = 0;
 
-                TcpClient sender = new TcpClient(MainActivity.this, serverIP);
-                sender.sendMsg(msg);
+                sendTcpMsg(msg);
             }
         });
 
@@ -162,12 +162,19 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             if (data.hasExtra("selected")) {
                 serverIP = data.getExtras().getString("selected");
-//                Log.i(TAG, "SELECTED:" + serverIP);
                 saveServerIp(serverIP);
+                sender.startSender(serverIP);
             }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void sendTcpMsg(byte[] msg){
+        if(!sender.sendMsg(msg)){
+            sender.startSender(serverIP);
+            sender.sendMsg(msg);
+        }
     }
 
     private void processTouch(int x, int y){
@@ -201,8 +208,7 @@ public class MainActivity extends AppCompatActivity {
             msg[1] = (byte) (offset_X & 0xFF);
             msg[2] = (byte) (offset_Y & 0xFF);
 
-            TcpClient sender = new TcpClient(this, serverIP);
-            sender.sendMsg(msg);
+            sendTcpMsg(msg);
         }
     }
 

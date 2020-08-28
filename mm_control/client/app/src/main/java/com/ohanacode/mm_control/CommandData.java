@@ -6,6 +6,8 @@ public class CommandData {
     public static final byte CODE_ASCII = 1;
     public static final byte CODE_SPECIAL = 2;
     public static final byte CODE_MOUSE = 3;
+    public static final byte CODE_MSG_START1 = 127;
+    public static final byte CODE_MSG_START2 = 126;
 
     // Special keys
     public static final byte KEY_LEFT = 1;

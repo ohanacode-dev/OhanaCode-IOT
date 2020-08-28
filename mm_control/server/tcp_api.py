@@ -224,6 +224,9 @@ def tcp_server():
     print("Starting TCP receiver\n")
     server = socket(AF_INET, SOCK_STREAM)
 
+    rxbuf = None
+    rx_timestamp = 0
+
     try:
         server.bind((IP, RX_PORT))
         server.listen(1)
@@ -234,10 +237,18 @@ def tcp_server():
             try:
                 # Receive the data in small chunks and retransmit it
                 while not stop_flag:
-                    data = connection.recv(16)
-                    if data is not None:
-                        print('received {}'.format(data))
-                        connection.sendall(0)
+                    data = connection.recv(3)
+                    if data is not None and len(data) > 0:
+                        if time() - rx_timestamp > 0.01:
+                            rxbuf = None
+
+                        if rxbuf is None:
+                            rxbuf = data
+                        else:
+                            rxbuf += data
+                        rx_timestamp = time()
+                        print('received {}'.format(rxbuf))
+                        # connection.sendall(0)
                         # connection.sendall(parse_cmd(data).encode('utf-8'))
                     else:
                         break

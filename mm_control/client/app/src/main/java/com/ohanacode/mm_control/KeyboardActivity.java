@@ -9,19 +9,18 @@ import android.view.View;
 public class KeyboardActivity extends AppCompatActivity implements View.OnClickListener{
 
     private final String TAG = "KeyboardActivity";
-    String serverIP = "";
+    TcpClient sender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sender = TcpClient.getInstance();
 
         try
         {
             this.getSupportActionBar().hide();
         }
         catch (NullPointerException e){}
-
-        serverIP = getIntent().getStringExtra("SERVER_IP");
 
         setContentView(R.layout.activity_keyboard);
 
@@ -380,15 +379,15 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if(codeType != CommandData.CODE_NONE){
-            Log.i(TAG, codeType + ":" + codeValue );
-
             byte[] msg = new byte[3];
             msg[0] = codeType;
             msg[1] = codeValue;
             msg[2] = 0;
 
-            TcpClient sender = new TcpClient(this, serverIP);
-            sender.sendMsg(msg);
+            if(!sender.sendMsg(msg)){
+                sender.restartSender();
+                sender.sendMsg(msg);
+            }
         }
     }
 }
