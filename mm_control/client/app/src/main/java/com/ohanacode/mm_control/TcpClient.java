@@ -1,10 +1,12 @@
 package com.ohanacode.mm_control;
 
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class TcpClient{
 
@@ -16,6 +18,7 @@ public class TcpClient{
     private static String SERVER_IP = "";
     private static byte[] msg;
     private Thread clientThread;
+    private byte[] startMsg = {CommandData.CODE_MSG_START1, CommandData.CODE_MSG_START2};
 
     private TcpClient()
     {
@@ -26,8 +29,9 @@ public class TcpClient{
     {
         if (instance== null) {
             synchronized(TcpClient.class) {
-                if (instance == null)
+                if (instance == null) {
                     instance = new TcpClient();
+                }
             }
         }
         // Return the instance
@@ -49,21 +53,19 @@ public class TcpClient{
 
     public boolean sendMsg(byte[] buf) {
         try {
-            DataOutputStream s_out = new DataOutputStream( socket.getOutputStream());
-
-            byte[] startMsg = new byte[2];
-            startMsg[0] = CommandData.CODE_MSG_START1;
-            startMsg[1] = CommandData.CODE_MSG_START2;
-
+            DataOutputStream s_out = new DataOutputStream(socket.getOutputStream());
             s_out.write(startMsg);
             s_out.write(buf);
             Log.i(TAG, "Sending:" + buf[0] + ' ' + buf[1] + ' ' + buf[2]);
             return true;
+        } catch (SocketException se){
+            Log.e(TAG, "ERROR1 sending data to:" + SERVER_IP + " " + se.getMessage());
         } catch (Exception e) {
-            Log.e(TAG, "ERROR sending data:" + e.getMessage());
+            Log.e(TAG, "ERROR2 sending data:" + e.getMessage());
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
 
     public void endClient(){
@@ -85,7 +87,5 @@ public class TcpClient{
                 Log.e(TAG, "ERROR connecting:" + e1.getMessage());
             }
         }
-
-
     }
 }

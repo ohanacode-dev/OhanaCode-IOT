@@ -23,6 +23,27 @@ public class CommandData {
     public static final byte KEY_ENTER = 11;
     public static final byte KEY_MOUSE_LEFT = 12;
     public static final byte KEY_MOUSE_RIGHT = 13;
-
-
+    public static final byte KEY_MOUSE_LEFT_DOWN = 14;
+    public static final byte KEY_MOUSE_RIGHT_DOWN = 15;
+    public static final byte KEY_MOUSE_LEFT_UP = 16;
+    public static final byte KEY_MOUSE_RIGHT_UP = 17;
+    public static final byte KEY_SPACE = 18;
+    public static final byte KEY_BACKSPACE = 19;
+    public static final byte KEY_MONKEY = 20;
+    public static final byte KEY_PLUS = 21;
+    public static final byte KEY_MINUS = 22;
+    public static final byte KEY_SLASH = 23;
+    public static final byte KEY_COLON = 24;
+    public static final byte KEY_SEMICOLON = 25;
+    public static final byte KEY_EQUAL = 26;
+    public static final byte KEY_PERCENT = 27;
+    public static final byte KEY_LESS = 28;
+    public static final byte KEY_GREATER = 29;
+    public static final byte KEY_QUESTION = 30;
+    public static final byte KEY_TILDE = 31;
+    public static final byte KEY_UNDERSCORE = 32;
+    public static final byte KEY_EXCLAMATION = 33;
+    public static final byte KEY_COMMA = 34;
+    public static final byte KEY_PERIOD = 35;
+    public static final byte KEY_QUOTE = 36;
 }

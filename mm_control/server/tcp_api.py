@@ -12,8 +12,53 @@ from time import sleep, time
 import sys
 from subprocess import Popen, CalledProcessError, PIPE
 from json import dumps as strEscape
-from command_executor import Cmd, CmdMod, execute_cmd
+import command_executor
 
+
+# Client messages
+CODE_NONE = 0
+CODE_ASCII = 1
+CODE_SPECIAL = 2
+CODE_MOUSE = 3
+CODE_MSG_START1 = 127
+CODE_MSG_START2 = 126
+
+KEY_LEFT = 1
+KEY_RIGHT = 2
+KEY_UP = 3
+KEY_DOWN = 4
+KEY_PLAY = 5
+KEY_CAPS = 6
+KEY_VOLUP = 7
+KEY_VOLDN = 8
+KEY_PGDN = 9
+KEY_PGUP = 10
+KEY_ENTER = 11
+KEY_MOUSE_LEFT = 12
+KEY_MOUSE_RIGHT = 13
+KEY_MOUSE_LEFT_DOWN = 14
+KEY_MOUSE_RIGHT_DOWN = 15
+KEY_MOUSE_LEFT_UP = 16
+KEY_MOUSE_RIGHT_UP = 17
+KEY_SPACE = 18
+KEY_BACKSPACE = 19
+KEY_MONKEY = 20
+KEY_PLUS = 21
+KEY_MINUS = 22
+KEY_SLASH = 23
+KEY_COLON = 24
+KEY_SEMICOLON = 25
+KEY_EQUAL = 26
+KEY_PERCENT = 27
+KEY_LESS = 28
+KEY_GREATER = 29
+KEY_QUESTION = 30
+KEY_TILDE = 31
+KEY_UNDERSCORE = 32
+KEY_EXCLAMATION = 33
+KEY_COMMA = 34
+KEY_PERIOD = 35
+KEY_QUOTE = 36
 
 DEV_ID = "50"
 BROADCAST_PORT = 4210
@@ -26,20 +71,14 @@ MSG_PING = "ujagaga ping"
 last_shutdown_timestamp = 0
 last_cmd_timestamp = 0
 last_ping_timestamp = 0
+rxbuf = []
 
 
-if 'linux' in sys.platform:
-    def get_active_window_name():
-        try:
-            return Popen(["xdotool", "getwindowfocus", "getwindowname"], stdout=PIPE).communicate()[0].decode()
-        except CalledProcessError as e:
-            return ""
-
-else:
-    from win32gui import GetWindowText, GetForegroundWindow
-
-    def get_active_window_name():
-        return GetWindowText(GetForegroundWindow())
+def get_active_window_name():
+    try:
+        return Popen(["xdotool", "getwindowfocus", "getwindowname"], stdout=PIPE).communicate()[0].decode()
+    except CalledProcessError as e:
+        return ""
 
 
 def thread_window_title():
@@ -59,81 +98,72 @@ def parse_cmd(cmdVal):
     global last_mute_timestamp
     global current_window_title
 
-    result = "OK"
-
     if cmdVal == 1:
         print("p window close")
-        execute_cmd(Cmd.F4, CmdMod.ALT)
+        command_executor.execute_cmd(command_executor.Cmd.F4, command_executor.CmdMod.ALT)
 
     elif cmdVal == 2:
         print("Lp Shutdown")
-        execute_cmd(Cmd.POWEROFF)
+        command_executor.execute_cmd(command_executor.Cmd.POWEROFF)
 
     elif cmdVal == 3:
         print("p stop")
-        execute_cmd(Cmd.STOP)
+        command_executor.execute_cmd(command_executor.Cmd.STOP)
 
     elif cmdVal == 4:
         print("lp stop")
-        execute_cmd(Cmd.STOP)
+        command_executor.execute_cmd(command_executor.Cmd.STOP)
 
     elif cmdVal == 5:
         print("p vol up")
-        execute_cmd(Cmd.VOL_UP)
+        command_executor.execute_cmd(command_executor.Cmd.VOL_UP)
 
     elif cmdVal == 6:
         print("lp vol up")
-        execute_cmd(Cmd.VOL_UP)
+        command_executor.execute_cmd(command_executor.Cmd.VOL_UP)
 
     elif cmdVal == 7:
         print("p prew")
-        execute_cmd(Cmd.PREVIOUS, current_window_title.lower())
+        command_executor.execute_cmd(command_executor.Cmd.PREVIOUS, current_window_title.lower())
 
     elif cmdVal == 8:
         print("lp rew")
-        execute_cmd(Cmd.REWIND, current_window_title.lower())
+        command_executor.execute_cmd(command_executor.Cmd.REWIND, current_window_title.lower())
 
     elif cmdVal == 9:
         print("p play/pause")
-        execute_cmd(Cmd.PLAY, current_window_title.lower())
+        command_executor.execute_cmd(command_executor.Cmd.PLAY, current_window_title.lower())
 
     elif cmdVal == 10:
         print("lp play/pause")
-        execute_cmd(Cmd.SPACEBAR)
+        command_executor.execute_cmd(command_executor.Cmd.SPACEBAR)
 
     elif cmdVal == 11:
         print("p next")
-        execute_cmd(Cmd.NEXT, current_window_title.lower())
+        command_executor.execute_cmd(command_executor.Cmd.NEXT, current_window_title.lower())
 
     elif cmdVal == 12:
         print("lp ffwd")
-        execute_cmd(Cmd.FORWARD, current_window_title.lower())
+        command_executor.execute_cmd(command_executor.Cmd.FORWARD, current_window_title.lower())
 
     elif cmdVal == 13:
         print("p vol down")
-        execute_cmd(Cmd.VOL_DOWN)
+        command_executor.execute_cmd(command_executor.Cmd.VOL_DOWN)
 
     elif cmdVal == 14:
         print("lp vol down")
-        execute_cmd(Cmd.MUTE)
+        command_executor.execute_cmd(command_executor.Cmd.MUTE)
 
     elif cmdVal == 15:
         print("p media")
-        execute_cmd(Cmd.MEDIA)
+        command_executor.execute_cmd(command_executor.Cmd.MEDIA)
 
     elif cmdVal == 16:
         print("lp media")
-        execute_cmd(Cmd.MEDIA)
-
-    elif cmdVal == 17:
-        print("Window title request")
-        result = current_window_title
+        command_executor.execute_cmd(command_executor.Cmd.MEDIA)
 
     else:
         print("ERROR: TCP API, unknown command: ", cmdVal)
-        result = "ERROR: TCP API, unknown command"
-
-    return result
 
 
 def get_ip():
@@ -218,14 +248,122 @@ def thread_beacon():
     print("Ending ping responder\n")
 
 
+def process_rx():
+    global rxbuf
+
+    if len(rxbuf) > 4:
+        print('rxbuf {}'.format(rxbuf), flush=True)
+
+        while len(rxbuf) > 4:
+            if rxbuf[0] != CODE_MSG_START1:
+                rxbuf = rxbuf[1:]
+            elif rxbuf[1] != CODE_MSG_START2:
+                rxbuf = rxbuf[2:]
+            else:
+                try:
+                    cmd_code = rxbuf[2]
+                    if cmd_code == CODE_ASCII:
+                        #Send ASCII key
+                        command_executor.send_key(chr(rxbuf[3]))
+                    elif cmd_code == CODE_SPECIAL:
+                        # Send a special key:
+                        key_val = rxbuf[3]
+                        if key_val == KEY_LEFT:
+                            command_executor.send_key(command_executor.Keypress.ARROW_LEFT.value)
+                        elif key_val == KEY_RIGHT:
+                            command_executor.send_key(command_executor.Keypress.ARROW_RIGHT.value)
+                        elif key_val == KEY_UP:
+                            command_executor.send_key(command_executor.Keypress.ARROW_UP.value)
+                        elif key_val == KEY_DOWN:
+                            command_executor.send_key(command_executor.Keypress.ARROW_DOWN.value)
+                        elif key_val == KEY_PLAY:
+                            command_executor.execute_cmd(command_executor.Cmd.PLAY, current_window_title.lower())
+                        elif key_val == KEY_CAPS:
+                            command_executor.send_key(command_executor.Keypress.CAPS_LOCK.value)
+                        elif key_val == KEY_VOLUP:
+                            command_executor.send_key(command_executor.Keypress.VOLUME_UP.value)
+                        elif key_val == KEY_VOLDN:
+                            command_executor.send_key(command_executor.Keypress.VOLUME_DOWN.value)
+                        elif key_val == KEY_PGDN:
+                            command_executor.send_key(command_executor.Keypress.PAGE_DOWN.value)
+                        elif key_val == KEY_PGUP:
+                            command_executor.send_key(command_executor.Keypress.PAGE_UP.value)
+                        elif key_val == KEY_ENTER:
+                            command_executor.send_key(command_executor.Keypress.ENTER.value)
+                        elif key_val == KEY_MOUSE_LEFT:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_CLICK_LEFT)
+                        elif key_val == KEY_MOUSE_RIGHT:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_CLICK_RIGHT)
+                        elif key_val == KEY_MOUSE_LEFT_DOWN:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_DOWN_LEFT)
+                        elif key_val == KEY_MOUSE_RIGHT_DOWN:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_DOWN_RIGHT)
+                        elif key_val == KEY_MOUSE_LEFT_UP:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_UP_LEFT.value)
+                        elif key_val == KEY_MOUSE_RIGHT_UP:
+                            command_executor.mouse_click(command_executor.Cmd.MOUSE_UP_RIGHT.value)
+                        elif key_val == KEY_SPACE:
+                            command_executor.send_key(command_executor.Keypress.SPACEBAR.value)
+                        elif key_val == KEY_BACKSPACE:
+                            command_executor.send_key(command_executor.Keypress.BACKSPACE.value)
+                        elif key_val == KEY_MONKEY:
+                            command_executor.send_key(command_executor.Keypress.MONKEY.value)
+                        elif key_val == KEY_PLUS:
+                            command_executor.send_key(command_executor.Keypress.PLUS.value)
+                        elif key_val == KEY_MINUS:
+                            command_executor.send_key(command_executor.Keypress.MINUS.value)
+                        elif key_val == KEY_SLASH:
+                            command_executor.send_key(command_executor.Keypress.SLASH.value)
+                        elif key_val == KEY_COLON:
+                            command_executor.send_key(command_executor.Keypress.COLON.value)
+                        elif key_val == KEY_SEMICOLON:
+                            command_executor.send_key(command_executor.Keypress.SEMICOLON.value)
+                        elif key_val == KEY_EQUAL:
+                            command_executor.send_key(command_executor.Keypress.EQUAL.value)
+                        elif key_val == KEY_PERCENT:
+                            command_executor.send_key(command_executor.Keypress.PERCENT.value)
+                        elif key_val == KEY_LESS:
+                            command_executor.send_key(command_executor.Keypress.LESS.value)
+                        elif key_val == KEY_GREATER:
+                            command_executor.send_key(command_executor.Keypress.GREATER.value)
+                        elif key_val == KEY_TILDE:
+                            command_executor.send_key(command_executor.Keypress.TILDE.value)
+                        elif key_val == KEY_QUESTION:
+                            command_executor.send_key(command_executor.Keypress.QUESTION.value)
+                        elif key_val == KEY_UNDERSCORE:
+                            command_executor.send_key(command_executor.Keypress.UNDERSCORE.value)
+                        elif key_val == KEY_EXCLAMATION:
+                            command_executor.send_key(command_executor.Keypress.EXCLAMATION.value)
+                        elif key_val == KEY_COMMA:
+                            command_executor.send_key(command_executor.Keypress.COMMA.value)
+                        elif key_val == KEY_PERIOD:
+                            command_executor.send_key(command_executor.Keypress.PERIOD.value)
+                        elif key_val == KEY_QUOTE:
+                            command_executor.send_key(command_executor.Keypress.QUOTE.value)
+
+                    elif cmd_code == CODE_MOUSE:
+                        # Coordinates should be signed 8 bit numbers. We get unsigned bytes.
+                        x_offset = rxbuf[3]
+                        y_offset = rxbuf[4]
+                        if x_offset > 127:
+                            x_offset = (256 - x_offset) * (-1)
+                        if y_offset > 127:
+                            y_offset = (256 - y_offset) * (-1)
+
+                        command_executor.move_cursor(x_offset, y_offset)
+                except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    print("\nERROR TCP_API on line{}: {}".format(exc_tb.tb_lineno, e))
+
+                rxbuf = rxbuf[4:]
+
+
 def tcp_server():
     global RX_PORT
+    global rxbuf
 
     print("Starting TCP receiver\n")
     server = socket(AF_INET, SOCK_STREAM)
-
-    rxbuf = None
-    rx_timestamp = 0
 
     try:
         server.bind((IP, RX_PORT))
@@ -239,27 +377,22 @@ def tcp_server():
                 while not stop_flag:
                     data = connection.recv(3)
                     if data is not None and len(data) > 0:
-                        if time() - rx_timestamp > 0.01:
-                            rxbuf = None
+                        for val in data:
+                            rxbuf.append(val)
+                        process_rx()
 
-                        if rxbuf is None:
-                            rxbuf = data
-                        else:
-                            rxbuf += data
-                        rx_timestamp = time()
-                        print('received {}'.format(rxbuf))
-                        # connection.sendall(0)
-                        # connection.sendall(parse_cmd(data).encode('utf-8'))
                     else:
                         break
-
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                print("\nERROR1 on line{}: {}".format(exc_tb.tb_lineno, e))
             finally:
                 # Clean up the connection
                 connection.close()
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print("\nERROR on line{}: {}".format(exc_tb.tb_lineno, e))
+        print("\nERROR2 on line{}: {}".format(exc_tb.tb_lineno, e))
 
     print("Ending TCP receiver\n")
 

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private int REQUEST_CODE = 13;
     String serverIP = "";
     TcpClient sender;
+    static final String mouseBtnColorUp = "#DBF0EA";
+    static final String mouseBtnColorDown = "#BCCCC8";
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -78,30 +81,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnMouseLeft = findViewById(R.id.button_left);
-        btnMouseLeft.setOnClickListener(new View.OnClickListener() {
+        final Button btnMouseLeft = findViewById(R.id.button_left);
+        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+        btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                // Send left click
+            public boolean onTouch(View v, MotionEvent event) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_LEFT;
 
-                sendTcpMsg(msg);
+                switch ( event.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
+                        sendTcpMsg(msg);
+                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
+                        sendTcpMsg(msg);
+                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        break;
+                }
+                return true;
             }
         });
 
-        Button btnMouseRight = findViewById(R.id.button_right);
-        btnMouseRight.setOnClickListener(new View.OnClickListener() {
+        final Button btnMouseRight = findViewById(R.id.button_right);
+        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+        btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                // Send right click
+            public boolean onTouch(View v, MotionEvent event) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_RIGHT;
-                msg[2] = 0;
 
-                sendTcpMsg(msg);
+                switch ( event.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
+                        sendTcpMsg(msg);
+                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
+                        sendTcpMsg(msg);
+                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        break;
+                }
+                return true;
             }
         });
 
@@ -202,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
         lastY = y;
 
         if((offset_X != 0) || (offset_Y != 0)){
-//            Log.i(TAG, "TOUCH OFFSET:" + offset_X + ", " + offset_Y);
             byte[] msg = new byte[3];
             msg[0] = CommandData.CODE_MOUSE;
             msg[1] = (byte) (offset_X & 0xFF);

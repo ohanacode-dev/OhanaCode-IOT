@@ -3,7 +3,6 @@ package com.ohanacode.mm_control;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 public class KeyboardActivity extends AppCompatActivity implements View.OnClickListener{
@@ -64,11 +63,10 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
 
         findViewById(R.id.btn_plus).setOnClickListener(this);
         findViewById(R.id.btn_minus).setOnClickListener(this);
-        findViewById(R.id.btn_times).setOnClickListener(this);
         findViewById(R.id.btn_div).setOnClickListener(this);
         findViewById(R.id.btn_eq).setOnClickListener(this);
-        findViewById(R.id.btn_column).setOnClickListener(this);
-        findViewById(R.id.btn_semicol).setOnClickListener(this);
+        findViewById(R.id.btn_colon).setOnClickListener(this);
+        findViewById(R.id.btn_semicolon).setOnClickListener(this);
         findViewById(R.id.btn_percent).setOnClickListener(this);
         findViewById(R.id.btn_lessthan).setOnClickListener(this);
         findViewById(R.id.btn_morethan).setOnClickListener(this);
@@ -250,80 +248,76 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
 
 
             case R.id.btn_plus:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '+';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_PLUS;
                 break;
             case R.id.btn_minus:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '-';
-                break;
-            case R.id.btn_times:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '*';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_MINUS;
                 break;
             case R.id.btn_div:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '/';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_SLASH;
                 break;
             case R.id.btn_eq:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '=';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_EQUAL;
                 break;
-            case R.id.btn_column:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = ':';
+            case R.id.btn_colon:
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_COLON;
                 break;
-            case R.id.btn_semicol:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = ';';
+            case R.id.btn_semicolon:
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_SEMICOLON;
                 break;
             case R.id.btn_percent:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '%';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_PERCENT;
                 break;
             case R.id.btn_lessthan:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '<';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_LESS;
                 break;
             case R.id.btn_morethan:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '>';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_GREATER;
                 break;
             case R.id.btn_question:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '?';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_QUESTION;
                 break;
             case R.id.btn_quote:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '"';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_QUOTE;
                 break;
             case R.id.btn_tild:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '~';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_TILDE;
                 break;
             case R.id.btn_underscore:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '_';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_UNDERSCORE;
                 break;
             case R.id.btn_exclamation:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '!';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_EXCLAMATION;
                 break;
             case R.id.btn_caps:
                 codeType = CommandData.CODE_SPECIAL;
                 codeValue = CommandData.KEY_CAPS;
                 break;
             case R.id.btn_at:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '@';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_MONKEY;
                 break;
             case R.id.btn_comma:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = ',';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_COMMA;
                 break;
             case R.id.btn_dot:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = '.';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_PERIOD;
                 break;
             case R.id.btn_vol_dn:
                 codeType = CommandData.CODE_SPECIAL;
@@ -362,16 +356,16 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
                 codeValue = CommandData.KEY_DOWN;
                 break;
             case R.id.btn_space:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = ' ';
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_SPACE;
                 break;
             case R.id.btn_enter:
                 codeType = CommandData.CODE_SPECIAL;
                 codeValue = CommandData.KEY_ENTER;
                 break;
             case R.id.btn_backspace:
-                codeType = CommandData.CODE_ASCII;
-                codeValue = 8;
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_BACKSPACE;
                 break;
 
             default:

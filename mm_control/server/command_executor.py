@@ -3,9 +3,9 @@
 # -*- coding: utf-8 -*-
 
 from time import sleep, time
-import sys
 import subprocess
 from enum import Enum
+import sys
 
 last_cmd_timestamp = 0
 
@@ -58,14 +58,11 @@ class Cmd(Enum):
     MOUSE_DOWN = 103
     MOUSE_CLICK_LEFT = 104
     MOUSE_CLICK_RIGHT = 105
+    MOUSE_DOWN_LEFT = 106
+    MOUSE_DOWN_RIGHT = 107
+    MOUSE_UP_LEFT = 108
+    MOUSE_UP_RIGHT = 109
 
-
-# def run_process(command_list):
-#     print("Execute: ", command_list)
-#     try:
-#         Popen(command_list)
-#     except:
-#         pass
 
 def run_process(command_list):
     result = subprocess.run(command_list, stdout=subprocess.PIPE)
@@ -73,172 +70,160 @@ def run_process(command_list):
     return str(result.stdout, 'utf-8')
 
 
-if 'linux' in sys.platform:
-    class Key(Enum):
-        PLAY = "XF86AudioPlay"
-        PAUSE = "XF86AudioPause"
-        VOLUME_MUTE = "XF86AudioMute"
-        STOP = "XF86AudioStop"
-        NEXT_TRACK = "XF86AudioNext"
-        PREVIOUS_TRACK = "XF86AudioPrev"
-        SHUT_DOWN = "XF86Close"
-        VOLUME_DOWN = "XF86AudioLowerVolume"
-        VOLUME_UP = "XF86AudioRaiseVolume"
-        FORWARD = "XF86Forward"
-        REWIND = "XF86Rewind"
-        F4 = "F4"
-        A = "a"
-        F = "f"
-        J = "j"
-        K = "k"
-        L = "l"
-        X = "x"
-        SPACEBAR = "space"
-        MEDIA = "XF86AudioMedia"
-        SHIFT = 'shift'
-        ALT = 'alt'
-        CTRL = 'ctrl'
+class Keypress(Enum):
+    PLAY = "XF86AudioPlay"
+    PAUSE = "XF86AudioPause"
+    VOLUME_MUTE = "XF86AudioMute"
+    STOP = "XF86AudioStop"
+    NEXT_TRACK = "XF86AudioNext"
+    PREVIOUS_TRACK = "XF86AudioPrev"
+    SHUT_DOWN = "XF86Close"
+    VOLUME_DOWN = "XF86AudioLowerVolume"
+    VOLUME_UP = "XF86AudioRaiseVolume"
+    FORWARD = "XF86Forward"
+    REWIND = "XF86Rewind"
+    F4 = "F4"
+    A = "a"
+    F = "f"
+    J = "j"
+    K = "k"
+    L = "l"
+    X = "x"
+    SPACEBAR = "space"
+    BACKSPACE = "BackSpace"
+    MEDIA = "XF86AudioMedia"
+    SHIFT = 'shift'
+    ALT = 'alt'
+    CTRL = 'ctrl'
+    ARROW_LEFT = "Left"
+    ARROW_RIGHT = "Right"
+    ARROW_UP = "Up"
+    ARROW_DOWN = "Down"
+    CAPS_LOCK = "Caps_Lock"
+    PAGE_UP = "Page_Up"
+    PAGE_DOWN = "Page_Down"
+    ENTER = "Return"
+    MONKEY = "at"
+    PLUS = "plus"
+    MINUS = "minus"
+    SLASH = "slash"
+    PERCENT = "percent"
+    LESS = "less"
+    GREATER = "greater"
+    COLON = "colon"
+    SEMICOLON = "semicolon"
+    TILDE = "asciitilde"
+    QUESTION = "question"
+    UNDERSCORE = "underscore"
+    EXCLAMATION = "exclam"
+    COMMA = "comma"
+    PERIOD = "period"
+    QUOTE = "quotedbl"
+    EQUAL = "equal"
 
-    def send_key(key, modifier=None):
+
+def send_key(keycode, modifier=""):
+    try:
         if modifier == CmdMod.ALT:
-            mod_key = Key.ALT + '+'
+            mod_key = "{}+".format(Keypress.ALT)
         elif modifier == CmdMod.SHIFT:
-            mod_key = Key.SHIFT + '+'
+            mod_key = "{}+".format(Keypress.SHIFT)
         elif modifier == CmdMod.CTRL:
-            mod_key = Key.CTRL + "+"
+            mod_key = "{}+".format(Keypress.CTRL)
         else:
             mod_key = ""
 
-        run_process(["xdotool", mod_key+"key", key])
+        print("SENDING:", mod_key, keycode)
 
-else:
-    # Build for windows. Other platforms not supported.
-    from win32api import keybd_event
-    from win32con import KEYEVENTF_KEYUP
+        run_process(["xdotool", "key", "{}{}".format(mod_key, keycode)])
 
-    class Key(Enum):
-        SHIFT = 0x10
-        CTRL = 0x11
-        ALT = 0x12
-        PAUSE = 0x13
-        SPACEBAR = 0x20
-        PAGE_UP = 0x21
-        PAGE_DOWN = 0x22,
-        END = 0x23
-        HOME = 0x24
-        LEFT_ARROW = 0x25
-        UP_ARROW = 0x26
-        RIGHT_ARROW = 0x27
-        DOWN_ARROW = 0x28
-        NUM_0 = 0x30
-        NUM_1 = 0x31
-        NUM_2 = 0x32
-        NUM_3 = 0x33
-        NUM_4 = 0x34
-        NUM_5 = 0x35
-        NUM_6 = 0x36
-        NUM_7 = 0x37
-        NUM_8 = 0x38
-        NUM_9 = 0x39
-        A = 0x41
-        F = 0x46
-        J = 0x4A
-        K = 0x4B
-        L = 0x4C
-        X = 0x58
-        F4 = 0x73
-        BROWSER_BACK = 0xA6
-        BROWSER_FORWARD = 0xA7
-        BROWSER_REFRESH = 0xA8
-        BROWSER_STOP = 0xA9
-        BROWSER_SEARCH = 0xAA
-        BROWSER_FAVOURITES = 0xAB
-        BROWSER_START = 0xAC
-        VOLUME_MUTE = 0xAD
-        VOLUME_DOWN = 0xAE
-        VOLUME_UP = 0xAF
-        NEXT_TRACK = 0xB0
-        PREVIOUS_TRACK = 0xB1
-        STOP = 0xB2
-        PLAY_PAUSE = 0xB3
-        PLAY = 0xFA
-        MEDIA = 0xB5
-
-    def send_key(key, modifier=None):
-        if modifier == CmdMod.ALT:
-            mod_key = Key.ALT
-        elif modifier == CmdMod.SHIFT:
-            mod_key = Key.SHIFT
-        elif modifier == CmdMod.CTRL:
-            mod_key = Key.CTRL
-        else:
-            mod_key = None
-
-        if mod_key is not None:
-            keybd_event(mod_key, 0, 0, 0)
-
-        keybd_event(key, 0, 0, 0)
-        sleep(0.05)
-        keybd_event(key, 0, KEYEVENTF_KEYUP, 0)
-
-        if modifier is not None:
-            keybd_event(mod_key, 0, KEYEVENTF_KEYUP, 0)
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print("\nERROR CMD_EXEC on line{}: {}".format(exc_tb.tb_lineno, e))
 
 
-def execute_cmd(cmdVal, current_window_title=""):
+def move_cursor(x_offset, y_offset):
+    result = run_process(["xdotool", "getmouselocation"])
+    try:
+        data = result.split(' ')
+        current_x = data[0].split(':')[1]
+        current_y = data[1].split(':')[1]
+
+        target_x = int(current_x) + x_offset
+        target_y = int(current_y) + y_offset
+
+        run_process(["xdotool", "mousemove", str(target_x), str(target_y)])
+
+    except Exception as e:
+        pass
+
+
+def mouse_click(button):
+    if button == Cmd.MOUSE_DOWN_RIGHT:
+        run_process(["xdotool", "mousedown", "3"])
+    elif button == Cmd.MOUSE_UP_RIGHT:
+        run_process(["xdotool", "mouseup", "3"])
+    elif button == Cmd.MOUSE_DOWN_LEFT:
+        run_process(["xdotool", "mousedown", "1"])
+    elif button == Cmd.MOUSE_UP_LEFT:
+        run_process(["xdotool", "mouseup", "1"])
+
+
+def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offset_y=0):
     global last_cmd_timestamp
 
     if cmdVal == Cmd.CLOSE:
-        send_key(Key.F4, Key.ALT)
+        send_key(Keypress.F4, Keypress.ALT)
     elif cmdVal == Cmd.SHUTDOWN:
         run_process(['poweroff'])
     elif cmdVal == Cmd.STOP:
-        send_key(Key.STOP)
+        send_key(Keypress.STOP)
     elif cmdVal == Cmd.VOL_UP:
-        send_key(Key.VOL_UP)
+        send_key(Keypress.VOL_UP)
     elif cmdVal == Cmd.PREVIOUS:
         if "butter" in current_window_title.lower():
-            send_key(Key.LEFT_ARROW, Key.SHIFT)
+            send_key(Keypress.LEFT_ARROW, Keypress.SHIFT)
         else:
-            send_key(Key.PREVIOUS_TRACK)
+            send_key(Keypress.PREVIOUS_TRACK)
     elif cmdVal == Cmd.REWIND:
         if "youtube" in current_window_title.lower():
-            send_key(Key.J)
+            send_key(Keypress.J)
         elif "vlc media player" in current_window_title.lower():
-            send_key(Key.LEFT_ARROW, Key.ALT)
+            send_key(Keypress.LEFT_ARROW, Keypress.ALT)
         else:
-            send_key(Key.LEFT_ARROW)
+            send_key(Keypress.LEFT_ARROW)
     elif cmdVal == Cmd.PLAY:
         if "youtube" in current_window_title.lower():
-            send_key(Key.K)
+            send_key(Keypress.K.value)
         elif "butter" in current_window_title.lower():
-            send_key(Key.SPACEBAR)
+            send_key(Keypress.SPACEBAR.value)
         else:
-            send_key(Key.PLAY)
+            send_key(Keypress.PLAY.value)
     elif cmdVal == Cmd.NEXT:
         if "butter" in current_window_title.lower():
-            send_key(Key.RIGHT_ARROW, Key.SHIFT)
+            send_key(Keypress.RIGHT_ARROW, Keypress.SHIFT)
         else:
-            send_key(Key.NEXT_TRACK)
+            send_key(Keypress.NEXT_TRACK)
     elif cmdVal == Cmd.FORWARD:
         if "youtube" in current_window_title.lower():
-            send_key(Key.L)
+            send_key(Keypress.L)
         elif "vlc media player" in current_window_title.lower():
-            send_key(Key.RIGHT_ARROW, Key.ALT)
+            send_key(Keypress.RIGHT_ARROW, Keypress.ALT)
         elif "butter" in current_window_title.lower():
-            send_key(Key.RIGHT_ARROW)
+            send_key(Keypress.RIGHT_ARROW)
         else:
-            send_key(Key.FORWARD)
+            send_key(Keypress.FORWARD)
     elif cmdVal == Cmd.VOL_DOWN:
-        send_key(Key.VOLUME_DOWN)
+        send_key(Keypress.VOLUME_DOWN)
     elif cmdVal == Cmd.MUTE:
         if (time() - last_cmd_timestamp) > 1:
-            send_key(Key.VOLUME_MUTE)
+            send_key(Keypress.VOLUME_MUTE)
         last_cmd_timestamp = time()
     elif cmdVal == Cmd.MEDIA:
-        send_key(Key.MEDIA)
+        send_key(Keypress.MEDIA)
     elif cmdVal == Cmd.POWEROFF:
         run_process(["poweroff"])
+
 
     else:
         print("ERROR: Command executor, unknown command: ", cmdVal)
