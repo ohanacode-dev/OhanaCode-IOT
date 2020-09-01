@@ -167,6 +167,10 @@ def mouse_click(button):
         run_process(["xdotool", "mousedown", "1"])
     elif button == Cmd.MOUSE_UP_LEFT:
         run_process(["xdotool", "mouseup", "1"])
+    elif button == Cmd.MOUSE_CLICK_LEFT:
+        run_process(["xdotool", "click", "1"])
+    elif button == Cmd.MOUSE_CLICK_RIGHT:
+        run_process(["xdotool", "click", "3"])
 
 
 def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offset_y=0):

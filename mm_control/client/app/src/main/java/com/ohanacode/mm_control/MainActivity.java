@@ -82,52 +82,70 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Button btnMouseLeft = findViewById(R.id.button_left);
-        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-        btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
+        btnMouseLeft.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onClick(View v) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-
-                switch ( event.getAction() ) {
-                    case MotionEvent.ACTION_DOWN:
-                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
-                        sendTcpMsg(msg);
-                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
-                        sendTcpMsg(msg);
-                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-                        break;
-                }
-                return true;
+                msg[1] = CommandData.KEY_MOUSE_LEFT;
+                sendTcpMsg(msg);
             }
         });
+//        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+//        btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                byte[] msg = new byte[3];
+//                msg[0] = CommandData.CODE_SPECIAL;
+//
+//                switch ( event.getAction() ) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
+//                        sendTcpMsg(msg);
+//                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
+//                        sendTcpMsg(msg);
+//                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
         final Button btnMouseRight = findViewById(R.id.button_right);
-        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-        btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
+        btnMouseRight.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onClick(View v) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-
-                switch ( event.getAction() ) {
-                    case MotionEvent.ACTION_DOWN:
-                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
-                        sendTcpMsg(msg);
-                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
-                        sendTcpMsg(msg);
-                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-                        break;
-                }
-                return true;
+                msg[1] = CommandData.KEY_MOUSE_RIGHT;
+                sendTcpMsg(msg);
             }
         });
+//        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+//        btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                byte[] msg = new byte[3];
+//                msg[0] = CommandData.CODE_SPECIAL;
+//
+//                switch ( event.getAction() ) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
+//                        sendTcpMsg(msg);
+//                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
+//                        sendTcpMsg(msg);
+//                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
         /* Create the About dialog as a globally accessible object so we can close it when the app goes in the background */
         final String aboutString = "Author: Rada Berar\ne-mail: rada.berar@ohanacode-dev.com\n\n" +
