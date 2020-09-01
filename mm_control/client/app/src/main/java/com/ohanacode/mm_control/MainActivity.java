@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("About")
                 .create();
     }
+
 
     @Override
     protected void onStop() {

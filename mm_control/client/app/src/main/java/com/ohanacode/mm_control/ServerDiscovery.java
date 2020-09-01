@@ -35,7 +35,6 @@ public class ServerDiscovery {
     private final int DEV_ID_INDEX = 6;
     private final int DEV_ID_MEDIA_TYPE = 80;
     private List<String> deviceList = new ArrayList<>();
-    private Handler deviceProcessorHandler;
 
     public ServerDiscovery(Context c){
         context = c;
