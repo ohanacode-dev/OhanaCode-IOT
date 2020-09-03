@@ -3,7 +3,6 @@ package com.ohanacode.mm_control;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 
@@ -20,25 +19,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ServerDiscovery {
+public class DiscoveryAndUdpComms {
 
-    private final String TAG = "COMMS";
+    private final String TAG = "UDP CLIENT";
 
-    private static final int RCV_SERVERPORT = 4211;
-    private static final int PING_PORT = 4210;         /* Port on which to broadcast the ping message */
+    private static final int TCP_RX_PORT = 4211;
+    private static final int UDP_TX_PORT = 4210;         /* Port on which to broadcast the ping message */
     private static final String pingMsg = "ujagaga ping";   /* Message to broadcast */
     private static final int SOCKET_TIMEOUT = 500;
     private ServerSocket serverSocket;
     private Thread serverThread;
     private boolean tcpServerEnabledFlag = false;
-    private Context context;
     private final int DEV_ID_INDEX = 6;
     private final int DEV_ID_MEDIA_TYPE = 80;
     private List<String> deviceList = new ArrayList<>();
+    private DatagramSocket udpSocket = null;
+    private static DiscoveryAndUdpComms instance;
+    private InetAddress broadcastAddr;
 
-    public ServerDiscovery(Context c){
-        context = c;
+
+    private DiscoveryAndUdpComms(Context c){
+        try {
+            broadcastAddr = getBroadcastAddress(c);
+        } catch (IOException e) {
+            Log.e(TAG, "IOException: " + e.getMessage());
+        }
+
+        try {
+            udpSocket = new DatagramSocket();
+            udpSocket.setBroadcast(true);
+            udpSocket.setSoTimeout(SOCKET_TIMEOUT);
+
+        }catch (SocketException e) {
+            Log.e(TAG, "SocketException: " + e.getMessage());
+        }
+
         startTcpServer();
+    }
+
+    public static DiscoveryAndUdpComms getInstance(Context c)
+    {
+        if (instance== null) {
+            synchronized(TcpClient.class) {
+                if (instance == null) {
+                    instance = new DiscoveryAndUdpComms(c);
+                }
+            }
+        }
+        // Return the instance
+        return instance;
     }
 
     private class ServerThread extends Thread {
@@ -46,7 +75,7 @@ public class ServerDiscovery {
         @Override
         public void run() {
             try {
-                serverSocket = new ServerSocket(RCV_SERVERPORT);
+                serverSocket = new ServerSocket(TCP_RX_PORT);
 
                 while (tcpServerEnabledFlag) {
                     // block the call until connection is created and return
@@ -58,7 +87,7 @@ public class ServerDiscovery {
                 }
 
             } catch (Exception e) {
-                Log.d("TC_ServerThreadRun", e.getMessage());
+                Log.d(TAG, e.getMessage());
             }
         }
 
@@ -162,6 +191,26 @@ public class ServerDiscovery {
         tcpServerEnabledFlag = false;
     }
 
+    public void sendUpdMsg(byte[] msg){
+        try {
+
+            if(udpSocket.isClosed()){
+                udpSocket = new DatagramSocket();
+                udpSocket.setBroadcast(true);
+                udpSocket.setSoTimeout(SOCKET_TIMEOUT);
+            }
+
+            try {
+                DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, broadcastAddr, UDP_TX_PORT);
+                udpSocket.send(sendPacket);
+            } catch (Exception e) {
+                Log.e(TAG, "IOException: " + e.getMessage());
+            }
+
+        }catch (SocketException e) {
+            Log.e(TAG, "SocketException: " + e.getMessage());
+        }
+    }
 
     /* Refresh all devices on the same network. To do this, we broadcast a UDP ping message,
      * and all devices will respond via TCP. */
@@ -181,7 +230,7 @@ public class ServerDiscovery {
             /* UDP package is not guarantied to arrive, so we send several of them and hope that at least one will arrive. */
             for (int i = 0; i < 5; i++) {
                 try {
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, getBroadcastAddress(context), PING_PORT);
+                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcastAddr, UDP_TX_PORT);
                     socket.send(sendPacket);
 
                 } catch (IOException e) {

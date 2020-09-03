@@ -19,7 +19,7 @@ import java.util.List;
 public class ScanActivity extends AppCompatActivity {
 
     private final String TAG = "ScanActivity";
-    private ServerDiscovery comms;
+    private DiscoveryAndUdpComms comms;
     private Handler deviceProcessorHandler;
     private ListView lv;
     private List<String> deviceArrayList;
@@ -66,7 +66,7 @@ public class ScanActivity extends AppCompatActivity {
         });
 
         // Initiate scan
-        comms = new ServerDiscovery(this);
+        comms = DiscoveryAndUdpComms.getInstance(this);
         deviceProcessorHandler = new Handler();
         scanNetworkForServer();
     }

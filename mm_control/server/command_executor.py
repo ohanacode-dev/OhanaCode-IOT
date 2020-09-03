@@ -62,6 +62,7 @@ class Cmd(Enum):
     MOUSE_DOWN_RIGHT = 107
     MOUSE_UP_LEFT = 108
     MOUSE_UP_RIGHT = 109
+    MOUSE_DOUBLECLICK_LEFT = 110
 
 
 def run_process(command_list):
@@ -171,6 +172,12 @@ def mouse_click(button):
         run_process(["xdotool", "click", "1"])
     elif button == Cmd.MOUSE_CLICK_RIGHT:
         run_process(["xdotool", "click", "3"])
+    elif button == Cmd.MOUSE_DOUBLECLICK_LEFT:
+        run_process(["xdotool", "click", "1"])
+        sleep(0.05)
+        run_process(["xdotool", "click", "1"])
+    else:
+        print("MOUSE UNKNOWN", button)
 
 
 def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offset_y=0):
@@ -227,8 +234,6 @@ def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offse
         send_key(Keypress.MEDIA)
     elif cmdVal == Cmd.POWEROFF:
         run_process(["poweroff"])
-
-
     else:
         print("ERROR: Command executor, unknown command: ", cmdVal)
 

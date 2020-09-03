@@ -8,11 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,17 +24,23 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String TAG = "Main";
-    public TextView TouchSurface;
-    int lastX = 0;
-    int lastY = 0;
+    private static final String TAG = "MAIN_ACTIVITY";
+    private static final String mouseBtnColorUp = "#DBF0EA";
+    private static final String mouseBtnColorDown = "#BCCCC8";
+    private static final int TAP_TIMEOUT = 100;
+    private static final int TAP_PROCESS_TIMEOUT = 300;
+    private static final int REQUEST_CODE = 13;
+    private String serverIP = "";
+    private int lastX = 0;
+    private int lastY = 0;
+    private boolean surfaceTouchedFlag = false;
+    private boolean mouseDownFlag = false;
+    private Long touchTimestamp;
+    private Long tapTimestamp;
     private AlertDialog aboutDialog;
-    private int REQUEST_CODE = 13;
-    String serverIP = "";
-    TcpClient sender;
-    static final String mouseBtnColorUp = "#DBF0EA";
-    static final String mouseBtnColorDown = "#BCCCC8";
-
+    private Handler tapProcessorHandler;
+    private DiscoveryAndUdpComms comms;
+    private TcpClient sender;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -46,8 +51,13 @@ public class MainActivity extends AppCompatActivity {
         sender = TcpClient.getInstance();
         sender.startSender(serverIP);
 
+        comms = DiscoveryAndUdpComms.getInstance(this);
+
         // Setup touchpad surface
-        TouchSurface = findViewById(R.id.textView_touch);
+        touchTimestamp = System.currentTimeMillis();
+        tapTimestamp = touchTimestamp;
+        tapProcessorHandler = new Handler();
+        TextView TouchSurface = findViewById(R.id.textView_touch);
         TouchSurface.setOnTouchListener(new View.OnTouchListener(){
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -57,8 +67,39 @@ public class MainActivity extends AppCompatActivity {
                         //pointer down.
                         lastX = 0;
                         lastY = 0;
+                        touchTimestamp = System.currentTimeMillis();
+                        surfaceTouchedFlag = true;
                         break;
                     case MotionEvent.ACTION_UP:
+                        surfaceTouchedFlag = false;
+                        Long releaseTimestamp = System.currentTimeMillis();
+                        if((releaseTimestamp - touchTimestamp) < TAP_TIMEOUT){
+                            // Tap detected
+                            if((releaseTimestamp - tapTimestamp) < TAP_PROCESS_TIMEOUT) {
+                                // Last tap happened recently. This is a double tap, so cancel touch processing and just send a double click.
+                                tapProcessorHandler.removeCallbacksAndMessages(null);
+                                mouseDownFlag = false;
+                                byte[] msg = new byte[3];
+                                msg[0] = CommandData.CODE_SPECIAL;
+                                msg[1] = CommandData.KEY_MOUSE_LEFT_DOUBLECLICK;
+                                sendTcpMsg(msg);
+                            }else{
+                                // Last tap was a long time ago
+                                tapProcessorHandler.postDelayed(tapProcessor, TAP_PROCESS_TIMEOUT);
+                            }
+
+                            tapTimestamp = releaseTimestamp;
+                        }
+
+                        if(mouseDownFlag){
+                            mouseDownFlag = false;
+                            byte[] msg = new byte[3];
+                            msg[0] = CommandData.CODE_SPECIAL;
+                            msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
+                            sendTcpMsg(msg);
+                        }
+
+                        break;
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_OUTSIDE:
                         //event has finished, pointer is up or event was canceled or the pointer is outside of the view's bounds
@@ -83,70 +124,53 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Button btnMouseLeft = findViewById(R.id.button_left);
-        btnMouseLeft.setOnClickListener(new View.OnClickListener() {
+        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+        btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_LEFT;
-                sendTcpMsg(msg);
+
+                switch ( event.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
+                        sendTcpMsg(msg);
+                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
+                        sendTcpMsg(msg);
+                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        break;
+                }
+                return true;
             }
         });
-//        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-//        btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                byte[] msg = new byte[3];
-//                msg[0] = CommandData.CODE_SPECIAL;
-//
-//                switch ( event.getAction() ) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
-//                        sendTcpMsg(msg);
-//                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
-//                        sendTcpMsg(msg);
-//                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
 
         final Button btnMouseRight = findViewById(R.id.button_right);
-        btnMouseRight.setOnClickListener(new View.OnClickListener() {
+        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+        btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onTouch(View v, MotionEvent event) {
                 byte[] msg = new byte[3];
                 msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_RIGHT;
-                sendTcpMsg(msg);
+
+                switch ( event.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
+                        sendTcpMsg(msg);
+                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
+                        sendTcpMsg(msg);
+                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        break;
+                }
+                return true;
             }
         });
-//        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-//        btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                byte[] msg = new byte[3];
-//                msg[0] = CommandData.CODE_SPECIAL;
-//
-//                switch ( event.getAction() ) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
-//                        sendTcpMsg(msg);
-//                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
-//                        sendTcpMsg(msg);
-//                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
+
 
         /* Create the About dialog as a globally accessible object so we can close it when the app goes in the background */
         final String aboutString = "Author: Rada Berar\ne-mail: rada.berar@ohanacode-dev.com\n\n" +
@@ -221,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void processTouch(int x, int y){
         int offset_X = 0;
         int offset_Y = 0;
@@ -251,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             msg[1] = (byte) (offset_X & 0xFF);
             msg[2] = (byte) (offset_Y & 0xFF);
 
-            sendTcpMsg(msg);
+            comms.sendUpdMsg(msg);
         }
     }
 
@@ -267,4 +292,24 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("srv_prefs", this.MODE_PRIVATE);
         return prefs.getString("serverip", "");
     }
+
+    Runnable tapProcessor = new Runnable() {
+        @Override
+        public void run() {
+            if(surfaceTouchedFlag){
+                // Mouse down
+                mouseDownFlag = true;
+                byte[] msg = new byte[3];
+                msg[0] = CommandData.CODE_SPECIAL;
+                msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
+                sendTcpMsg(msg);
+            }else{
+                // click
+                byte[] msg = new byte[3];
+                msg[0] = CommandData.CODE_SPECIAL;
+                msg[1] = CommandData.KEY_MOUSE_LEFT_CLICK;
+                sendTcpMsg(msg);
+            }
+        }
+    };
 }

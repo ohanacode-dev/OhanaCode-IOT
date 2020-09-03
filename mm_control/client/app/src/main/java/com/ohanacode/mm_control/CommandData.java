@@ -6,8 +6,6 @@ public class CommandData {
     public static final byte CODE_ASCII = 1;
     public static final byte CODE_SPECIAL = 2;
     public static final byte CODE_MOUSE = 3;
-    public static final byte CODE_MSG_START1 = 127;
-    public static final byte CODE_MSG_START2 = 126;
 
     // Special keys
     public static final byte KEY_LEFT = 1;
@@ -21,8 +19,8 @@ public class CommandData {
     public static final byte KEY_PGDN = 9;
     public static final byte KEY_PGUP = 10;
     public static final byte KEY_ENTER = 11;
-    public static final byte KEY_MOUSE_LEFT = 12;
-    public static final byte KEY_MOUSE_RIGHT = 13;
+    public static final byte KEY_MOUSE_LEFT_CLICK = 12;
+    public static final byte KEY_MOUSE_RIGHT_CLICK = 13;
     public static final byte KEY_MOUSE_LEFT_DOWN = 14;
     public static final byte KEY_MOUSE_RIGHT_DOWN = 15;
     public static final byte KEY_MOUSE_LEFT_UP = 16;
@@ -46,4 +44,5 @@ public class CommandData {
     public static final byte KEY_COMMA = 34;
     public static final byte KEY_PERIOD = 35;
     public static final byte KEY_QUOTE = 36;
+    public static final byte KEY_MOUSE_LEFT_DOUBLECLICK = 37;
 }

@@ -1,6 +1,5 @@
 package com.ohanacode.mm_control;
 
-import android.os.Handler;
 import android.util.Log;
 
 import java.io.DataOutputStream;
@@ -18,7 +17,6 @@ public class TcpClient{
     private static String SERVER_IP = "";
     private static byte[] msg;
     private Thread clientThread;
-    private byte[] startMsg = {CommandData.CODE_MSG_START1, CommandData.CODE_MSG_START2};
 
     private TcpClient()
     {
@@ -54,7 +52,6 @@ public class TcpClient{
     public boolean sendMsg(byte[] buf) {
         try {
             DataOutputStream s_out = new DataOutputStream(socket.getOutputStream());
-            s_out.write(startMsg);
             s_out.write(buf);
             Log.i(TAG, "Sending:" + buf[0] + ' ' + buf[1] + ' ' + buf[2]);
             return true;
