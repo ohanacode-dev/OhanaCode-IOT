@@ -62,9 +62,8 @@ KEY_QUOTE = 36
 KEY_MOUSE_LEFT_DOUBLECLICK = 37
 
 DEV_ID = "50"
-UDP_DISCOVER_PORT = 4210
+UDP_RX_PORT = 4210
 TCP_RX_PORT = 4213
-UDP_RX_PORT = 4214
 IP = None
 stop_flag = False
 MAC = ""
@@ -72,7 +71,6 @@ current_window_title = ""
 MSG_PING = "ujagaga ping"
 last_shutdown_timestamp = 0
 last_cmd_timestamp = 0
-last_ping_timestamp = 0
 
 
 def get_active_window_name():
@@ -187,12 +185,11 @@ def get_ip():
 
 
 def send_tcp_response(sender_address, msg):
-
     success_status = True
 
     try:
         responder = socket(AF_INET, SOCK_STREAM)
-        responder.connect((sender_address, UDP_DISCOVER_PORT + 1))
+        responder.connect((sender_address, UDP_RX_PORT + 1))
         responder.send(msg)
         responder.close()
     except:
@@ -304,19 +301,13 @@ def process_rx(rxbuf):
             print("\nERROR TCP_API on line{}: {}".format(exc_tb.tb_lineno, e))
 
 
-def discovery_server():
-    global IP
-    global UDP_DISCOVER_PORT
-    global MSG_PING
-    global stop_flag
-    global MAC
-    global last_ping_timestamp
+def udp_server():
+    print("Starting UDP server\n")
 
-    print("Starting discovery server\n")
-
+    last_ping_timestamp = 0
     while not stop_flag:
         try:
-            (msg, (sender_addr, sender_port)) = broadcast_receiver.recvfrom(24)
+            (msg, (sender_addr, sender_port)) = udp_receiver.recvfrom(24)
 
             if msg is not None and len(msg) > 0:
                 try:
@@ -333,47 +324,11 @@ def discovery_server():
                     last_ping_timestamp = time()
 
                 else:
-                    print("BROADCAST RX")
-                    # udp_rxbuf = []
-                    # for val in msg:
-                    #     udp_rxbuf.append(val)
-                    # process_rx(udp_rxbuf)
+                    udp_rxbuf = []
+                    for val in msg:
+                        udp_rxbuf.append(val)
+                    process_rx(udp_rxbuf)
 
-        except Exception as e:
-            # print("ERR: {}".format(e))
-            try:
-                broadcast_receiver.close()
-            except:
-                pass
-            try:
-                broadcast_receiver = socket(AF_INET, SOCK_DGRAM)
-                broadcast_receiver.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-                broadcast_receiver.settimeout(20)
-                broadcast_receiver.bind(("", UDP_DISCOVER_PORT))
-            except:
-                pass
-
-    print("Ending discovery server\n")
-
-
-def udp_server():
-    global IP
-    global UDP_RX_PORT
-    global stop_flag
-
-    print("Starting udp server\n")
-
-    while not stop_flag:
-        try:
-            (msg, (sender_addr, sender_port)) = udp_receiver.recvfrom(24)
-
-            if msg is not None and len(msg) > 0:
-                print("UNICAST RX")
-
-                udp_rxbuf = []
-                for val in msg:
-                    udp_rxbuf.append(val)
-                process_rx(udp_rxbuf)
         except Exception as e:
             # print("ERR: {}".format(e))
             try:
@@ -382,18 +337,16 @@ def udp_server():
                 pass
             try:
                 udp_receiver = socket(AF_INET, SOCK_DGRAM)
+                udp_receiver.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
                 udp_receiver.settimeout(10)
-                udp_receiver.bind((IP, UDP_RX_PORT))
+                udp_receiver.bind(("", UDP_RX_PORT))
             except:
                 pass
 
-    print("Ending udp server\n")
+    print("Ending UDP server\n")
 
 
 def tcp_server():
-    global TCP_RX_PORT
-    global tcp_rxbuf
-
     print("Starting TCP receiver\n")
     server = socket(AF_INET, SOCK_STREAM)
 
@@ -452,9 +405,6 @@ def init(standalone=False):
     # Activate communication
     t_window_title = threading.Thread(target=thread_window_title)
     t_window_title.start()
-
-    t_discovery_server = threading.Thread(target=discovery_server)
-    t_discovery_server.start()
 
     t_udp_server = threading.Thread(target=udp_server)
     t_udp_server.start()
