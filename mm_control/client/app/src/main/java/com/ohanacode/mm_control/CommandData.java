@@ -45,4 +45,5 @@ public class CommandData {
     public static final byte KEY_PERIOD = 35;
     public static final byte KEY_QUOTE = 36;
     public static final byte KEY_MOUSE_LEFT_DOUBLECLICK = 37;
+    public static final byte KEY_CLOSE = 38;
 }

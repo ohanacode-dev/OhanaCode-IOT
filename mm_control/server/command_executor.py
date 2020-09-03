@@ -10,12 +10,6 @@ import sys
 last_cmd_timestamp = 0
 
 
-class CmdMod(Enum):
-    SHIFT = 1
-    ALT = 2
-    CTRL = 3
-
-
 class Cmd(Enum):
     A = 1
     F = 2
@@ -71,7 +65,7 @@ def run_process(command_list):
     return str(result.stdout, 'utf-8')
 
 
-class Keypress(Enum):
+class KEYPRESS(Enum):
     PLAY = "XF86AudioPlay"
     PAUSE = "XF86AudioPause"
     VOLUME_MUTE = "XF86AudioMute"
@@ -93,9 +87,9 @@ class Keypress(Enum):
     SPACEBAR = "space"
     BACKSPACE = "BackSpace"
     MEDIA = "XF86AudioMedia"
-    SHIFT = 'shift'
-    ALT = 'alt'
-    CTRL = 'ctrl'
+    SHIFT_KEY = 'shift'
+    ALT_KEY = 'alt'
+    CTRL_KEY = 'ctrl'
     ARROW_LEFT = "Left"
     ARROW_RIGHT = "Right"
     ARROW_UP = "Up"
@@ -125,18 +119,15 @@ class Keypress(Enum):
 
 def send_key(keycode, modifier=""):
     try:
-        if modifier == CmdMod.ALT:
-            mod_key = "{}+".format(Keypress.ALT)
-        elif modifier == CmdMod.SHIFT:
-            mod_key = "{}+".format(Keypress.SHIFT)
-        elif modifier == CmdMod.CTRL:
-            mod_key = "{}+".format(Keypress.CTRL)
+
+        if modifier != "":
+            requested_keypress = "{}+{}".format(modifier, keycode)
         else:
-            mod_key = ""
+            requested_keypress = keycode
 
-        print("SENDING:", mod_key, keycode)
+        print("SENDING:", requested_keypress)
 
-        run_process(["xdotool", "key", "{}{}".format(mod_key, keycode)])
+        run_process(["xdotool", "key", "{}".format(requested_keypress)])
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -183,57 +174,64 @@ def mouse_click(button):
 def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offset_y=0):
     global last_cmd_timestamp
 
-    if cmdVal == Cmd.CLOSE:
-        send_key(Keypress.F4, Keypress.ALT)
-    elif cmdVal == Cmd.SHUTDOWN:
-        run_process(['poweroff'])
-    elif cmdVal == Cmd.STOP:
-        send_key(Keypress.STOP)
-    elif cmdVal == Cmd.VOL_UP:
-        send_key(Keypress.VOL_UP)
-    elif cmdVal == Cmd.PREVIOUS:
-        if "butter" in current_window_title.lower():
-            send_key(Keypress.LEFT_ARROW, Keypress.SHIFT)
+    try:
+
+        if cmdVal == Cmd.CLOSE:
+            send_key(KEYPRESS.F4.value, KEYPRESS.ALT_KEY.value)
+        elif cmdVal == Cmd.PLAY:
+            if "youtube" in current_window_title.lower():
+                send_key(KEYPRESS.K.value)
+            elif "butter" in current_window_title.lower():
+                send_key(KEYPRESS.SPACEBAR.value)
+            else:
+                send_key(KEYPRESS.PLAY.value)
+        elif cmdVal == Cmd.SHUTDOWN:
+            run_process(['poweroff'])
+        elif cmdVal == Cmd.STOP:
+            send_key(KEYPRESS.STOP.value)
+        elif cmdVal == Cmd.VOL_UP:
+            send_key(KEYPRESS.VOL_UP.value)
+        elif cmdVal == Cmd.PREVIOUS:
+            if "butter" in current_window_title.lower():
+                send_key(KEYPRESS.LEFT_ARROW.value, KEYPRESS.SHIFT.value)
+            else:
+                send_key(KEYPRESS.PREVIOUS_TRACK.value)
+        elif cmdVal == Cmd.REWIND:
+            if "youtube" in current_window_title.lower():
+                send_key(KEYPRESS.J.value)
+            elif "vlc media player" in current_window_title.lower():
+                send_key(KEYPRESS.LEFT_ARROW.value, KEYPRESS.ALT.value)
+            else:
+                send_key(KEYPRESS.LEFT_ARROW.value)
+
+        elif cmdVal == Cmd.NEXT:
+            if "butter" in current_window_title.lower():
+                send_key(KEYPRESS.RIGHT_ARROW.value, KEYPRESS.SHIFT.value)
+            else:
+                send_key(KEYPRESS.NEXT_TRACK.value)
+        elif cmdVal == Cmd.FORWARD:
+            if "youtube" in current_window_title.lower():
+                send_key(KEYPRESS.L.value)
+            elif "vlc media player" in current_window_title.lower():
+                send_key(KEYPRESS.RIGHT_ARROW.value, KEYPRESS.ALT.value)
+            elif "butter" in current_window_title.lower():
+                send_key(KEYPRESS.RIGHT_ARROW.value)
+            else:
+                send_key(KEYPRESS.FORWARD.value)
+        elif cmdVal == Cmd.VOL_DOWN:
+            send_key(KEYPRESS.VOLUME_DOWN.value)
+        elif cmdVal == Cmd.MUTE:
+            if (time() - last_cmd_timestamp) > 1:
+                send_key(KEYPRESS.VOLUME_MUTE.value)
+            last_cmd_timestamp = time()
+        elif cmdVal == Cmd.MEDIA:
+            send_key(KEYPRESS.MEDIA.value)
+        elif cmdVal == Cmd.POWEROFF:
+            run_process(["poweroff"])
         else:
-            send_key(Keypress.PREVIOUS_TRACK)
-    elif cmdVal == Cmd.REWIND:
-        if "youtube" in current_window_title.lower():
-            send_key(Keypress.J)
-        elif "vlc media player" in current_window_title.lower():
-            send_key(Keypress.LEFT_ARROW, Keypress.ALT)
-        else:
-            send_key(Keypress.LEFT_ARROW)
-    elif cmdVal == Cmd.PLAY:
-        if "youtube" in current_window_title.lower():
-            send_key(Keypress.K.value)
-        elif "butter" in current_window_title.lower():
-            send_key(Keypress.SPACEBAR.value)
-        else:
-            send_key(Keypress.PLAY.value)
-    elif cmdVal == Cmd.NEXT:
-        if "butter" in current_window_title.lower():
-            send_key(Keypress.RIGHT_ARROW, Keypress.SHIFT)
-        else:
-            send_key(Keypress.NEXT_TRACK)
-    elif cmdVal == Cmd.FORWARD:
-        if "youtube" in current_window_title.lower():
-            send_key(Keypress.L)
-        elif "vlc media player" in current_window_title.lower():
-            send_key(Keypress.RIGHT_ARROW, Keypress.ALT)
-        elif "butter" in current_window_title.lower():
-            send_key(Keypress.RIGHT_ARROW)
-        else:
-            send_key(Keypress.FORWARD)
-    elif cmdVal == Cmd.VOL_DOWN:
-        send_key(Keypress.VOLUME_DOWN)
-    elif cmdVal == Cmd.MUTE:
-        if (time() - last_cmd_timestamp) > 1:
-            send_key(Keypress.VOLUME_MUTE)
-        last_cmd_timestamp = time()
-    elif cmdVal == Cmd.MEDIA:
-        send_key(Keypress.MEDIA)
-    elif cmdVal == Cmd.POWEROFF:
-        run_process(["poweroff"])
-    else:
-        print("ERROR: Command executor, unknown command: ", cmdVal)
+            print("ERROR: Command executor, unknown command: ", cmdVal)
+
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print("\nERROR execute_cmd on line{}: {}".format(exc_tb.tb_lineno, e))
 

@@ -3,6 +3,7 @@ package com.ohanacode.mm_control;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class KeyboardActivity extends AppCompatActivity implements View.OnClickListener{
@@ -92,6 +93,7 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
         findViewById(R.id.btn_space).setOnClickListener(this);
         findViewById(R.id.btn_enter).setOnClickListener(this);
         findViewById(R.id.btn_backspace).setOnClickListener(this);
+        findViewById(R.id.btn_close).setOnClickListener(this);
     }
 
     @Override
@@ -366,6 +368,10 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btn_backspace:
                 codeType = CommandData.CODE_SPECIAL;
                 codeValue = CommandData.KEY_BACKSPACE;
+                break;
+            case R.id.btn_close:
+                codeType = CommandData.CODE_SPECIAL;
+                codeValue = CommandData.KEY_CLOSE;
                 break;
 
             default:

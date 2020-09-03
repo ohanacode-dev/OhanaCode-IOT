@@ -21,7 +21,7 @@ import java.util.List;
 
 public class DiscoveryAndUdpComms {
 
-    private final String TAG = "UDP CLIENT";
+    private final String TAG = "DiscoveryAndUdpComms";
 
     private static final int TCP_RX_PORT = 4211;
     private static final int UDP_TX_PORT = 4210;         /* Port on which to broadcast the ping message */
@@ -66,6 +66,7 @@ public class DiscoveryAndUdpComms {
                 }
             }
         }
+
         // Return the instance
         return instance;
     }
@@ -166,8 +167,8 @@ public class DiscoveryAndUdpComms {
     }
 
     private void startTcpServer(){
-        Log.d("TC_Start", "Starting");
         if(!tcpServerEnabledFlag) {
+            Log.d("TC_Start", "Starting");
             tcpServerEnabledFlag = true;
             serverThread = new Thread(new ServerThread());
             serverThread.start();
@@ -182,34 +183,26 @@ public class DiscoveryAndUdpComms {
             if(serverSocket != null) {
                 serverSocket.close();
             }else{
-                Log.d("TC_Stop", "Already stopped");
+                Log.d(TAG, "Already stopped");
             }
         } catch (Exception e) {
-            Log.e("TC_stopTcpServer", "SocketException: " + e.getMessage());
+            Log.e(TAG, "SocketException: " + e.getMessage());
         }
 
         tcpServerEnabledFlag = false;
     }
 
-    public void sendUdpMsg(byte[] msg, String destinationIP){
+    public boolean sendUdpMsg(byte[] msg, String destinationIP){
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         try {
-
-            if(udpSocket.isClosed()){
-                udpSocket = new DatagramSocket();
-                udpSocket.setBroadcast(true);
-                udpSocket.setSoTimeout(SOCKET_TIMEOUT);
-            }
-
-            try {
-                DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, InetAddress.getByName(destinationIP), UDP_TX_PORT);
-                udpSocket.send(sendPacket);
-            } catch (Exception e) {
-                Log.e(TAG, "IOException: " + e.getMessage());
-            }
-
-        }catch (SocketException e) {
-            Log.e(TAG, "SocketException: " + e.getMessage());
+            DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, InetAddress.getByName(destinationIP), UDP_TX_PORT);
+            udpSocket.send(sendPacket);
+        }catch (Exception e) {
+            Log.e(TAG, "SocketException1: " + e.getMessage());
+            return false;
         }
+        return true;
     }
 
     /* Refresh all devices on the same network. To do this, we broadcast a UDP ping message,

@@ -60,6 +60,7 @@ KEY_COMMA = 34
 KEY_PERIOD = 35
 KEY_QUOTE = 36
 KEY_MOUSE_LEFT_DOUBLECLICK = 37
+KEY_CLOSE = 38
 
 DEV_ID = "50"
 UDP_RX_PORT = 4210
@@ -212,27 +213,27 @@ def process_rx(rxbuf):
                 # Send a special key:
                 key_val = rxbuf[1]
                 if key_val == KEY_LEFT:
-                    command_executor.send_key(command_executor.Keypress.ARROW_LEFT.value)
+                    command_executor.send_key(command_executor.KEYPRESS.ARROW_LEFT.value)
                 elif key_val == KEY_RIGHT:
-                    command_executor.send_key(command_executor.Keypress.ARROW_RIGHT.value)
+                    command_executor.send_key(command_executor.KEYPRESS.ARROW_RIGHT.value)
                 elif key_val == KEY_UP:
-                    command_executor.send_key(command_executor.Keypress.ARROW_UP.value)
+                    command_executor.send_key(command_executor.KEYPRESS.ARROW_UP.value)
                 elif key_val == KEY_DOWN:
-                    command_executor.send_key(command_executor.Keypress.ARROW_DOWN.value)
+                    command_executor.send_key(command_executor.KEYPRESS.ARROW_DOWN.value)
                 elif key_val == KEY_PLAY:
                     command_executor.execute_cmd(command_executor.Cmd.PLAY, current_window_title.lower())
                 elif key_val == KEY_CAPS:
-                    command_executor.send_key(command_executor.Keypress.CAPS_LOCK.value)
+                    command_executor.send_key(command_executor.KEYPRESS.CAPS_LOCK.value)
                 elif key_val == KEY_VOLUP:
-                    command_executor.send_key(command_executor.Keypress.VOLUME_UP.value)
+                    command_executor.send_key(command_executor.KEYPRESS.VOLUME_UP.value)
                 elif key_val == KEY_VOLDN:
-                    command_executor.send_key(command_executor.Keypress.VOLUME_DOWN.value)
+                    command_executor.send_key(command_executor.KEYPRESS.VOLUME_DOWN.value)
                 elif key_val == KEY_PGDN:
-                    command_executor.send_key(command_executor.Keypress.PAGE_DOWN.value)
+                    command_executor.send_key(command_executor.KEYPRESS.PAGE_DOWN.value)
                 elif key_val == KEY_PGUP:
-                    command_executor.send_key(command_executor.Keypress.PAGE_UP.value)
+                    command_executor.send_key(command_executor.KEYPRESS.PAGE_UP.value)
                 elif key_val == KEY_ENTER:
-                    command_executor.send_key(command_executor.Keypress.ENTER.value)
+                    command_executor.send_key(command_executor.KEYPRESS.ENTER.value)
                 elif key_val == KEY_MOUSE_LEFT:
                     command_executor.mouse_click(command_executor.Cmd.MOUSE_CLICK_LEFT)
                 elif key_val == KEY_MOUSE_RIGHT:
@@ -248,43 +249,45 @@ def process_rx(rxbuf):
                 elif key_val == KEY_MOUSE_RIGHT_UP:
                     command_executor.mouse_click(command_executor.Cmd.MOUSE_UP_RIGHT)
                 elif key_val == KEY_SPACE:
-                    command_executor.send_key(command_executor.Keypress.SPACEBAR.value)
+                    command_executor.send_key(command_executor.KEYPRESS.SPACEBAR.value)
                 elif key_val == KEY_BACKSPACE:
-                    command_executor.send_key(command_executor.Keypress.BACKSPACE.value)
+                    command_executor.send_key(command_executor.KEYPRESS.BACKSPACE.value)
                 elif key_val == KEY_MONKEY:
-                    command_executor.send_key(command_executor.Keypress.MONKEY.value)
+                    command_executor.send_key(command_executor.KEYPRESS.MONKEY.value)
                 elif key_val == KEY_PLUS:
-                    command_executor.send_key(command_executor.Keypress.PLUS.value)
+                    command_executor.send_key(command_executor.KEYPRESS.PLUS.value)
                 elif key_val == KEY_MINUS:
-                    command_executor.send_key(command_executor.Keypress.MINUS.value)
+                    command_executor.send_key(command_executor.KEYPRESS.MINUS.value)
                 elif key_val == KEY_SLASH:
-                    command_executor.send_key(command_executor.Keypress.SLASH.value)
+                    command_executor.send_key(command_executor.KEYPRESS.SLASH.value)
                 elif key_val == KEY_COLON:
-                    command_executor.send_key(command_executor.Keypress.COLON.value)
+                    command_executor.send_key(command_executor.KEYPRESS.COLON.value)
                 elif key_val == KEY_SEMICOLON:
-                    command_executor.send_key(command_executor.Keypress.SEMICOLON.value)
+                    command_executor.send_key(command_executor.KEYPRESS.SEMICOLON.value)
                 elif key_val == KEY_EQUAL:
-                    command_executor.send_key(command_executor.Keypress.EQUAL.value)
+                    command_executor.send_key(command_executor.KEYPRESS.EQUAL.value)
                 elif key_val == KEY_PERCENT:
-                    command_executor.send_key(command_executor.Keypress.PERCENT.value)
+                    command_executor.send_key(command_executor.KEYPRESS.PERCENT.value)
                 elif key_val == KEY_LESS:
-                    command_executor.send_key(command_executor.Keypress.LESS.value)
+                    command_executor.send_key(command_executor.KEYPRESS.LESS.value)
                 elif key_val == KEY_GREATER:
-                    command_executor.send_key(command_executor.Keypress.GREATER.value)
+                    command_executor.send_key(command_executor.KEYPRESS.GREATER.value)
                 elif key_val == KEY_TILDE:
-                    command_executor.send_key(command_executor.Keypress.TILDE.value)
+                    command_executor.send_key(command_executor.KEYPRESS.TILDE.value)
                 elif key_val == KEY_QUESTION:
-                    command_executor.send_key(command_executor.Keypress.QUESTION.value)
+                    command_executor.send_key(command_executor.KEYPRESS.QUESTION.value)
                 elif key_val == KEY_UNDERSCORE:
-                    command_executor.send_key(command_executor.Keypress.UNDERSCORE.value)
+                    command_executor.send_key(command_executor.KEYPRESS.UNDERSCORE.value)
                 elif key_val == KEY_EXCLAMATION:
-                    command_executor.send_key(command_executor.Keypress.EXCLAMATION.value)
+                    command_executor.send_key(command_executor.KEYPRESS.EXCLAMATION.value)
                 elif key_val == KEY_COMMA:
-                    command_executor.send_key(command_executor.Keypress.COMMA.value)
+                    command_executor.send_key(command_executor.KEYPRESS.COMMA.value)
                 elif key_val == KEY_PERIOD:
-                    command_executor.send_key(command_executor.Keypress.PERIOD.value)
+                    command_executor.send_key(command_executor.KEYPRESS.PERIOD.value)
                 elif key_val == KEY_QUOTE:
-                    command_executor.send_key(command_executor.Keypress.QUOTE.value)
+                    command_executor.send_key(command_executor.KEYPRESS.QUOTE.value)
+                elif key_val == KEY_CLOSE:
+                    command_executor.execute_cmd(command_executor.Cmd.CLOSE)
 
             elif cmd_code == CODE_MOUSE:
                 # Coordinates should be signed 8 bit numbers. We get unsigned bytes.
@@ -298,7 +301,7 @@ def process_rx(rxbuf):
                 command_executor.move_cursor(x_offset, y_offset)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            print("\nERROR TCP_API on line{}: {}".format(exc_tb.tb_lineno, e))
+            print("\nERROR COMMS on line{}: {}".format(exc_tb.tb_lineno, e))
 
 
 def udp_server():

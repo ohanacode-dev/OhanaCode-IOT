@@ -25,8 +25,6 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MAIN_ACTIVITY";
-    private static final String mouseBtnColorUp = "#DBF0EA";
-    private static final String mouseBtnColorDown = "#BCCCC8";
     private static final int TAP_TIMEOUT = 100;
     private static final int TAP_PROCESS_TIMEOUT = 300;
     private static final int REQUEST_CODE = 13;
@@ -124,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Button btnMouseLeft = findViewById(R.id.button_left);
-        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
         btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -135,12 +132,13 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
                         sendTcpMsg(msg);
-                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        btnMouseLeft.getBackground().setAlpha(150);
+
                         break;
                     case MotionEvent.ACTION_UP:
                         msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
                         sendTcpMsg(msg);
-                        btnMouseLeft.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        btnMouseLeft.getBackground().setAlpha(255);
                         break;
                 }
                 return true;
@@ -148,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Button btnMouseRight = findViewById(R.id.button_right);
-        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
         btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -159,12 +156,12 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
                         sendTcpMsg(msg);
-                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorDown));
+                        btnMouseRight.getBackground().setAlpha(150);
                         break;
                     case MotionEvent.ACTION_UP:
                         msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
                         sendTcpMsg(msg);
-                        btnMouseRight.setBackgroundColor(Color.parseColor(mouseBtnColorUp));
+                        btnMouseRight.getBackground().setAlpha(255);
                         break;
                 }
                 return true;
@@ -276,7 +273,9 @@ public class MainActivity extends AppCompatActivity {
             msg[1] = (byte) (offset_X & 0xFF);
             msg[2] = (byte) (offset_Y & 0xFF);
 
-            comms.sendUdpMsg(msg, serverIP);
+            if(!comms.sendUdpMsg(msg, serverIP)){
+                comms.sendUdpMsg(msg, serverIP);
+            }
         }
     }
 
