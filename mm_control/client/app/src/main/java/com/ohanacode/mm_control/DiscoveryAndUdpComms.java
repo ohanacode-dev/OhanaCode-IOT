@@ -191,7 +191,7 @@ public class DiscoveryAndUdpComms {
         tcpServerEnabledFlag = false;
     }
 
-    public void sendUpdMsg(byte[] msg){
+    public void sendUdpMsg(byte[] msg, String destinationIP){
         try {
 
             if(udpSocket.isClosed()){
@@ -201,7 +201,7 @@ public class DiscoveryAndUdpComms {
             }
 
             try {
-                DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, broadcastAddr, UDP_TX_PORT);
+                DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, InetAddress.getByName(destinationIP), UDP_TX_PORT);
                 udpSocket.send(sendPacket);
             } catch (Exception e) {
                 Log.e(TAG, "IOException: " + e.getMessage());

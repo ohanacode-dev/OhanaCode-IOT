@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
             msg[1] = (byte) (offset_X & 0xFF);
             msg[2] = (byte) (offset_Y & 0xFF);
 
-            comms.sendUpdMsg(msg);
+            comms.sendUdpMsg(msg, serverIP);
         }
     }
 

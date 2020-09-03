@@ -304,7 +304,7 @@ def process_rx(rxbuf):
             print("\nERROR TCP_API on line{}: {}".format(exc_tb.tb_lineno, e))
 
 
-def udp_server():
+def discovery_server():
     global IP
     global UDP_DISCOVER_PORT
     global MSG_PING
@@ -312,7 +312,7 @@ def udp_server():
     global MAC
     global last_ping_timestamp
 
-    print("Starting udp server\n")
+    print("Starting discovery server\n")
 
     while not stop_flag:
         try:
@@ -330,13 +330,15 @@ def udp_server():
                             print("ERROR: No TCP connection!")
                         else:
                             print("Responding via TCP with: ", MAC)
-
                     last_ping_timestamp = time()
+
                 else:
-                    udp_rxbuf = []
-                    for val in msg:
-                        udp_rxbuf.append(val)
-                    process_rx(udp_rxbuf)
+                    print("BROADCAST RX")
+                    # udp_rxbuf = []
+                    # for val in msg:
+                    #     udp_rxbuf.append(val)
+                    # process_rx(udp_rxbuf)
+
         except Exception as e:
             # print("ERR: {}".format(e))
             try:
@@ -348,6 +350,40 @@ def udp_server():
                 broadcast_receiver.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
                 broadcast_receiver.settimeout(20)
                 broadcast_receiver.bind(("", UDP_DISCOVER_PORT))
+            except:
+                pass
+
+    print("Ending discovery server\n")
+
+
+def udp_server():
+    global IP
+    global UDP_RX_PORT
+    global stop_flag
+
+    print("Starting udp server\n")
+
+    while not stop_flag:
+        try:
+            (msg, (sender_addr, sender_port)) = udp_receiver.recvfrom(24)
+
+            if msg is not None and len(msg) > 0:
+                print("UNICAST RX")
+
+                udp_rxbuf = []
+                for val in msg:
+                    udp_rxbuf.append(val)
+                process_rx(udp_rxbuf)
+        except Exception as e:
+            # print("ERR: {}".format(e))
+            try:
+                udp_receiver.close()
+            except:
+                pass
+            try:
+                udp_receiver = socket(AF_INET, SOCK_DGRAM)
+                udp_receiver.settimeout(10)
+                udp_receiver.bind((IP, UDP_RX_PORT))
             except:
                 pass
 
@@ -416,6 +452,9 @@ def init(standalone=False):
     # Activate communication
     t_window_title = threading.Thread(target=thread_window_title)
     t_window_title.start()
+
+    t_discovery_server = threading.Thread(target=discovery_server)
+    t_discovery_server.start()
 
     t_udp_server = threading.Thread(target=udp_server)
     t_udp_server.start()
