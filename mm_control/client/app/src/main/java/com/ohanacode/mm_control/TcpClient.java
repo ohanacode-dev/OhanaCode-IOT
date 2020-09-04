@@ -69,6 +69,7 @@ public class TcpClient{
         try {
             clientThread.interrupt();
         } catch (Exception e1) {}
+
         try {
             socket.close();
         } catch (Exception e1) {}

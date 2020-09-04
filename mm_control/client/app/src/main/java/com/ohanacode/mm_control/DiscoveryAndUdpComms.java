@@ -192,7 +192,7 @@ public class DiscoveryAndUdpComms {
         tcpServerEnabledFlag = false;
     }
 
-    public boolean sendUdpMsg(byte[] msg, String destinationIP){
+    public void sendUdpMsg(byte[] msg, String destinationIP){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         try {
@@ -200,9 +200,7 @@ public class DiscoveryAndUdpComms {
             udpSocket.send(sendPacket);
         }catch (Exception e) {
             Log.e(TAG, "SocketException1: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     /* Refresh all devices on the same network. To do this, we broadcast a UDP ping message,
@@ -237,5 +235,13 @@ public class DiscoveryAndUdpComms {
 
     public List<String> getDeviceList(){
         return deviceList;
+    }
+
+    public void closeUdpSocket(){
+        try {
+            udpSocket.close();
+        }catch (Exception e){
+
+        }
     }
 }
