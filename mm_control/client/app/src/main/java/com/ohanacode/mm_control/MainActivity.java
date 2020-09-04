@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
@@ -27,11 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN_ACTIVITY";
     private static final int TAP_TIMEOUT = 100;
     private static final int TAP_PROCESS_TIMEOUT = 300;
-    private static final int TOUCH_SEND_TIMEOUT = ;
+    private static final int TOUCH_PROCESS_TIMEOUT = 50;
     private static final int REQUEST_CODE = 13;
     private String serverIP = "";
-    private int lastX = 0;
-    private int lastY = 0;
+    private int prevX = 0;
+    private int prevY = 0;
+    private int nextX = 0;
+    private int nextY = 0;
     private boolean surfaceTouchedFlag = false;
     private boolean mouseDownFlag = false;
     private Long touchTimestamp;
@@ -39,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog aboutDialog;
     private Handler tapProcessorHandler;
     private Handler touchSenderHandler;
-    private DiscoveryAndUdpComms comms;
-    private TcpClient sender;
+    private DiscoveryAndUdpComms udpSender;
+    private TcpClient tcpSender;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -48,12 +49,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         serverIP = readServerIp();
-        sender = TcpClient.getInstance();
-        sender.startSender(serverIP);
+        tcpSender = TcpClient.getInstance();
+        tcpSender.startSender(serverIP);
 
-        comms = DiscoveryAndUdpComms.getInstance(this);
+        udpSender = DiscoveryAndUdpComms.getInstance(this);
         touchSenderHandler = new Handler();
-        tapProcessorHandler.postDelayed(tapProcessor, TAP_PROCESS_TIMEOUT);
+        touchSenderHandler.postDelayed(touchSenderProcessor, TOUCH_PROCESS_TIMEOUT);
 
         // Setup touchpad surface
         touchTimestamp = System.currentTimeMillis();
@@ -67,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         //pointer down.
-                        lastX = 0;
-                        lastY = 0;
+                        prevX = (int)event.getX();
+                        prevY = (int)event.getY();
                         touchTimestamp = System.currentTimeMillis();
                         surfaceTouchedFlag = true;
                         break;
@@ -108,10 +109,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
-                float screenX = event.getX();
-                float screenY = event.getY();
+                nextX = (int)event.getX();
+                nextY = (int)event.getY();
 
-                processTouch((int)screenX, (int)screenY);
                 return true;
             }
         });
@@ -204,6 +204,11 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     /* Create options menu */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -232,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
             if (data.hasExtra("selected")) {
                 serverIP = data.getExtras().getString("selected");
                 saveServerIp(serverIP);
-                sender.startSender(serverIP);
+                tcpSender.startSender(serverIP);
             }
         }
 
@@ -240,9 +245,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendTcpMsg(byte[] msg){
-        if(!sender.sendMsg(msg)){
-            sender.startSender(serverIP);
-            sender.sendMsg(msg);
+        if(!tcpSender.sendMsg(msg)){
+            tcpSender.startSender(serverIP);
+            tcpSender.sendMsg(msg);
         }
     }
 
@@ -251,25 +256,23 @@ public class MainActivity extends AppCompatActivity {
         int offset_X = 0;
         int offset_Y = 0;
 
-        if(lastX != 0){
-            offset_X = x - lastX;
-            if(offset_X > 127){
-                offset_X = 127;
-            }else if(offset_X < -127){
-                offset_X = -127;
-            }
-        }
-        if(lastY != 0){
-            offset_Y = y - lastY;
-            if(offset_Y > 127){
-                offset_Y = 127;
-            }else if(offset_Y < -127){
-                offset_Y = -127;
-            }
+        offset_X = nextX - prevX;
+        if(offset_X > 127){
+            offset_X = 127;
+        }else if(offset_X < -127){
+            offset_X = -127;
         }
 
-        lastX = x;
-        lastY = y;
+        prevX = nextX;
+
+        offset_Y = nextY - prevY;
+        if(offset_Y > 127){
+            offset_Y = 127;
+        }else if(offset_Y < -127){
+            offset_Y = -127;
+        }
+
+        prevY = nextY;
 
         if((offset_X != 0) || (offset_Y != 0)){
             byte[] msg = new byte[3];
@@ -277,9 +280,7 @@ public class MainActivity extends AppCompatActivity {
             msg[1] = (byte) (offset_X & 0xFF);
             msg[2] = (byte) (offset_Y & 0xFF);
 
-            if(!comms.sendUdpMsg(msg, serverIP)){
-                comms.sendUdpMsg(msg, serverIP);
-            }
+            udpSender.sendUdpMsg(msg, serverIP);
         }
     }
 
@@ -313,6 +314,14 @@ public class MainActivity extends AppCompatActivity {
                 msg[1] = CommandData.KEY_MOUSE_LEFT_CLICK;
                 sendTcpMsg(msg);
             }
+        }
+    };
+
+    Runnable touchSenderProcessor = new Runnable() {
+        @Override
+        public void run() {
+            processTouch(nextX, nextY);
+            touchSenderHandler.postDelayed(touchSenderProcessor, TOUCH_PROCESS_TIMEOUT);
         }
     };
 }

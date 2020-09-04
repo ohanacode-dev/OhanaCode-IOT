@@ -173,12 +173,12 @@ public class DiscoveryAndUdpComms {
             serverThread = new Thread(new ServerThread());
             serverThread.start();
         }else{
-            Log.d("TC_Start", "Already started");
+            Log.d(TAG, "Already started");
         }
     }
 
     public void stopTcpServer(){
-        Log.d("TC_Stop", "Stopping");
+        Log.d(TAG, "Stopping");
         try {
             if(serverSocket != null) {
                 serverSocket.close();
@@ -192,7 +192,7 @@ public class DiscoveryAndUdpComms {
         tcpServerEnabledFlag = false;
     }
 
-    public boolean sendUdpMsg(byte[] msg, String destinationIP){
+    public void sendUdpMsg(byte[] msg, String destinationIP){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         try {
@@ -200,9 +200,7 @@ public class DiscoveryAndUdpComms {
             udpSocket.send(sendPacket);
         }catch (Exception e) {
             Log.e(TAG, "SocketException1: " + e.getMessage());
-            return false;
         }
-        return true;
     }
 
     /* Refresh all devices on the same network. To do this, we broadcast a UDP ping message,
@@ -227,15 +225,23 @@ public class DiscoveryAndUdpComms {
                     socket.send(sendPacket);
 
                 } catch (IOException e) {
-                    Log.e("TC_discoverDevices", "IOException: " + e.getMessage());
+                    Log.e(TAG, "IOException: " + e.getMessage());
                 }
             }
         }catch (SocketException e) {
-            Log.e("TC_discoverDevices", "SocketException: " + e.getMessage());
+            Log.e(TAG, "SocketException: " + e.getMessage());
         }
     }
 
     public List<String> getDeviceList(){
         return deviceList;
+    }
+
+    public void closeUdpSocket(){
+        try {
+            udpSocket.close();
+        }catch (Exception e){
+
+        }
     }
 }

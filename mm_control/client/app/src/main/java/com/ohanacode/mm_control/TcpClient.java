@@ -53,7 +53,7 @@ public class TcpClient{
         try {
             DataOutputStream s_out = new DataOutputStream(socket.getOutputStream());
             s_out.write(buf);
-            Log.i(TAG, "Sending:" + buf[0] + ' ' + buf[1] + ' ' + buf[2]);
+//            Log.i(TAG, "Sending:" + buf[0] + ' ' + buf[1] + ' ' + buf[2]);
             return true;
         } catch (SocketException se){
             Log.e(TAG, "ERROR1 sending data to:" + SERVER_IP + " " + se.getMessage());
@@ -69,6 +69,7 @@ public class TcpClient{
         try {
             clientThread.interrupt();
         } catch (Exception e1) {}
+
         try {
             socket.close();
         } catch (Exception e1) {}
