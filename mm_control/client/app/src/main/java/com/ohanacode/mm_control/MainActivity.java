@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN_ACTIVITY";
     private static final int TAP_TIMEOUT = 100;
     private static final int TAP_PROCESS_TIMEOUT = 300;
+    private static final int TOUCH_SEND_TIMEOUT = ;
     private static final int REQUEST_CODE = 13;
     private String serverIP = "";
     private int lastX = 0;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Long tapTimestamp;
     private AlertDialog aboutDialog;
     private Handler tapProcessorHandler;
+    private Handler touchSenderHandler;
     private DiscoveryAndUdpComms comms;
     private TcpClient sender;
 
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         sender.startSender(serverIP);
 
         comms = DiscoveryAndUdpComms.getInstance(this);
+        touchSenderHandler = new Handler();
+        tapProcessorHandler.postDelayed(tapProcessor, TAP_PROCESS_TIMEOUT);
 
         // Setup touchpad surface
         touchTimestamp = System.currentTimeMillis();
