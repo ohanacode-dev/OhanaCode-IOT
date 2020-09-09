@@ -29,10 +29,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int TOUCH_PROCESS_TIMEOUT = 50;
     private static final int REQUEST_CODE = 13;
     private String serverIP = "";
+
     private int prevX = 0;
     private int prevY = 0;
     private int nextX = 0;
     private int nextY = 0;
+
     private boolean surfaceTouchedFlag = false;
     private boolean mouseDownFlag = false;
     private Long touchTimestamp;
@@ -274,14 +276,12 @@ public class MainActivity extends AppCompatActivity {
 
         prevY = nextY;
 
-        if((offset_X != 0) || (offset_Y != 0)){
-            byte[] msg = new byte[3];
-            msg[0] = CommandData.CODE_MOUSE;
-            msg[1] = (byte) (offset_X & 0xFF);
-            msg[2] = (byte) (offset_Y & 0xFF);
+        accX += offset_X;
+        accY += offset_Y;
 
-            udpSender.sendUdpMsg(msg, serverIP);
-        }
+
+        udpSender.sendUdpMsg(msg, serverIP);
+
     }
 
     private void saveServerIp(String ipAddr){

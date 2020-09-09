@@ -1,28 +1,21 @@
 #!/bin/bash
 
-INSTALLDIR=magieye_install
-APP_DIR=magiceye
+APP_DIR=mm_ctrl
 TIMESTAMP=$(date +"%y%m%d.%I")
 
 mkdir $APP_DIR
 
-rm -rf ../commonlib/__pycache__
 rm -rf ../__pycache__
-rm magiceyeinstaller*
+rm mm_installer*
 
-cp -r ../commonlib $APP_DIR/
+cp -r ../assets $APP_DIR/
+cp -r ../templates $APP_DIR/
 cp ../logo.png $APP_DIR/
-cp ../magiceye-gui.py $APP_DIR/
-cp uninstaller.sh $APP_DIR/
+cp ../*.py $APP_DIR/
+cp uninstall.sh $APP_DIR/
+cp install.sh $APP_DIR/
 
-tar -czvf app.tar.gz $APP_DIR
-
-mkdir $INSTALLDIR 
-mv app.tar.gz $INSTALLDIR 
-cp installer.sh $INSTALLDIR
-
-tar -czvf magiceyeinstaller.$TIMESTAMP.tar.gz $INSTALLDIR
+tar -czvf $APP_DIR-$TIMESTAMP.tar.gz $APP_DIR
 
 rm -rf $APP_DIR
-rm -rf $INSTALLDIR
 
