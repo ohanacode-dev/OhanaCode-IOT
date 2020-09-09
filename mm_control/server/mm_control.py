@@ -2,10 +2,10 @@
 
 from flask import Flask, request, render_template, send_from_directory, redirect, url_for, abort
 import os
-from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
+from socket import socket, AF_INET, SOCK_DGRAM
 from uuid import getnode as get_mac
-from command_executor import Cmd, CmdMod, execute_cmd, run_process
-from tcp_api import init as tcp_init, stop as tcp_stop
+import command_executor
+import comms
 
 WEB_PORT = 8080
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -58,7 +58,7 @@ def get_ip():
 
 def get_playlist():
     cmd = ['mpc', CMD_LIST]
-    ret_val = run_process(cmd)
+    ret_val = command_executor.run_process(cmd)
     if ret_val.endswith('\n'):
         ret_val = ret_val[:-1]
     return ret_val.split('\n')
@@ -84,7 +84,7 @@ def sort_playlist():
         if current_id != i:
             # move from current_id to position i. Note that mpc playlist index starts from 1.
             cmd = ['mpc', CMD_MOVE, str(current_id + 1), str(i + 1)]
-            run_process(cmd)
+            command_executor.run_process(cmd)
 
             temp_list = get_playlist()
             url_list = []
@@ -115,7 +115,7 @@ def load_cfg():
     # get currently playing
     current = 0
     cmd = ['mpc']
-    status = run_process(cmd).split('\n')
+    status = command_executor.run_process(cmd).split('\n')
 
     for i in range(0, len(status)):
         if '[playing]' in status[i]:
@@ -143,14 +143,14 @@ def home():
 
             if url not in playlist:
                 cmd = ['mpc', CMD_ADD, url]
-                run_process(cmd)
+                command_executor.run_process(cmd)
                 load_cfg()
 
     elif action == 'del':
         if (id > 0) and (id <= len(url_list)):
 
             cmd = ['mpc', CMD_DEL, str(id)]
-            run_process(cmd)
+            command_executor.run_process(cmd)
 
             load_cfg()
 
@@ -158,24 +158,25 @@ def home():
         if (id > 0) and (id <= len(url_list)):
 
             cmd = ['mpc', CMD_PLAY, str(id)]
-            run_process(cmd)
+            command_executor.run_process(cmd)
 
     elif action == 'stop':
         current = 0
         cmd = ['mpc', CMD_STOP]
-        run_process(cmd)
+        command_executor.run_process(cmd)
 
     elif action == 'vol_up':
-        execute_cmd(Cmd.VOL_UP)
+        print("p vol up")
+        command_executor.execute_cmd(command_executor.Cmd.VOL_UP)
 
     elif action == 'vol_dn':
-        execute_cmd(Cmd.VOL_DOWN)
+        command_executor.execute_cmd(command_executor.Cmd.VOL_DOWN)
 
     elif action == 'mm_play':
-        execute_cmd(Cmd.VOL_UP)
+        command_executor.execute_cmd(command_executor.Cmd.VOL_UP)
 
     elif action == 'mm_stop':
-        execute_cmd(Cmd.STOP)
+        command_executor.execute_cmd(command_executor.Cmd.STOP)
 
     elif action == 'sort':
         sort_playlist()
@@ -183,7 +184,7 @@ def home():
 
     else:
         cur_cmd = ['mpc', CMD_CURRENT]
-        current_text = run_process(cur_cmd)
+        current_text = command_executor.run_process(cur_cmd)
         print(current_text)
         if len(current_text) > 2:
             try:
@@ -216,14 +217,14 @@ def uploadpls():
         if len(url_list) > 0:
             # Clear current playlist
             cmd = ['mpc', CMD_CLEAR]
-            run_process(cmd)
+            command_executor.run_process(cmd)
 
             for url in url_list:
                 cmd = ['mpc', CMD_ADD, url]
-                run_process(cmd)
+                command_executor.run_process(cmd)
 
             cmd = ['mpc', CMD_PLAY, str(len(url_list) + 1)]
-            run_process(cmd)
+            command_executor.run_process(cmd)
 
             load_cfg()
 
@@ -239,7 +240,7 @@ def downloadpls():
 
     # Save current playlist
     cmd = ['mpc', CMD_SAVE, PLS_NAME]
-    run_process(cmd)
+    command_executor.run_process(cmd)
 
     if os.path.isfile(file_path):
         return send_from_directory(PLS_PATH, PLS_NAME + '.m3u')
@@ -257,7 +258,7 @@ def savepls():
 
     # Save current playlist
     cmd = ['mpc', CMD_SAVE, PLS_NAME]
-    run_process(cmd)
+    command_executor.run_process(cmd)
 
     load_cfg()
 
@@ -273,7 +274,7 @@ def favicon():
 def get_id():
     print('id')
     cur_cmd = ['mpc', CMD_CURRENT]
-    current_text = run_process(cur_cmd)
+    current_text = command_executor.run_process(cur_cmd)
     if len(current_text) > 2:
         try:
             song_title = current_text.split(':')[1]
@@ -294,14 +295,14 @@ def get_id():
 
 if __name__ == '__main__':
     cmd = ['mpc', CMD_CLEAR]
-    run_process(cmd)
+    command_executor.run_process(cmd)
     cmd = ['mpc', CMD_LOAD, PLS_NAME]
-    run_process(cmd)
+    command_executor.run_process(cmd)
 
     load_cfg()
-    tcp_init()
+    comms.init()
 
     app.run('0.0.0.0', WEB_PORT, threaded=True, debug=False)
-    tcp_stop()
+    comms.stop()
     stop_flag = True
 

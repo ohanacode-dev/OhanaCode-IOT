@@ -171,32 +171,33 @@ def mouse_click(button):
         print("MOUSE UNKNOWN", button)
 
 
-def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offset_y=0):
+def execute_cmd(cmdVal, current_window_title=""):
     global last_cmd_timestamp
 
+    print("CMD EXECUTE: ", cmdVal)
     try:
 
-        if cmdVal == Cmd.CLOSE:
+        if cmdVal == Cmd.CLOSE or cmdVal == Cmd.CLOSE.value:
             send_key(KEYPRESS.F4.value, KEYPRESS.ALT_KEY.value)
-        elif cmdVal == Cmd.PLAY:
+        elif cmdVal == Cmd.PLAY or cmdVal == Cmd.PLAY.value:
             if "youtube" in current_window_title.lower():
                 send_key(KEYPRESS.K.value)
             elif "butter" in current_window_title.lower():
                 send_key(KEYPRESS.SPACEBAR.value)
             else:
                 send_key(KEYPRESS.PLAY.value)
-        elif cmdVal == Cmd.SHUTDOWN:
+        elif cmdVal == Cmd.SHUTDOWN or cmdVal == Cmd.SHUTDOWN.value:
             run_process(['poweroff'])
-        elif cmdVal == Cmd.STOP:
+        elif cmdVal == Cmd.STOP or cmdVal == Cmd.STOP.value:
             send_key(KEYPRESS.STOP.value)
-        elif cmdVal == Cmd.VOL_UP:
-            send_key(KEYPRESS.VOL_UP.value)
-        elif cmdVal == Cmd.PREVIOUS:
+        elif cmdVal == Cmd.VOL_UP or cmdVal == Cmd.VOL_UP.value:
+            send_key(KEYPRESS.VOLUME_UP.value)
+        elif cmdVal == Cmd.PREVIOUS or cmdVal == Cmd.PREVIOUS.value:
             if "butter" in current_window_title.lower():
                 send_key(KEYPRESS.LEFT_ARROW.value, KEYPRESS.SHIFT.value)
             else:
                 send_key(KEYPRESS.PREVIOUS_TRACK.value)
-        elif cmdVal == Cmd.REWIND:
+        elif cmdVal == Cmd.REWIND or cmdVal == Cmd.REWIND.value:
             if "youtube" in current_window_title.lower():
                 send_key(KEYPRESS.J.value)
             elif "vlc media player" in current_window_title.lower():
@@ -204,12 +205,12 @@ def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offse
             else:
                 send_key(KEYPRESS.LEFT_ARROW.value)
 
-        elif cmdVal == Cmd.NEXT:
+        elif cmdVal == Cmd.NEXT or cmdVal == Cmd.NEXT.value:
             if "butter" in current_window_title.lower():
                 send_key(KEYPRESS.RIGHT_ARROW.value, KEYPRESS.SHIFT.value)
             else:
                 send_key(KEYPRESS.NEXT_TRACK.value)
-        elif cmdVal == Cmd.FORWARD:
+        elif cmdVal == Cmd.FORWARD or cmdVal == Cmd.FORWARD.value:
             if "youtube" in current_window_title.lower():
                 send_key(KEYPRESS.L.value)
             elif "vlc media player" in current_window_title.lower():
@@ -218,15 +219,15 @@ def execute_cmd(cmdVal, current_window_title="", cursor_offset_x=0, cursor_offse
                 send_key(KEYPRESS.RIGHT_ARROW.value)
             else:
                 send_key(KEYPRESS.FORWARD.value)
-        elif cmdVal == Cmd.VOL_DOWN:
+        elif cmdVal == Cmd.VOL_DOWN or cmdVal == Cmd.VOL_DOWN.value:
             send_key(KEYPRESS.VOLUME_DOWN.value)
-        elif cmdVal == Cmd.MUTE:
+        elif cmdVal == Cmd.MUTE or cmdVal == Cmd.MUTE.value:
             if (time() - last_cmd_timestamp) > 1:
                 send_key(KEYPRESS.VOLUME_MUTE.value)
             last_cmd_timestamp = time()
-        elif cmdVal == Cmd.MEDIA:
+        elif cmdVal == Cmd.MEDIA or cmdVal == Cmd.MEDIA.value:
             send_key(KEYPRESS.MEDIA.value)
-        elif cmdVal == Cmd.POWEROFF:
+        elif cmdVal == Cmd.POWEROFF or cmdVal == Cmd.POWEROFF.value:
             run_process(["poweroff"])
         else:
             print("ERROR: Command executor, unknown command: ", cmdVal)
