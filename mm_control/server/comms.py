@@ -308,6 +308,7 @@ def udp_server():
     print("Starting UDP server\n")
 
     last_ping_timestamp = 0
+    last_package_number = 255
     while not stop_flag:
         try:
             (msg, (sender_addr, sender_port)) = udp_receiver.recvfrom(24)
@@ -330,7 +331,11 @@ def udp_server():
                     udp_rxbuf = []
                     for val in msg:
                         udp_rxbuf.append(val)
-                    process_rx(udp_rxbuf)
+
+                    if last_package_number != udp_rxbuf[0]:
+                        last_package_number = udp_rxbuf[0]
+                        udp_rxbuf.pop(0)
+                        process_rx(udp_rxbuf)
 
         except Exception as e:
             # print("ERR: {}".format(e))
@@ -347,43 +352,6 @@ def udp_server():
                 pass
 
     print("Ending UDP server\n")
-
-
-def tcp_server():
-    print("Starting TCP receiver\n")
-    server = socket(AF_INET, SOCK_STREAM)
-
-    try:
-        server.bind((IP, TCP_RX_PORT))
-        server.listen(1)
-
-        while not stop_flag:
-            # Wait for a connection
-            connection, client_address = server.accept()
-            try:
-                # Receive the data in small chunks and retransmit it
-                while not stop_flag:
-                    data = connection.recv(5)
-                    if data is not None and len(data) > 0:
-                        tcp_rxbuf = []
-                        for val in data:
-                            tcp_rxbuf.append(val)
-                        process_rx(tcp_rxbuf)
-
-                    else:
-                        break
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                print("\nERROR1 on line{}: {}".format(exc_tb.tb_lineno, e))
-            finally:
-                # Clean up the connection
-                connection.close()
-
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        print("\nERROR2 on line{}: {}".format(exc_tb.tb_lineno, e))
-
-    print("Ending TCP receiver\n")
 
 
 def init(standalone=False):
@@ -409,14 +377,11 @@ def init(standalone=False):
     t_window_title = threading.Thread(target=thread_window_title)
     t_window_title.start()
 
-    t_udp_server = threading.Thread(target=udp_server)
-    t_udp_server.start()
-
     if standalone:
-        tcp_server()
+        udp_server()
     else:
-        t_tcp_server = threading.Thread(target=tcp_server)
-        t_tcp_server.start()
+        t_udp_server = threading.Thread(target=udp_server)
+        t_udp_server.start()
 
 
 def stop():

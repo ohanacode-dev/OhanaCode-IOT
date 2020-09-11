@@ -9,12 +9,13 @@ import android.view.View;
 public class KeyboardActivity extends AppCompatActivity implements View.OnClickListener{
 
     private final String TAG = "KeyboardActivity";
-    TcpClient sender;
+    private DiscoveryAndUdpComms udpSender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sender = TcpClient.getInstance();
+
+        udpSender = DiscoveryAndUdpComms.getInstance(this);
 
         try
         {
@@ -379,15 +380,13 @@ public class KeyboardActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if(codeType != CommandData.CODE_NONE){
-            byte[] msg = new byte[3];
-            msg[0] = codeType;
-            msg[1] = codeValue;
-            msg[2] = 0;
+            byte[] msg = new byte[4];
+            msg[0] = udpSender.getNextPacketNumber();
+            msg[1] = codeType;
+            msg[2] = codeValue;
+            msg[3] = 0;
 
-            if(!sender.sendMsg(msg)){
-                sender.restartSender();
-                sender.sendMsg(msg);
-            }
+            udpSender.sendUdpMsg(msg);
         }
     }
 }

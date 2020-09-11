@@ -36,6 +36,8 @@ public class DiscoveryAndUdpComms {
     private DatagramSocket udpSocket = null;
     private static DiscoveryAndUdpComms instance;
     private InetAddress broadcastAddr;
+    private static byte packetNumber;
+    private static String serverIP;
 
 
     private DiscoveryAndUdpComms(Context c){
@@ -54,13 +56,15 @@ public class DiscoveryAndUdpComms {
             Log.e(TAG, "SocketException: " + e.getMessage());
         }
 
+        packetNumber = 0;
+
         startTcpServer();
     }
 
     public static DiscoveryAndUdpComms getInstance(Context c)
     {
         if (instance== null) {
-            synchronized(TcpClient.class) {
+            synchronized(DiscoveryAndUdpComms.class) {
                 if (instance == null) {
                     instance = new DiscoveryAndUdpComms(c);
                 }
@@ -196,11 +200,21 @@ public class DiscoveryAndUdpComms {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         try {
+
             DatagramPacket sendPacket = new DatagramPacket(msg, msg.length, InetAddress.getByName(destinationIP), UDP_TX_PORT);
-            udpSocket.send(sendPacket);
+
+            // UDP packet is not guaranteed to be received, so send a few just in case.
+            // This is less overhead and faster then handshaking or TCP.
+            for(int i = 0; i < 3; i++) {
+                udpSocket.send(sendPacket);
+            }
         }catch (Exception e) {
             Log.e(TAG, "SocketException1: " + e.getMessage());
         }
+    }
+
+    public void sendUdpMsg(byte[] msg){
+        sendUdpMsg(msg, serverIP);
     }
 
     /* Refresh all devices on the same network. To do this, we broadcast a UDP ping message,
@@ -224,6 +238,7 @@ public class DiscoveryAndUdpComms {
                     DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcastAddr, UDP_TX_PORT);
                     socket.send(sendPacket);
 
+                    Log.i(TAG, "SENDING PING");
                 } catch (IOException e) {
                     Log.e(TAG, "IOException: " + e.getMessage());
                 }
@@ -243,5 +258,13 @@ public class DiscoveryAndUdpComms {
         }catch (Exception e){
 
         }
+    }
+
+    public byte getNextPacketNumber(){
+        return packetNumber++;
+    }
+
+    public void setDefaultServerIP(String IP){
+        serverIP = IP;
     }
 }

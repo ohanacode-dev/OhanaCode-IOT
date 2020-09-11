@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private Handler tapProcessorHandler;
     private Handler touchSenderHandler;
     private DiscoveryAndUdpComms udpSender;
-    private TcpClient tcpSender;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -51,10 +50,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         serverIP = readServerIp();
-        tcpSender = TcpClient.getInstance();
-        tcpSender.startSender(serverIP);
 
         udpSender = DiscoveryAndUdpComms.getInstance(this);
+        udpSender.setDefaultServerIP(serverIP);
         touchSenderHandler = new Handler();
         touchSenderHandler.postDelayed(touchSenderProcessor, TOUCH_PROCESS_TIMEOUT);
 
@@ -84,10 +82,11 @@ public class MainActivity extends AppCompatActivity {
                                 // Last tap happened recently. This is a double tap, so cancel touch processing and just send a double click.
                                 tapProcessorHandler.removeCallbacksAndMessages(null);
                                 mouseDownFlag = false;
-                                byte[] msg = new byte[3];
-                                msg[0] = CommandData.CODE_SPECIAL;
-                                msg[1] = CommandData.KEY_MOUSE_LEFT_DOUBLECLICK;
-                                sendTcpMsg(msg);
+                                byte[] msg = new byte[4];
+                                msg[0] = udpSender.getNextPacketNumber();
+                                msg[1] = CommandData.CODE_SPECIAL;
+                                msg[2] = CommandData.KEY_MOUSE_LEFT_DOUBLECLICK;
+                                udpSender.sendUdpMsg(msg);
                             }else{
                                 // Last tap was a long time ago
                                 tapProcessorHandler.postDelayed(tapProcessor, TAP_PROCESS_TIMEOUT);
@@ -98,10 +97,11 @@ public class MainActivity extends AppCompatActivity {
 
                         if(mouseDownFlag){
                             mouseDownFlag = false;
-                            byte[] msg = new byte[3];
-                            msg[0] = CommandData.CODE_SPECIAL;
-                            msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
-                            sendTcpMsg(msg);
+                            byte[] msg = new byte[4];
+                            msg[0] = udpSender.getNextPacketNumber();
+                            msg[1] = CommandData.CODE_SPECIAL;
+                            msg[2] = CommandData.KEY_MOUSE_LEFT_UP;
+                            udpSender.sendUdpMsg(msg);
                         }
 
                         break;
@@ -131,19 +131,20 @@ public class MainActivity extends AppCompatActivity {
         btnMouseLeft.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                byte[] msg = new byte[3];
-                msg[0] = CommandData.CODE_SPECIAL;
+                byte[] msg = new byte[4];
+                msg[0] = udpSender.getNextPacketNumber();
+                msg[1] = CommandData.CODE_SPECIAL;
 
                 switch ( event.getAction() ) {
                     case MotionEvent.ACTION_DOWN:
-                        msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
-                        sendTcpMsg(msg);
+                        msg[2] = CommandData.KEY_MOUSE_LEFT_DOWN;
+                        udpSender.sendUdpMsg(msg);
                         btnMouseLeft.getBackground().setAlpha(150);
 
                         break;
                     case MotionEvent.ACTION_UP:
-                        msg[1] = CommandData.KEY_MOUSE_LEFT_UP;
-                        sendTcpMsg(msg);
+                        msg[2] = CommandData.KEY_MOUSE_LEFT_UP;
+                        udpSender.sendUdpMsg(msg);
                         btnMouseLeft.getBackground().setAlpha(255);
                         break;
                 }
@@ -155,18 +156,19 @@ public class MainActivity extends AppCompatActivity {
         btnMouseRight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                byte[] msg = new byte[3];
-                msg[0] = CommandData.CODE_SPECIAL;
+                byte[] msg = new byte[4];
+                msg[0] = udpSender.getNextPacketNumber();
+                msg[1] = CommandData.CODE_SPECIAL;
 
                 switch ( event.getAction() ) {
                     case MotionEvent.ACTION_DOWN:
-                        msg[1] = CommandData.KEY_MOUSE_RIGHT_DOWN;
-                        sendTcpMsg(msg);
+                        msg[2] = CommandData.KEY_MOUSE_RIGHT_DOWN;
+                        udpSender.sendUdpMsg(msg);
                         btnMouseRight.getBackground().setAlpha(150);
                         break;
                     case MotionEvent.ACTION_UP:
-                        msg[1] = CommandData.KEY_MOUSE_RIGHT_UP;
-                        sendTcpMsg(msg);
+                        msg[2] = CommandData.KEY_MOUSE_RIGHT_UP;
+                        udpSender.sendUdpMsg(msg);
                         btnMouseRight.getBackground().setAlpha(255);
                         break;
                 }
@@ -239,20 +241,11 @@ public class MainActivity extends AppCompatActivity {
             if (data.hasExtra("selected")) {
                 serverIP = data.getExtras().getString("selected");
                 saveServerIp(serverIP);
-                tcpSender.startSender(serverIP);
             }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-    public void sendTcpMsg(byte[] msg){
-        if(!tcpSender.sendMsg(msg)){
-            tcpSender.startSender(serverIP);
-            tcpSender.sendMsg(msg);
-        }
-    }
-
 
     private void processTouch(int x, int y){
         int offset_X = 0;
@@ -276,11 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
         prevY = nextY;
 
-        accX += offset_X;
-        accY += offset_Y;
+        byte[] msg = new byte[4];
+        msg[0] = udpSender.getNextPacketNumber();
+        msg[1] = CommandData.CODE_MOUSE;
+        msg[2] = (byte) (offset_X & 0xFF);
+        msg[3] = (byte) (offset_Y & 0xFF);
 
-
-        udpSender.sendUdpMsg(msg, serverIP);
+        udpSender.sendUdpMsg(msg);
 
     }
 
@@ -290,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
 
         editor.putString("serverip", ipAddr);
         editor.apply();
+
+        udpSender.setDefaultServerIP(ipAddr);
     }
 
     public String readServerIp() {
@@ -303,16 +300,18 @@ public class MainActivity extends AppCompatActivity {
             if(surfaceTouchedFlag){
                 // Mouse down
                 mouseDownFlag = true;
-                byte[] msg = new byte[3];
-                msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_LEFT_DOWN;
-                sendTcpMsg(msg);
+                byte[] msg = new byte[4];
+                msg[0] = udpSender.getNextPacketNumber();
+                msg[1] = CommandData.CODE_SPECIAL;
+                msg[2] = CommandData.KEY_MOUSE_LEFT_DOWN;
+                udpSender.sendUdpMsg(msg);
             }else{
                 // click
-                byte[] msg = new byte[3];
-                msg[0] = CommandData.CODE_SPECIAL;
-                msg[1] = CommandData.KEY_MOUSE_LEFT_CLICK;
-                sendTcpMsg(msg);
+                byte[] msg = new byte[4];
+                msg[0] = udpSender.getNextPacketNumber();
+                msg[1] = CommandData.CODE_SPECIAL;
+                msg[2] = CommandData.KEY_MOUSE_LEFT_CLICK;
+                udpSender.sendUdpMsg(msg);
             }
         }
     };
