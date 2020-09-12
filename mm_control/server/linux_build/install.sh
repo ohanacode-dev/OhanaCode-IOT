@@ -2,11 +2,12 @@
 
 APPDIR=$PWD
 SHORTCUT_NAME=$HOME/.local/share/applications/mm_ctrl.desktop
+STARTUP_LINK=$HOME/.config/autostart/mm_ctrl.desktop
 
 # Install dependencies
 sudo apt update
-sudo apt install -y python3-pip
-python3 pip install Flask
+sudo apt install -y python3-pip mpd mpc xdotool
+pip3 install Flask
 
 # Create a start menu shortcut
 mkdir $HOME/.local/share/applications
@@ -23,5 +24,5 @@ echo "Path=$APPDIR" >> $SHORTCUT_NAME
 echo "Icon=$APPDIR/logo.png" >> $SHORTCUT_NAME
 echo "Categories=AudioVideo;" >> $SHORTCUT_NAME
 
-
+cp $SHORTCUT_NAME $STARTUP_LINK
 
