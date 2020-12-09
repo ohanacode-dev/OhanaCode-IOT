@@ -117,17 +117,21 @@ void setup(void) {
 }
 
 
-void loop(void) {
+void loop(void) {     
   ESP.wdtFeed();
   /* Over The Air update takes up considerable processor time and causes the light to blink, so it should not be executed at the same time. */
   if(OTA_updateInProgress()){
     OTA_process();
   }else{
     HTTP_process();  
-    WS_process();
-    UDPPING_process();  
-    WIFIC_process(); 
     ESP.wdtFeed();
-    updateTouchSensor();  
+    WS_process();
+    ESP.wdtFeed();
+    UDPPING_process();  
+    ESP.wdtFeed();
+    WIFIC_process();
+
+    ESP.wdtFeed();
+    //updateTouchSensor();  
   }
 }

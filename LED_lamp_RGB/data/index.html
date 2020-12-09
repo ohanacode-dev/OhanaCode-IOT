@@ -10,15 +10,12 @@
 <div class="contain">
   <div class="center_div">
 	<img id="logo" src="" alt="Logo">
-    <h1>Ohana WiFi LED Control</h1>      
-    <div id='cpick'></div>  
-		<div class="row">  
-			<div id='samp'>        
-			  <div id='sampc'>
-				<input type="color" id='choose' onchange="setColor(this.value);"> 
-			  </div>          
-			</div>
-		</div> 
+    <h1>Ohana WiFi LED Control</h1> 
+    <div id="spick">
+      <input type="range" min="0" max="10" class="r_slide" id="c_r">
+      <input type="range" min="0" max="10" class="g_slide" id="c_g">
+      <input type="range" min="0" max="10" class="b_slide" id="c_b">
+    </div>
     <input type="range" min="0" max="8" value="8" class="slider" id="opac">
   </div>
   <hr>

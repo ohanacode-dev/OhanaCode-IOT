@@ -23,11 +23,11 @@
 The device fails to create an AP if total AP name is longer than 31 character. */
 #define AP_NAME_PREFIX          "OC_rgb_"    
 
-#define LED_G_PIN                     (0)    /* D3 */  
-#define LED_R_PIN                     (4)    /* D2 */  
-#define LED_B_PIN                     (5)    /* D1 */           
-#define SENSPIN                       (14)   /* D5 */
-#define LED_STATUS_PIN                (2)    /* D4 */
+#define LED_G_PIN                     (14)    
+#define LED_R_PIN                     (12)   
+#define LED_B_PIN                     (13)        
+#define SENSPIN                       (16)  
+#define LED_STATUS_PIN                (2)   
 
 
 #define DEBOUNCE_TIMEOUT              (100u)
