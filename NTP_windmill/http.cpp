@@ -15,9 +15,9 @@
 #include "wifi_connection.h"
 #include "web_socket.h"
 #include "config.h"
-#include "NTP_clock_basic.h"
-#include "ota.h"
+#include "NTP_windmill.h"
 #include "ntp.h"
+#include "ota.h"
 
 
 /* Declaring a web server object. */
@@ -64,7 +64,7 @@ static bool handleFileRead(String path) { // send the right file to the client (
     
     retVal = true;
   }else{
-    Serial.println("FS ERROR: " + originalPath + " not found!");
+//    Serial.println("FS ERROR: " + originalPath + " not found!");
     
     retVal = false;
   }
@@ -79,7 +79,7 @@ static void showNotFound(void){
 }
 
 String HTTP_getFeatures( void ){
-  Serial.print("returnFeatures");
+//  Serial.print("returnFeatures");
   String response = "{\"MAC\":\"";
   response += WiFi.macAddress();
   response += ":";
@@ -88,17 +88,17 @@ String HTTP_getFeatures( void ){
   response += ",\"CURRENT\":";
   response += NTP_getTimeString();  
   response += "}"; 
-  Serial.println(response); 
+//  Serial.println(response); 
   return response;     
 }
 
 void showID( void ) {    
-  Serial.println("show ID");
+//  Serial.println("show ID");
   webServer.send(200, "text/plain", HTTP_getFeatures());  
 }
 
 static void showStatusPage() {    
-  Serial.println("showStatusPage");
+//  Serial.println("showStatusPage");
   String response = "Connection Status:" + MAIN_getStatusMsg();
   webServer.send(200, "text/plain", response);   
 }
@@ -216,13 +216,13 @@ void HTTP_init(void){
   webServer.begin();
 
   if(!SPIFFS.begin()){
-    Serial.println("SPIFFS Initialization failed. Did you enable SPIFFS in \"Tools/Flash size\"?");
+//    Serial.println("SPIFFS Initialization failed. Did you enable SPIFFS in \"Tools/Flash size\"?");/
   }
 
-  Serial.println("\tListing files...");
+//  Serial.println("\tListing files...");
   Dir dir = SPIFFS.openDir("/");
   while (dir.next()) {
-      Serial.println(dir.fileName());      
+//      Serial.println(dir.fileName());      
   }
-  Serial.println("\tEnd of file list...");
+//  Serial.println("\tEnd of file list...");
 }

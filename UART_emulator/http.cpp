@@ -15,9 +15,8 @@
 #include "wifi_connection.h"
 #include "web_socket.h"
 #include "config.h"
-#include "NTP_clock_basic.h"
+#include "UART_emulator.h"
 #include "ota.h"
-#include "ntp.h"
 
 
 /* Declaring a web server object. */
@@ -44,7 +43,6 @@ static String getContentType(String filename) { // convert the file extension to
 
 static bool handleFileRead(String path) { // send the right file to the client (if it exists)
   bool retVal = false;
-  //Serial.println("handleFileRead: " + path);
   String originalPath = path;
   
   if (path.endsWith("/")){
@@ -64,8 +62,7 @@ static bool handleFileRead(String path) { // send the right file to the client (
     
     retVal = true;
   }else{
-    Serial.println("FS ERROR: " + originalPath + " not found!");
-    
+   
     retVal = false;
   }
   
@@ -79,26 +76,20 @@ static void showNotFound(void){
 }
 
 String HTTP_getFeatures( void ){
-  Serial.print("returnFeatures");
   String response = "{\"MAC\":\"";
   response += WiFi.macAddress();
   response += ":";
   response += DEV_ID;
-  response += "\",\"MODEL\":\"OC NTP clock\"";
-  response += ",\"CURRENT\":";
-  response += NTP_getTimeString();  
-  response += "}"; 
-  Serial.println(response); 
+  response += "\",\"MODEL\":\"OC UART\"";
+  response += ",\"CURRENT\":\"\"}"; 
   return response;     
 }
 
 void showID( void ) {    
-  Serial.println("show ID");
   webServer.send(200, "text/plain", HTTP_getFeatures());  
 }
 
 static void showStatusPage() {    
-  Serial.println("showStatusPage");
   String response = "Connection Status:" + MAIN_getStatusMsg();
   webServer.send(200, "text/plain", response);   
 }
@@ -217,12 +208,5 @@ void HTTP_init(void){
 
   if(!SPIFFS.begin()){
     Serial.println("SPIFFS Initialization failed. Did you enable SPIFFS in \"Tools/Flash size\"?");
-  }
-
-  Serial.println("\tListing files...");
-  Dir dir = SPIFFS.openDir("/");
-  while (dir.next()) {
-      Serial.println(dir.fileName());      
-  }
-  Serial.println("\tEnd of file list...");
+  }  
 }

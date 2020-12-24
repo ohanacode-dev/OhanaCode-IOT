@@ -4,7 +4,7 @@
 #include <DNSServer.h>
 #include "web_socket.h"
 #include "config.h"
-#include "LED_lamp_RGB.h"
+#include "UART_emulator.h"
 
 
 static char myApName[32] = {0};    /* Array to form AP name based on read MAC */
@@ -84,9 +84,6 @@ void WIFIC_APMode(void){
     wifi_statusMessage = "No access point is configured to connect to";    
   }  
      
-  Serial.println("\n" + wifi_statusMessage);
-
-  Serial.println("\nStarting AP");  
   WiFi.mode(WIFI_AP);  
   WiFi.begin();
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));

@@ -4,7 +4,7 @@
 #include <DNSServer.h>
 #include "web_socket.h"
 #include "config.h"
-#include "LED_lamp_RGB.h"
+#include "NTP_windmill.h"
 
 
 static char myApName[32] = {0};    /* Array to form AP name based on read MAC */
@@ -84,9 +84,9 @@ void WIFIC_APMode(void){
     wifi_statusMessage = "No access point is configured to connect to";    
   }  
      
-  Serial.println("\n" + wifi_statusMessage);
+//  Serial.println("\n" + wifi_statusMessage);
 
-  Serial.println("\nStarting AP");  
+//  Serial.println("\nStarting AP");  
   WiFi.mode(WIFI_AP);  
   WiFi.begin();
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
@@ -101,7 +101,7 @@ void WIFIC_APMode(void){
   }else{
     wifi_statusMessage = "Failed to switch to AP mode.";
   }
-  Serial.println(wifi_statusMessage);  
+//  Serial.println(wifi_statusMessage);  
   MAIN_setStatusMsg(wifi_statusMessage);
 
   /* Once you setup an AP for the device to connect to, and it is not found at startup, so AP mode is atempted,
@@ -115,7 +115,7 @@ void WIFIC_stationMode(void){
   if(connectedToAPFlag){
     WiFi.disconnect();
   }
-  Serial.println("Trying STA mode."); 
+//  Serial.println("Trying STA mode."); 
   WiFi.mode(WIFI_STA);  
   WiFi.begin(st_ssid, st_pass);
 
@@ -140,11 +140,11 @@ void WIFIC_stationMode(void){
     wifi_statusMessage += st_ssid;
     wifi_statusMessage += ". IP address: " + WiFi.localIP().toString();   
     
-    Serial.println(wifi_statusMessage);  
+//    Serial.println(wifi_statusMessage);  
     WS_ServerBroadcast("{\"STATUS\":\"" + wifi_statusMessage + "\"}");    
     MAIN_setStatusMsg(wifi_statusMessage);
   }else{    
-    Serial.println("accessPointMode");
+//    Serial.println("accessPointMode");
     WIFIC_APMode(); 
   } 
 }
