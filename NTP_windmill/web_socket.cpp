@@ -8,6 +8,7 @@
 #include <TimeLib.h>
 
 WebSocketsServer wsServer = WebSocketsServer(81);
+static bool LED_state = false;
 
 void WS_process(){
   wsServer.loop();   
@@ -46,51 +47,12 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       if(root.containsKey("STATUS")){  
         String statusMsg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";               
         wsServer.broadcastTXT(statusMsg);   
-      }
-
-      if(root.containsKey("TIMEZONE")){
-        String zoneStr = root["TIMEZONE"];
-        if(zoneStr.length() > 0){
-          /* Setting time zone */
-        
-          int zone = root["TIMEZONE"];
-  
-          NTP_setTimeZone(zone);
-        }
-         
-        String bcMsg = "{\"TIMEZONE\":" + String(NTP_getTimeZone()) + "}";               
-        wsServer.broadcastTXT(bcMsg);              
-      }   
-
-      if(root.containsKey("DLSAVE")){
-        String dlsave = root["DLSAVE"];
-        if(dlsave.length() > 0){
-          /* Setting daylight savings */
-        
-          int dls = root["DLSAVE"];
-  
-          NTP_setDayLightSavings(dls);
-        }
-         
-        String bcMsg = "{\"DLSAVE\":" + String(NTP_getDayLightSavings()) + "}";               
-        wsServer.broadcastTXT(bcMsg);              
-      }
+      }     
 
       if(root.containsKey("LIGHT")){
-        char buf[] = {0x42, 0x48};
-        Serial.write(buf, 2);            
-      }
-
-      if(root.containsKey("SYNC")){
-        char buf[5];
-        buf[0] = 0x43;
-        buf[1] = hour();
-        buf[2] = minute();
-        buf[3] = second();
-        buf[4] = 0x48;
-        
-        Serial.write(buf, 5);      
-      }
+        LED_state = !LED_state;
+        digitalWrite(LED_PIN, LED_state);               
+      }      
     }      
   }   
 }
@@ -98,4 +60,5 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
 void WS_init(){
   wsServer.begin(); 
   wsServer.onEvent(serverEvent);  
+  digitalWrite(LED_PIN, LED_state);   
 }

@@ -5,7 +5,7 @@
 #include "config.h"
 #include "ntp.h"
 #include "ota.h"
-
+#include "stepper_motor_driver.h"
 
 static String statusMessage = ""; 
 
@@ -20,9 +20,10 @@ String MAIN_getStatusMsg(void){
 void setup(void) {
 	/* Need to wait for background processes to complete. Otherwise trouble with gpio.*/
   delay(100);   
-  Serial.begin(9600,SERIAL_8N1,SERIAL_TX_ONLY); /* Use only tx, so rx can be used as GPIO */   
+  Serial.begin(300,SERIAL_8N1,SERIAL_TX_ONLY); 
+  pinMode(LED_PIN, OUTPUT);
   //ESP.eraseConfig();
-  
+  STMDRV_init();
   WIFIC_init();   
   HTTP_init();
   WS_init();  
@@ -41,6 +42,7 @@ void loop(void) {
     UDPPING_process();
     WIFIC_process(); 
     NTP_process();
-    ESP.wdtFeed();
+    STMDRV_process();
+    ESP.wdtFeed();    
   }
 }

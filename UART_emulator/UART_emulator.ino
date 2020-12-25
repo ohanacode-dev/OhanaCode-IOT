@@ -27,7 +27,7 @@ String MAIN_getStatusMsg(void){
 void setup(void) {
   /* Need to wait for background processes to complete. Otherwise trouble with gpio.*/
   delay(100);   
-  Serial.begin(115200,SERIAL_8N1); 
+  Serial.begin(300,SERIAL_8N1); 
   //ESP.eraseConfig();
   WIFIC_init();
   HTTP_init();

@@ -18,5 +18,6 @@ extern int NTP_getTimeZone();
 extern void NTP_setTimeZone(int zone);
 extern void NTP_setDayLightSavings(int dls);
 extern int NTP_getDayLightSavings(void);
+extern unsigned long NTP_getLocalTime();
 
 #endif
