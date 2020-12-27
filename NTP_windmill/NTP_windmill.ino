@@ -42,7 +42,6 @@ void loop(void) {
     UDPPING_process();
     WIFIC_process(); 
     NTP_process();
-    STMDRV_process();
     ESP.wdtFeed();    
   }
 }

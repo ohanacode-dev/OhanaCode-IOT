@@ -15,7 +15,7 @@
 #define DAYSAVE_SIZE            (1)
 #define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE + TIMEZONE_SIZE + DAYSAVE_SIZE)   
 
-#define LARGE_TIMEOUT           (120)   /* Used to check if configured AP appeared and connect to it if possible */ 
+#define LARGE_TIMEOUT           (190)   /* Used to check if configured AP appeared and connect to it if possible */ 
 #define PING_RX_PORT            (4210u)  /* local port to listen on */
 #define PING_RESPONSE_PORT      (4211u)
 #define UDP_NTP_PORT            (2390)  /* local port to listen for ntp messages */

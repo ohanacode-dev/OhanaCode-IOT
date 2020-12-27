@@ -5,6 +5,7 @@
 #include "config.h"
 #include "ntp.h"
 #include <TimeLib.h>
+#include "stepper_motor_driver.h"
 
 
 static unsigned long localTime;
@@ -29,8 +30,9 @@ void NTP_process()
     WS_ServerBroadcast(timeStatus); 
     
     uint8_t m = minute();
-    Serial.write(&m, 1);    
+    Serial.write(&m, 1); 
 
+    STMDRV_tick();
   } 
 }
 
