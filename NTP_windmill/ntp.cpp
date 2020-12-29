@@ -32,7 +32,7 @@ void NTP_process()
     uint8_t m = minute();
     Serial.write(&m, 1); 
 
-    STMDRV_tick();
+    STMDRV_tick(second());
   } 
 }
 

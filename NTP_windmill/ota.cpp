@@ -35,6 +35,8 @@ void OTA_init() {
       type = "filesystem";
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+
+    SPIFFS.end();
     Serial.println("Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {

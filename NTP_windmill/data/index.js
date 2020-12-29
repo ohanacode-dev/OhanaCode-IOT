@@ -17,3 +17,7 @@ cn.onmessage=function(e){
 function light_tgl(){
   cn.send('{"LIGHT":1}');  
 }
+
+function tick(){
+  cn.send('{"TICK":1}');  
+}

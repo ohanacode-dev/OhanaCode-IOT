@@ -18,40 +18,56 @@ static void M_H_tickStop(void){
 }
 
 static void M_H_tick(void){
-  switch(tickCount & 0b11){
-    case 0:
-      digitalWrite(M_H_PIN1, HIGH);
-      digitalWrite(M_H_PIN2, LOW);
-      digitalWrite(M_H_PIN3, LOW);
-      digitalWrite(M_H_PIN4, LOW);
-      break;
-     case 1:
-      digitalWrite(M_H_PIN1, LOW);
-      digitalWrite(M_H_PIN2, HIGH);
-      digitalWrite(M_H_PIN3, LOW);
-      digitalWrite(M_H_PIN4, LOW);
-      break;
-     case 2:
+  switch(tickCount & 0b11){    
+     case 0:
       digitalWrite(M_H_PIN1, LOW);
       digitalWrite(M_H_PIN2, LOW);
       digitalWrite(M_H_PIN3, HIGH);
       digitalWrite(M_H_PIN4, LOW);
       break;
-     case 3:
+     case 1:
       digitalWrite(M_H_PIN1, LOW);
       digitalWrite(M_H_PIN2, LOW);
       digitalWrite(M_H_PIN3, LOW);
       digitalWrite(M_H_PIN4, HIGH);
+      break;
+     case 2:
+      digitalWrite(M_H_PIN1, HIGH);
+      digitalWrite(M_H_PIN2, LOW);
+      digitalWrite(M_H_PIN3, LOW);
+      digitalWrite(M_H_PIN4, LOW);
+      break;
+     case 3:
+      digitalWrite(M_H_PIN1, LOW);
+      digitalWrite(M_H_PIN2, HIGH);
+      digitalWrite(M_H_PIN3, LOW);
+      digitalWrite(M_H_PIN4, LOW);
       break;
   }
  
   tickCount++; 
 }
 
+uint8_t STMDRV_getTickCount(){
+  return (tickCount & 0b11);
+}
 
-void STMDRV_tick(void)
+void STMDRV_tick(uint8_t sec)
 {  
-  secCount++;
+ 
+  if(secCount == 0){
+     // Sync the step so 12 o clock will show correctly
+    uint8_t rem = sec % TICK_TIMEOUT;
+    if(rem != 0){
+      secCount = 0;     
+      tickTimestamp = 0; 
+    }else{
+      secCount++;
+    }
+  }else{  
+    secCount++;
+  }
+  
   if((secCount - tickTimestamp) >= TICK_TIMEOUT){
     tickTimestamp += TICK_TIMEOUT;
 
@@ -59,6 +75,13 @@ void STMDRV_tick(void)
     delay(TICK_DURATION);
     M_H_tickStop();    
   }
+}
+
+void STMDRV_forceTick(void)
+{
+  M_H_tick();
+  delay(TICK_DURATION);
+  M_H_tickStop(); 
 }
 
 void STMDRV_init(void){

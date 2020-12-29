@@ -5,7 +5,8 @@
 #include "http.h"
 #include "NTP_windmill.h"
 #include "ntp.h"
-#include <TimeLib.h>
+#include "stepper_motor_driver.h"
+
 
 WebSocketsServer wsServer = WebSocketsServer(81);
 static bool LED_state = false;
@@ -52,7 +53,11 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       if(root.containsKey("LIGHT")){
         LED_state = !LED_state;
         digitalWrite(LED_PIN, LED_state);               
-      }      
+      } 
+
+      if(root.containsKey("TICK")){
+        STMDRV_forceTick();
+      } 
     }      
   }   
 }
