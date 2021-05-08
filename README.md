@@ -6,9 +6,9 @@ Most devices can act as an access point or a client device on a WiFi network. Af
 it gets difficult to find its IP address if it is dynamically alocated, so I also provided an Android app to list all devices on the same network. 
 Every device responds to an UDP broadcast string "ujagaga ping" via TCP socket. 
 There is also an implemented Over The Air update. 
-Most projects are build using Arduino studio and an **ESP8266** device. I am using **Wemos D1 mini** and **ESP-12** devices. ESP-01 is possible to use for most projects, but without the OTA update due to insufficient flash size.
+Most projects are build using Arduino studio and an **ESP8266** device. I am using **Wemos D1 mini** and **ESP-12** devices.
 
-NOTE: this is still work in progress. I have refactored some of the projects to use a filesystem on ESP8266 flash memory for storing web interface files. Most of the projects are functional, but I still want to improove them.
+NOTE: this is still work in progress. Most of the projects are functional, but I still want to improove them.
 Most projects support "Over The Air" update, but it does sometimes crash, so you will still ocasionally need the wired connection.
 
 ---
