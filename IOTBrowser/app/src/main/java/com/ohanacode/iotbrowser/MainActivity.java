@@ -4,13 +4,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.net.wifi.SupplicantState;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -40,10 +40,10 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MAIN";
     private TextView statusText;
     private Handler wifiRefreshHandler;
     private Handler deviceProcessorHandler;
-    private int wifiAvailableFlag = 0;
     private DisplayAdapter adapter;
     private ThreadedCommunication comms;
     private AlertDialog aboutDialog;
@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void refreshDevs(){
-        Log.d("Main_refreshDevs", "Refreshing device list");
+//        Log.d("Main_refreshDevs", "Refreshing device list");
 
         adapter.clear();
 
@@ -340,40 +340,25 @@ public class MainActivity extends AppCompatActivity {
         deviceProcessorHandler.postDelayed(deviceResponseProcessor, 500);
     }
 
-    private void CheckWiFiAvailable() {
+    private Boolean CheckWiFiAvailable() {
         WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (manager.isWifiEnabled()) {
             WifiInfo wifiInfo = manager.getConnectionInfo();
-            if (wifiInfo != null) {
-                NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-                if (state == NetworkInfo.DetailedState.CONNECTED || state == NetworkInfo.DetailedState.OBTAINING_IPADDR) {
-                    statusText.setText( String.format(getResources().getString(R.string.connected_to), wifiInfo.getSSID()));
-
-                    if(wifiAvailableFlag < 3) {
-                        if(wifiAvailableFlag == 2){
-                            refreshDevs();
-                        }
-                        wifiAvailableFlag++;
-                    }
-                    return;
-                }
+            if (wifiInfo != null && wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
+                statusText.setText( String.format(getResources().getString(R.string.connected_to), wifiInfo.getSSID()));
+                refreshDevs();
+                return true;
             }
         }
         statusText.setText( getResources().getString(R.string.no_wifi_connection));
-
-        if(wifiAvailableFlag > 0){
-            refreshDevs();
-        }
-        wifiAvailableFlag = 0;
+        return false;
     }
 
 
     Runnable WiFiStatusChecker = new Runnable() {
         @Override
         public void run() {
-            try {
-                CheckWiFiAvailable();
-            } finally {
+            if(!CheckWiFiAvailable()){
                 wifiRefreshHandler.postDelayed(WiFiStatusChecker, 2000);
             }
         }
