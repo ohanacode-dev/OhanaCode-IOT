@@ -18,6 +18,7 @@ MQTT_RX_TOPIC = "device_status"
 MQTT_SERVER_ADDR = "localhost"
 MQTT_SERVER_PORT = 1883
 DATABASE = ''
+LABELBASE = ''
 WEB_PORT = 8000
 
 
@@ -69,9 +70,17 @@ class WsConnectionManager:
             await connection.send_text(message)
 
 
+def mqttSend(device_mac, message, host=MQTT_SERVER_ADDR, port=MQTT_SERVER_PORT):
+    client = mqtt.Client('Tx')
+    client.connect(host, port=port)
+    client.publish(device_mac, message)
+
+
 def init_database():
     global DATABASE
+    global LABELBASE
 
+    # Setup main database
     db_dir = '/tmp/.iot-portal'
     if not os.path.isdir(db_dir):
         os.mkdir(db_dir)
@@ -89,6 +98,24 @@ def init_database():
     db.commit()
 
     db.close()
+
+    # Setup label database
+    db_dir = os.path.join( os.path.expanduser('~'), '.iot-portal')
+    if not os.path.isdir(db_dir):
+        os.mkdir(db_dir)
+
+    LABELBASE = os.path.join(db_dir, "database.db")
+
+    if not os.path.exists(LABELBASE):
+        # Create an empty database
+        db = sqlite3.connect(LABELBASE)
+
+        # Create a label table
+        sql = "create table label (id INTEGER PRIMARY KEY AUTOINCREMENT, mac TEXT, label TEXT)"
+        db.execute(sql)
+        db.commit()
+
+        db.close()
 
 
 def query_db(db, query, args=(), one=False):
@@ -146,6 +173,28 @@ def get_devices_from_db(device_mac=None, id=None):
     return result
 
 
+def set_device_label(device_mac, label):
+    try:
+        db = sqlite3.connect(LABELBASE)
+
+        # Get this device data if exists
+        sql = "SELECT * FROM label WHERE mac='{}'".format(device_mac)
+        result = query_db(db, sql, one=True)
+
+        if result is None:
+            sql = "INSERT INTO label (mac, label) VALUES ('{}', '{}')".format(device_mac, label)
+        else:
+            sql = "UPDATE label SET label='{}' WHERE mac='{}'".format(label, device_mac)
+
+        db.execute(sql)
+        db.commit()
+        db.close()
+
+    except Exception as exc:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print("ERROR writing label to db on line {}!\n\t{}".format(exc_tb.tb_lineno, exc))
+
+
 def report_device_status_change(device_mac):
     try:
         device = get_devices_from_db(device_mac=device_mac)
@@ -172,7 +221,22 @@ ws_manager = WsConnectionManager()
 
 def get_device_label(device_mac):
     result = device_mac
-    # TODO: create $HOME/.iot-portal/database.db with label table and get label for this MAC
+
+    try:
+        if device_mac is not None:
+            sql = "SELECT * FROM label WHERE mac='{}'".format(device_mac)
+
+            db = sqlite3.connect(LABELBASE)
+            data = query_db(db, sql, one=True)
+            db.close()
+
+            if data is not None:
+                result = data.get('label', device_mac)
+
+    except Exception as exc:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print("ERROR reading label on line {}!\n\t{}".format(exc_tb.tb_lineno, exc))
+
     return result
 
 
@@ -199,6 +263,12 @@ async def websocket_server(websocket: WebSocket):
             if data['topic'] == "device_list":
                 devices = get_devices_from_db()
 
+                # Update labels
+                for i in range(0, len(devices)):
+                    data = json.loads(devices[i]['data'])
+                    data['label'] = get_device_label(devices[i]['mac'])
+                    devices[i]['data'] = json.dumps(data)
+
                 response = {'topic': 'device_list', 'data': devices}
 
                 await ws_manager.send_text(json.dumps(response), websocket)
@@ -211,7 +281,7 @@ async def websocket_server(websocket: WebSocket):
                 if id is not None:
                     device = get_devices_from_db(id=id)
                 elif mac is not None:
-                    device = get_devices_from_db(mac=mac)
+                    device = get_devices_from_db(device_mac=mac)
                 else:
                     device = None
 
@@ -220,13 +290,17 @@ async def websocket_server(websocket: WebSocket):
 
                     for key in device_db_data.keys():
                         if key in new_device_data:
+                            if key == 'label':
+                                if device_db_data[key] != new_device_data[key]:
+                                    set_device_label(device['mac'], new_device_data[key])
+
                             device_db_data[key] = new_device_data[key]
 
                     device['data'] = json.dumps(device_db_data)
 
-                    # TODO: Communicate with the device to update
-                    # response = {'topic': 'set_device', 'data': device}
-                    # await ws_manager.broadcast(json.dumps(response))
+                    # Send updated data to device. Device will report the change which will be propagated to the UI.
+                    mqttSend(device['mac'], device['data'])
+
             elif data['topic'] == "notify_device_status":
                 id = data.get('id', None)
                 device = get_devices_from_db(id=id)

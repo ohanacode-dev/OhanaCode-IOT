@@ -1,0 +1,186 @@
+/* Common elements */
+.label{
+    font-size: 15px;
+    padding: 5px;
+    height: 1em;
+    margin: 5px 0 0 0;
+    display: inline-block;
+    text-align: center;
+    width: calc(100% - 70px);
+}
+.setup, .redirect{
+    font-size: 15px;
+    width: 15px;
+    padding: 5px;
+    height: 15px;
+    display: inline-block;
+    cursor: pointer;
+}
+.redirect{
+    float: right;
+    margin: 5px 5px 0 0;
+}
+.setup{
+    margin: 5px 0 0 5px;
+}
+
+/* Light round button */
+.lightBtnOff, .lightBtnOn{
+	width: 100px;
+	height: 100px;
+	position: relative;
+	margin: 0 auto;
+	display: inline-block;
+}
+
+.lightBtnOff::before, .lightBtnOff::after, .lightBtnOff span,
+.lightBtnOn::before, .lightBtnOn::after, .lightBtnOn span{
+	display: block;
+   	content: "";
+   	position: absolute;
+}
+
+.lightBtnOff::before, .lightBtnOn::before{
+	width: 80px;
+	height: 80px;
+	background: black;
+	border-radius: 50%;
+	top: 10px;
+	left: 10px;
+}
+
+.lightBtnOff::before{
+	border: 2px solid #ACABA4;
+}
+
+.lightBtnOn::before{
+	border: 2px solid white;
+	box-shadow: 0 0 20px white;
+}
+
+.lightBtnOff::after, .lightBtnOn::after{
+	width: 40px;
+	height: 40px;
+	top: 25px;
+	left: 26px;
+	border-radius: 50%;
+}
+
+.lightBtnOff::after{
+	background: black;
+	border: 6px solid #8a8a5c;
+}
+
+.lightBtnOn::after{
+	background: black;
+	border: 6px solid #66ff66;
+}
+
+.lightBtnOff span, .lightBtnOn span{
+	width: 4px;
+	height: 20px;
+	border: 6px solid black;
+	top: 20px;
+	left: 44px;
+	z-index: 2;
+}
+.lightBtnOff span{
+	background: #8a8a5c;
+}
+
+.lightBtnOn span{
+	background: #66ff66;
+}
+
+/* Slider */
+.v-slider-wrapper{
+    width: 40px;
+    height: 160px;
+    padding: 0;
+    display: inline-block;
+    position: relative;
+	margin: 0 auto;
+}
+.v-slider {
+    -webkit-appearance: none;
+    width: 130px;
+    height: 6px;
+    border-radius: 3px;
+    background: #e7d7c3;
+    margin: 0 17px;
+    transform-origin: 75px 75px;
+    transform: rotate(-90deg);
+    outline: none;
+}
+
+.v-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: gray;
+}
+
+.v-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: gray;
+}
+
+.color_0::-webkit-slider-thumb{
+    background-color: red;
+}
+.color_0::-moz-range-thumb {
+    background-color: red;
+}
+
+.color_1::-webkit-slider-thumb {
+    background-color: green;
+}
+.color_1::-moz-range-thumb {
+    background-color: green;
+}
+
+.color_2::-webkit-slider-thumb {
+    background-color: blue;
+}
+.color_2::-moz-range-thumb {
+    background-color: blue;
+}
+
+.color_3::-webkit-slider-thumb {
+    background-color: white;
+}
+.color_3::-moz-range-thumb {
+    background-color: white;
+}
+
+/* Thermometer */
+.thermometer{
+    width: 100px;
+	height: 100px;
+	position: relative;
+	margin: 10px auto 0 auto;
+	display: inline-block;
+	border: 2px solid #e7d7c3;
+	border-radius: 50%;
+	position: relative;
+}
+.thermo-text{
+    font-size: 40px;
+    padding: 0;
+    margin: calc(50% - 25px) 0;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+.units{
+    position: absolute;
+    font-size: 20px;
+    top: -15px;
+    left: 35px;
+}

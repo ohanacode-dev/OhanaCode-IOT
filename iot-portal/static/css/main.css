@@ -40,4 +40,11 @@ th,td {
 .device_div{
     border-bottom: 2px solid #e7d7c3;
     color: #e7d7c3;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+}
+.break {
+    flex-basis: 100%;
+    height: 0;
 }
