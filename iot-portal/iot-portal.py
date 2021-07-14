@@ -177,14 +177,17 @@ def set_device_label(device_mac, label):
     try:
         db = sqlite3.connect(LABELBASE)
 
-        # Get this device data if exists
-        sql = "SELECT * FROM label WHERE mac='{}'".format(device_mac)
-        result = query_db(db, sql, one=True)
-
-        if result is None:
-            sql = "INSERT INTO label (mac, label) VALUES ('{}', '{}')".format(device_mac, label)
+        if len(label) == 0:
+            sql = "DELETE FROM label WHERE mac='{}'".format(device_mac)
         else:
-            sql = "UPDATE label SET label='{}' WHERE mac='{}'".format(label, device_mac)
+            # Get this device data if exists
+            sql = "SELECT * FROM label WHERE mac='{}'".format(device_mac)
+            result = query_db(db, sql, one=True)
+
+            if result is None:
+                sql = "INSERT INTO label (mac, label) VALUES ('{}', '{}')".format(device_mac, label)
+            else:
+                sql = "UPDATE label SET label='{}' WHERE mac='{}'".format(label, device_mac)
 
         db.execute(sql)
         db.commit()

@@ -1,33 +1,26 @@
 /* Common elements */
 .label{
-    font-size: 15px;
-    padding: 5px;
-    height: 1em;
-    margin: 5px 0 0 0;
     display: inline-block;
     text-align: center;
-    width: calc(100% - 70px);
+    width: calc(100% - 4em);
 }
 .setup, .redirect{
-    font-size: 15px;
-    width: 15px;
-    padding: 5px;
-    height: 15px;
+    width: 1em;
     display: inline-block;
     cursor: pointer;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
+
 .redirect{
     float: right;
-    margin: 5px 5px 0 0;
 }
-.setup{
-    margin: 5px 0 0 5px;
-}
+
 
 /* Light round button */
 .lightBtnOff, .lightBtnOn{
-	width: 100px;
-	height: 100px;
+	width: 6em;
+	height: 6em;
 	position: relative;
 	margin: 0 auto;
 	display: inline-block;
@@ -41,12 +34,12 @@
 }
 
 .lightBtnOff::before, .lightBtnOn::before{
-	width: 80px;
-	height: 80px;
-	background: black;
+	width: 5em;
+	height: 5em;
+	background: #3a3a3a;
 	border-radius: 50%;
-	top: 10px;
-	left: 10px;
+	top: calc(0.5em - 2px);
+	left: calc(0.5em - 2px);
 }
 
 .lightBtnOff::before{
@@ -59,43 +52,43 @@
 }
 
 .lightBtnOff::after, .lightBtnOn::after{
-	width: 40px;
-	height: 40px;
-	top: 25px;
-	left: 26px;
+	width: 3em;
+	height: 3em;
+	top: calc(1.5em - 6px);
+	left: calc(1.5em - 6px);
 	border-radius: 50%;
 }
 
 .lightBtnOff::after{
-	background: black;
-	border: 6px solid #8a8a5c;
+	background: #3a3a3a;
+	border: 6px solid #ACABA4;
 }
 
 .lightBtnOn::after{
-	background: black;
-	border: 6px solid #66ff66;
+	background: #3a3a3a;
+	border: 6px solid white;
 }
 
 .lightBtnOff span, .lightBtnOn span{
-	width: 4px;
-	height: 20px;
-	border: 6px solid black;
-	top: 20px;
-	left: 44px;
+	width: 6px;
+	height: 22px;
+	border: 6px solid #3a3a3a;
+	top: calc(1.5em - 12px);
+	left: calc(3em - 9px);
 	z-index: 2;
 }
 .lightBtnOff span{
-	background: #8a8a5c;
+	background: #ACABA4;
 }
 
 .lightBtnOn span{
-	background: #66ff66;
+	background: white;
 }
 
 /* Slider */
 .v-slider-wrapper{
-    width: 40px;
-    height: 160px;
+    width: 4.4em;
+    height: 10em;
     padding: 0;
     display: inline-block;
     position: relative;
@@ -103,12 +96,12 @@
 }
 .v-slider {
     -webkit-appearance: none;
-    width: 130px;
-    height: 6px;
-    border-radius: 3px;
+    width: 8em;
+    height: 0.2em;
+    border-radius: 0.1em;
     background: #e7d7c3;
-    margin: 0 17px;
-    transform-origin: 75px 75px;
+    margin: -7em 2.2em 0 2.2em;
+    transform-origin: 8em 8em;
     transform: rotate(-90deg);
     outline: none;
 }
@@ -159,28 +152,34 @@
     background-color: white;
 }
 
-/* Thermometer */
-.thermometer{
-    width: 100px;
-	height: 100px;
+/* Thermometerc, Thermometerf, Clock */
+.text-display{
+    min-height: 60px;
 	position: relative;
 	margin: 10px auto 0 auto;
 	display: inline-block;
 	border: 2px solid #e7d7c3;
-	border-radius: 50%;
+	border-radius: 10px;
 	position: relative;
+	width: 250px;
+	text-align: center;
+	color: #e7d7c3;
 }
-.thermo-text{
+.text-data{
     font-size: 40px;
-    padding: 0;
-    margin: calc(50% - 25px) 0;
-    display: inline-block;
-    text-align: center;
-    width: 100%;
+    height: 40px;
+    padding: 5px;
+    margin: 0;
+    width: calc(100% - 10px);
+    display: block;
 }
-.units{
-    position: absolute;
+
+.target_text{
+    padding: 5px;
+    margin: 0;
+    width: calc(100% - 10px);
+}
+.type-icon{
+    float: left;
     font-size: 20px;
-    top: -15px;
-    left: 35px;
 }

@@ -26,17 +26,47 @@ function addNewDevice(device){
                             device.current[i] + "' onchange='update_dimmer(" + device.id + ", " + i + ", this.value)'></div>";
         }
 
-    }else if(device.type == 'thermometer'){
-
-        for (let i = 0; i < device.current.length; i++) {
-            new_dev_html += "<div class='thermometer'>";
-            new_dev_html += "<p class='units'>&#8451;</p>";
-            new_dev_html += "<p class= 'thermo-text' id='dev_" + device.id + "_" + i + "'>" + device.current[i] + "</p>"
-            new_dev_html += "</div>";
+    }else if((device.type == 'thermometerc') || (device.type == 'thermometerf') || (device.type == 'clock')){
+        var type_icon = "";
+        var type_unit = "";
+        if(device.type == 'thermometerc'){
+            type_icon = "<i class='type-icon fas fa-thermometer-half'></i>";
+            type_unit = "&#8451;";
+        }else if(device.type == 'thermometerf'){
+            type_icon = "<i class='type-icon fas fa-thermometer-half'></i>";
+            type_unit = "&#8457;";
+        }else if(device.type == 'clock'){
+            type_icon = "<i class='type-icon far fa-clock'></i>";
         }
 
-    }else if(device.type == 'thermostat'){
-//                    new_dev_html = "<div class='thermostat_div' id='" + device.mac + "'><p class='temp'></p><p class='target'></p>";
+        for (let i = 0; i < device.current.length; i++) {
+            new_dev_html += "<div class='text-display'>";
+            new_dev_html += "<p class='text-data'>" + type_icon + "<span id='dev_" + device.id + "_" + i + "'>" + device.current[i] + "</span>" + type_unit + "</p></div>";
+        }
+
+    }else if((device.type == 'thermostatc') || (device.type == 'thermostatf') || (device.type == 'timer')){
+        var type_icon = "";
+        var type_unit = "";
+        if(device.type == 'thermostatc'){
+            type_icon = "<i class='type-icon fas fa-thermometer-half'></i>";
+            type_unit = "&#8451;";
+        }else if(device.type == 'thermostatf'){
+            type_icon = "<i class='type-icon fas fa-thermometer-half'></i>";
+            type_unit = "&#8457;";
+        }else if(device.type == 'timer'){
+            type_icon = "<i class='type-icon fas fa-stopwatch'></i>";
+        }
+
+        for (let i = 0; i < device.current.length; i++) {
+            var target_icon = "<i class='type-icon fas fa-bullseye' id='ticon_" + device.id + "_" + i + "'></i>";
+
+            new_dev_html += "<div class='text-display'>";
+            new_dev_html += "<p class='text-data'>" + type_icon;
+            new_dev_html += "<span id='dev_" + device.id + "_" + i + "'>" + device.current[i] + "</span>" + type_unit + "</p>";
+            new_dev_html += "<p class='target_text'>" + target_icon;
+            new_dev_html += "<span id='target_" + device.id + "_" + i + "'>" + device.target[i] + "</span>";
+            new_dev_html += type_unit + "</p></div>";
+        }
     }else{
         console.log("Unsupported device type:" + device.type);
     }
@@ -44,10 +74,18 @@ function addNewDevice(device){
     new_dev_html += "<div class='break'></div>";
     new_dev_html += "<p class='setup' onclick='setLabel(\"" + device.id + "\");' title='Set label'><i class='fas fa-wrench'></i></p>";
     new_dev_html += "<p class='label'>" + device.label + "</p>";
-    new_dev_html += "<a class='redirect' href='http://" + device.addr + "' target='_blank' ' title='Open device UI'><i class='fas fa-arrow-circle-right'></i></a>";
+    new_dev_html += "<p class='redirect' onclick='goto(\"href='http://" + device.addr + "\")' title='Open device UI'><i class='fas fa-arrow-circle-right'></i></p>";
     new_dev_html += "</div>";
 
     document.getElementById('device_list').innerHTML += new_dev_html;
+
+    for (let i = 0; i < device.current.length; i++) {
+        try{
+            if (device.state[i] > 0){
+                document.getElementById("ticon_" + device.id + "_" + i).style.color = 'red';
+            }
+        }catch (error){}
+    }
 
     dev_value_list[device.id] = device.current;
 }
@@ -88,16 +126,28 @@ dev_ws.onmessage = function(event) {
                     }
                 }else if(device.type == 'dimmer'){
                     for (let i = 0; i < device.current.length; i++) {
-                        var dimmer_obj = document.getElementById("dev_" + device.id + "_" + i);
-                        dimmer_obj.value = device.current[i];
+                        document.getElementById("dev_" + device.id + "_" + i).value = device.current[i];
                     }
-                }else if(device.type == 'thermometer'){
+                }else if((device.type == 'thermometerc') || (device.type == 'thermometerf') || (device.type == 'clock')){
                     for (let i = 0; i < device.current.length; i++) {
-                        var dimmer_obj = document.getElementById("dev_" + device.id + "_" + i);
-                        dimmer_obj.innerHTML = device.current[i];
+                        document.getElementById("dev_" + device.id + "_" + i).innerHTML = device.current[i];
                     }
-                }else if(device.type == 'thermostat'){
+                }else if((device.type == 'thermostatc') || (device.type == 'thermostatf') || (device.type == 'timer')){
+                    for (let i = 0; i < device.current.length; i++) {
+                        document.getElementById("dev_" + device.id + "_" + i).innerHTML = device.current[i];
 
+                        try{
+                            document.getElementById("target_" + device.id + "_" + i).innerHTML = device.target[i];
+                        }catch (error){}
+
+                        try{
+                            if (device.state[i] > 0){
+                                document.getElementById("ticon_" + device.id + "_" + i).style.color = 'red';
+                            }else{
+                                document.getElementById("ticon_" + device.id + "_" + i).style.color = '#e7d7c3';
+                            }
+                        }catch (error){}
+                    }
                 }else{
                     console.log("Unsupported device type:" + device.type);
                 }
@@ -145,4 +195,8 @@ function update_dimmer(dev_id, value_id, value){
     dev_values[value_id] = value;
     var msg = { topic: "set_device", id: dev_id, data: {"current": dev_values}};
     dev_ws.send(JSON.stringify(msg));
+}
+
+function goto(url){
+    window.open(url, '_blank').focus();
 }
