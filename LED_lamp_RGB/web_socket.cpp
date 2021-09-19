@@ -79,7 +79,8 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
           
         } 
         rgbClr = LED_getCurrentRGB();
-        wsServer.broadcastTXT("{\"CURRENT\":{\"OPA\":" + String(LED_getCurrentVal()) + ",\"CLR\":\"" + rgbToHexStr(rgbClr) + "\"}}"); 
+        String msg = String("{\"CURRENT\":{\"OPA\":") + String(LED_getCurrentVal()) + String(",\"CLR\":\"") + String(rgbToHexStr(rgbClr)) + String("\"}}");
+        wsServer.broadcastTXT(msg); 
       }
       
       if(root.containsKey("ID")){

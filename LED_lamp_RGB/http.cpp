@@ -9,7 +9,7 @@
 #include <EEPROM.h>
 #include <ESP8266HTTPClient.h>
 #include <pgmspace.h>
-#include <FS.h>
+#include <LittleFS.h>
 #include "http.h"
 #include "udp_ping.h"
 #include "wifi_connection.h"
@@ -57,8 +57,8 @@ static bool handleFileRead(String path) { // send the right file to the client (
   
   String contentType = getContentType(path);            // Get the MIME type
   
-  if (SPIFFS.exists(path)) {                            // If the file exists
-    File file = SPIFFS.open(path, "r");                 // Open it
+  if (LittleFS.exists(path)) {                            // If the file exists
+    File file = LittleFS.open(path, "r");                 // Open it
     size_t sent = webServer.streamFile(file, contentType); // And send it to the client
     file.close();                                       // Then close the file again
     
@@ -215,12 +215,12 @@ void HTTP_init(void){
   
   webServer.begin();
 
-  if(!SPIFFS.begin()){
+  if(!LittleFS.begin()){
     Serial.println("SPIFFS Initialization failed. Did you enable SPIFFS in \"Tools/Flash size\"?");
   }
 
   Serial.println("\tListing files...");
-  Dir dir = SPIFFS.openDir("/");
+  Dir dir = LittleFS.openDir("/");
   while (dir.next()) {
       Serial.println(dir.fileName());      
   }
