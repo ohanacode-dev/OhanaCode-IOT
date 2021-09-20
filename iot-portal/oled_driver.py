@@ -4,6 +4,11 @@
 Script to display weather data. Uses www.weatherbit.io.
 Dependencies: pip3 install requests
 City ID can be acquired from city.list.json.gz at: http://bulk.openweathermap.org/sample/city.list.json.gz
+
+To use the OLED screen you will need to enable I2C interface. On Armbian, you can use armbian-config to enable it.
+Then append the driver to /etc/modules-load.d/modules.conf:
+     12c-dev
+     
 '''
 
 import requests
@@ -121,4 +126,4 @@ if __name__ == '__main__':
         msg = '{}{}C {} {}'.format(temp, u'\N{DEGREE SIGN}', description, icon)
 
         output_weather_to_display(msg)
-        time.sleep(60)
+        time.sleep(60 * 5)
