@@ -44,7 +44,7 @@ ASCII_ICON_NIGHT = {
 FONT_WEATHER = ImageFont.truetype("./DejaVuSans.ttf", 12)
 serial = i2c(port=0, address=0x3C)
 device = sh1106(serial)
-MARGIN = 10
+last_weather_text = ""
 
 
 def query_server():
@@ -53,27 +53,6 @@ def query_server():
     json_ret_val = json.loads(r.text)
 
     return json_ret_val
-
-
-def split_text_2_rows_by_letter(in_text):
-    with canvas(device) as draw:
-        text_0 = in_text
-        text_len = draw.textsize(text_0, FONT_WEATHER)[0]
-
-        while text_len > (device.width - 6):
-            # Remove symbols from the end
-            text_0 = text_0[:-1]
-            text_len = draw.textsize(text_0, FONT_WEATHER)[0]
-
-        text_1 = in_text[len(text_0) - 1:]
-        text_len = draw.textsize(text_1, FONT_WEATHER)[0]
-
-        while text_len > (device.width - 6):
-            # Remove symbols from the end
-            text_1 = text_1[:-1]
-            text_len = draw.textsize(text_1, FONT_WEATHER)[0]
-
-    return [text_0, text_1]
 
 
 def split_text_2_rows_by_word(in_text):
@@ -109,10 +88,16 @@ def split_text_2_rows_by_word(in_text):
 
 
 def output_weather_to_display(text):
-    out_text = split_text_2_rows_by_word(text)
-    with canvas(device) as draw:
-        draw.text((0, device.height - 1 - FONT_WEATHER.size * 2), out_text[0], fill="white", font=FONT_WEATHER)
-        draw.text((0, device.height - 1 - FONT_WEATHER.size), out_text[1], fill="white", font=FONT_WEATHER)
+    global last_weather_text
+
+    if last_weather_text != text:
+        # Only refresh if differs
+        last_weather_text = text
+
+        out_text = split_text_2_rows_by_word(text)
+        with canvas(device) as draw:
+            draw.text((0, device.height - 1 - FONT_WEATHER.size * 2), out_text[0], fill="white", font=FONT_WEATHER)
+            draw.text((0, device.height - 1 - FONT_WEATHER.size), out_text[1], fill="white", font=FONT_WEATHER)
 
     time.sleep(1)
 

@@ -37,6 +37,8 @@ echo
 echo "[Service]"
 echo Type=simple
 echo User=root
+echo Restart=always
+echo RestartSec=10
 echo WorkingDirectory=$PWD
 echo ExecStart=/usr/bin/python3 oled_driver.py
 echo
