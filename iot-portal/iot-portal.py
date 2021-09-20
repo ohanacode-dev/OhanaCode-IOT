@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import json
 import os
@@ -315,4 +315,13 @@ async def websocket_server(websocket: WebSocket):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        arg_port = sys.argv[1]
+        try:
+            new_port = int(arg_port)
+            if new_port > 79:
+                WEB_PORT = new_port
+        except Exception as e:
+            print(e)
+
     uvicorn.run(app, host="0.0.0.0", port=WEB_PORT)

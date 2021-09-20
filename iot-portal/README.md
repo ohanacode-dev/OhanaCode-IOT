@@ -11,7 +11,7 @@ that devices post to so it can write data to an SQLITE database for the UI to us
 ## Dependencies
 
     sudo apt install mosquitto mosquitto-clients
-    pip3 install paho-mqtt fastapi uvicorn[standard] jinja2 aiofiles websocket-client
+    pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client websockets
     
 ## Expected mqtt message from a device
 
