@@ -27,3 +27,22 @@ sudo mv $SERVICE_FILE /etc/systemd/system/
 sudo systemctl enable $SERVICE_FILE
 
 
+echo "installing oled service"
+
+SERVICE_FILE=oled.service
+{
+echo "[Unit]"
+echo Description=OLED driver for weather and temperature display
+echo
+echo "[Service]"
+echo Type=simple
+echo User=root
+echo WorkingDirectory=$PWD
+echo ExecStart=/usr/bin/python3 oled_driver.py
+echo
+echo "[Install]"
+echo WantedBy=multi-user.target
+} > $SERVICE_FILE
+
+sudo mv $SERVICE_FILE /etc/systemd/system/
+sudo systemctl enable $SERVICE_FILE
