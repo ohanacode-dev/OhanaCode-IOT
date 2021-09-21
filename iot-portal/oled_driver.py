@@ -21,10 +21,10 @@ import json
 import fontawesome as fa
 
 
-FONT_WEATHER = ImageFont.truetype("./DejaVuSans.ttf", 12)
-FONT_TITLE = ImageFont.truetype("./DejaVuSans.ttf", 10)
-FONT_TEMP = ImageFont.truetype("./DejaVuSans.ttf", 20)
-FONT_ICON = ImageFont.truetype("./fontawesome-webfont.ttf", 14)
+FONT_WEATHER = ImageFont.truetype("DejaVuSans.ttf", 12)
+FONT_TITLE = ImageFont.truetype("DejaVuSans.ttf", 10)
+FONT_TEMP = ImageFont.truetype("DejaVuSans.ttf", 20)
+FONT_ICON = ImageFont.truetype("fontawesome-webfont.ttf", 14)
 serial = i2c(port=0, address=0x3C)
 device = sh1106(serial)
 WEATHER_ROW_1 = device.height - 1 - FONT_WEATHER.size * 2
