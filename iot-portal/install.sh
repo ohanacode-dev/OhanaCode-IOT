@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt install mosquitto mosquitto-clients python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev fonts-font-awesome ttf-dejavu
+sudo apt install -y mosquitto mosquitto-clients python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev fonts-font-awesome ttf-dejavu
 sudo pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client websockets luma.oled pillow==2.8.2 fontawesome
 
 IOT_SERVICE_FILE=iotportal.service
