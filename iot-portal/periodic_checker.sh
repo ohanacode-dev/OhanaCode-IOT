@@ -1,11 +1,5 @@
 #!/bin/bash
-
 # This is a helper script to periodically check ambient temperature and weather
-
-SCRIPT_FULL_PATH="$(realpath -s $0)"
-SCRIPT_DIR="$(dirname $SCRIPT_FULL_PATH)"
-
-cd $SCRIPT_DIR
 
 # Initial check of weather and temperature
 ./weather.py
@@ -22,7 +16,7 @@ do
     ./weather.py
   fi
 	
-  let COUNTER++
+  ((COUNTER++))
 
   if [ "$COUNTER" -eq "14" ]; then
     COUNTER=0

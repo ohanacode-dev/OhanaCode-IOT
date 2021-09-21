@@ -99,6 +99,7 @@ if __name__ == '__main__':
     msg = {"name": client_id, "msg": weather_msg}
     print(msg)
 
-    # Send to mqtt server
+    # Send to mqtt server.
+    send_to_mqtt("Wake up")
     mqtt_msg = json.dumps(msg)
     send_to_mqtt(mqtt_msg)

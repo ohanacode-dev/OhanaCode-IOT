@@ -68,7 +68,7 @@ echo User=$USER
 echo Restart=always
 echo RestartSec=30
 echo WorkingDirectory=$PWD
-echo ExecStart=periodic_checker.sh
+echo ExecStart=$PWD/periodic_checker.sh
 echo
 echo "[Install]"
 echo WantedBy=multi-user.target
