@@ -11,53 +11,86 @@ Then append the driver to /etc/modules-load.d/modules.conf:
      
 '''
 
-import requests
-import json
 from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import sh1106
-import time
 from PIL import ImageFont
+from paho.mqtt import client as mqtt_client
+import time
+import json
+import fontawesome as fa
 
-
-API_KEY = "6b15e16bb3dc4ba1b063d0836d56ce44"
-API_URL = "http://api.weatherbit.io/v2.0/current"
-CITY_ID = '3194360'     # Novi Sad
-# CITY_ID = '789518'    # Kikinda
-# CITY_ID = '783814'    # Zrenjanin
-# CITY_ID = '792680'    # Beograd
-ASCII_ICON_DAY = {
-    '200': '\u2633', '201': '\u2633', '202': '\u2633', '230': '\u2633', '231': '\u2633', '232': '\u2633',
-    '233': '\u2633', '300': '\u1F328', '301': '\u1F328', '302': '\u1F328', '500': '\u2614', '501': '\u2614',
-    '502': '\u2614', '511': '\u2614', '520': '\u2614', '521': '\u2614', '522': '\u2614', '600': '\u2603',
-    '601': '\u2603', '602': '\u2603', '610': '\u2603', '611': '\u2603', '612': '\u2603', '621': '\u2603',
-    '622': '\u2603', '623': '\u2603', '700': '\u2601', '711': '\u2601', '721': '\u2601', '731': '\u2601',
-    '741': '\u2601', '751': '\u2601', '800': '\u263C', '801': '\u263C', '802': '\u2601', '803': '\u2601',
-    '804': '\u2601', '900': '\u2614'
-}
-
-ASCII_ICON_NIGHT = {
-    '200': '\u2633', '201': '\u2633', '202': '\u2633', '230': '\u2633', '231': '\u2633', '232': '\u2633',
-    '233': '\u2633', '300': '\u1F328', '301': '\u1F328', '302': '\u1F328', '500': '\u2614', '501': '\u2614',
-    '502': '\u2614', '511': '\u2614', '520': '\u2614', '521': '\u2614', '522': '\u2614', '600': '\u2603',
-    '601': '\u2603', '602': '\u2603', '610': '\u2603', '611': '\u2603', '612': '\u2603', '621': '\u2603',
-    '622': '\u2603', '623': '\u2603', '700': '\u2601', '711': '\u2601', '721': '\u2601', '731': '\u2601',
-    '741': '\u2601', '751': '\u2601', '800': '\u263D', '801': '\u263D', '802': '\u2601', '803': '\u2601',
-    '804': '\u2601', '900': '\u2614'
-}
 
 FONT_WEATHER = ImageFont.truetype("./DejaVuSans.ttf", 12)
+FONT_TITLE = ImageFont.truetype("./DejaVuSans.ttf", 10)
+FONT_TEMP = ImageFont.truetype("./DejaVuSans.ttf", 20)
+FONT_ICON = ImageFont.truetype("./fontawesome-webfont.ttf", 14)
 serial = i2c(port=0, address=0x3C)
 device = sh1106(serial)
-last_weather_text = ""
+WEATHER_ROW_1 = device.height - 1 - FONT_WEATHER.size * 2
+WEATHER_ROW_2 = device.height - 1 - FONT_WEATHER.size
+TITLE_ROW = 2
+TEMPERATURE_ROW = TITLE_ROW + 12
+MIDDLE_X = int(device.width / 2)
+
+topic = "iot"
+broker = 'localhost'
+port = 1883
+
+SENDER_WEATHER = "weather"
+SENDER_TEMP_AMBIENT = "temp_ambient"
+SENDER_TEMP_EXTERNAL = "temp_external"
+
+weather_text = ""
+temp_ambient = "----- "
+temp_external = "----- "
 
 
-def query_server():
-    url_params = {'key': API_KEY, 'city_id': CITY_ID}
-    r = requests.get(API_URL, params=url_params)
-    json_ret_val = json.loads(r.text)
+class MqttReceiver:
+    def __init__(self):
+        self.host = broker
+        self.port = port
+        self.topic = topic
+        self.rx_msg = None
 
-    return json_ret_val
+        self.client = mqtt_client.Client('Rcv')
+        try:
+            self.client.connect(self.host, port=port)
+            self.client.on_connect = self.on_connect
+            self.client.on_message = self.on_message
+            self.client.loop_start()
+        except:
+            pass
+
+    def on_connect(self, client, userdata, flags, rc):
+        client.subscribe(self.topic)
+
+    def on_message(self, client, userdata, msg):
+        global weather_text
+        global temp_ambient
+        global temp_external
+
+        try:
+            self.rx_msg = json.loads(msg.payload.decode())
+            sender = self.rx_msg.get("name", "")
+            message = self.rx_msg.get("msg", "")
+            if sender == SENDER_WEATHER:
+                weather_text = message
+            elif sender == SENDER_TEMP_AMBIENT:
+                temp_ambient = message
+            elif sender == SENDER_TEMP_EXTERNAL:
+                temp_external = message
+
+        except Exception as ex:
+            print("ERROR: ", ex)
+            self.rx_msg = msg.payload.decode()
+
+        # print('MQTT RX: {}'.format(self.rx_msg))
+        output_to_display()
+
+    def stop(self):
+        self.client.disconnect()
+        self.client.loop_stop()
 
 
 def split_text_2_rows_by_word(in_text):
@@ -92,38 +125,26 @@ def split_text_2_rows_by_word(in_text):
     return [text_0 + " ", text_1 + " "]
 
 
-def output_weather_to_display(text):
-    global last_weather_text
+def output_to_display():
+    display_weather_text = split_text_2_rows_by_word(weather_text)
+    with canvas(device) as draw:
+        draw.rectangle((0, 0, MIDDLE_X, WEATHER_ROW_1 - 1), outline="white", fill="black")
+        draw.text((4, TITLE_ROW), fa.icons['home'], fill="white", font=FONT_ICON)
+        draw.text((4, TEMPERATURE_ROW), temp_ambient, fill="white", font=FONT_TEMP)
 
-    if last_weather_text != text:
-        # Only refresh if differs
-        last_weather_text = text
+        draw.rectangle((MIDDLE_X, 0, device.width - 1, WEATHER_ROW_1 - 1), outline="white", fill="black")
+        draw.text((MIDDLE_X + 4, TITLE_ROW), fa.icons['tree'], fill="white", font=FONT_ICON)
+        draw.text((MIDDLE_X + 4, TEMPERATURE_ROW), temp_external, fill="white", font=FONT_TEMP)
 
-        out_text = split_text_2_rows_by_word(text)
-        with canvas(device) as draw:
-            draw.text((0, device.height - 1 - FONT_WEATHER.size * 2), out_text[0], fill="white", font=FONT_WEATHER)
-            draw.text((0, device.height - 1 - FONT_WEATHER.size), out_text[1], fill="white", font=FONT_WEATHER)
-
-    time.sleep(1)
+        draw.text((0, WEATHER_ROW_1), display_weather_text[0], fill="white", font=FONT_WEATHER)
+        draw.text((0, WEATHER_ROW_2), display_weather_text[1], fill="white", font=FONT_WEATHER)
 
 
 if __name__ == '__main__':
-    while True:
-        print("Getting weather")
-        response = query_server()
-        data = response['data'][0]
-        temp = data['temp']
-        weather = data['weather']
-        description = weather['description']
-        weather_code = '{}'.format(weather['code'])
-        weather_icon = weather['icon']
-
-        if weather_icon.endswith('n'):
-            icon = ASCII_ICON_NIGHT[weather_code]
-        else:
-            icon = ASCII_ICON_DAY[weather_code]
-
-        msg = '{}{}C {} {}'.format(temp, u'\N{DEGREE SIGN}', description, icon)
-
-        output_weather_to_display(msg)
-        time.sleep(60 * 5)
+    receiver = MqttReceiver()
+    output_to_display()
+    try:
+        while True:
+            time.sleep(5)
+    except Exception as e:
+        receiver.stop()

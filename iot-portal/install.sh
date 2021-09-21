@@ -1,14 +1,21 @@
 #!/bin/bash
 
-sudo apt install mosquitto python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev ttf-mscorefonts-installer
-sudo pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client websockets luma.oled pillow==2.8.2
+sudo apt install mosquitto mosquitto-clients python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev ttf-mscorefonts-installer fonts-font-awesome
+sudo pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client websockets luma.oled pillow==2.8.2 fontawesome
 
 sudo mkdir /usr/share/fonts
 sudo cp DejaVuSans.ttf /usr/share/fonts/
 
-echo "installing startup service"
+IOT_SERVICE_FILE=iotportal.service
+OLED_SERVICE_FILE=oled.service
+CHECKER_SERVICE_FILE=periodicchecker.service
+# Disable all existing services if any
+sudo systemctl disable $IOT_SERVICE_FILE
+sudo systemctl disable $OLED_SERVICE_FILE
+sudo systemctl disable $CHECKER_SERVICE_FILE
 
-SERVICE_FILE=iotportal.service
+echo "installing IOT portal service"
+
 {
 echo "[Unit]"
 echo Description=IOT-Portal
@@ -21,15 +28,14 @@ echo ExecStart=/usr/bin/python3 iot-portal.py 80
 echo
 echo "[Install]"
 echo WantedBy=multi-user.target
-} > $SERVICE_FILE
+} > $IOT_SERVICE_FILE
 
-sudo mv $SERVICE_FILE /etc/systemd/system/
-sudo systemctl enable $SERVICE_FILE
+sudo mv $IOT_SERVICE_FILE /etc/systemd/system/
+sudo systemctl enable $IOT_SERVICE_FILE
 
 
-echo "installing oled service"
+echo "installing OLED display service"
 
-SERVICE_FILE=oled.service
 {
 echo "[Unit]"
 echo Description=OLED driver for weather and temperature display
@@ -44,7 +50,29 @@ echo ExecStart=/usr/bin/python3 oled_driver.py
 echo
 echo "[Install]"
 echo WantedBy=multi-user.target
-} > $SERVICE_FILE
+} > $OLED_SERVICE_FILE
 
-sudo mv $SERVICE_FILE /etc/systemd/system/
-sudo systemctl enable $SERVICE_FILE
+sudo mv $OLED_SERVICE_FILE /etc/systemd/system/
+sudo systemctl enable $OLED_SERVICE_FILE
+
+
+echo "installing periodic checker service"
+
+{
+echo "[Unit]"
+echo Description=Periodic runner of weather and temperature apps
+echo
+echo "[Service]"
+echo Type=simple
+echo User=$USER
+echo Restart=always
+echo RestartSec=30
+echo WorkingDirectory=$PWD
+echo ExecStart=periodic_checker.sh
+echo
+echo "[Install]"
+echo WantedBy=multi-user.target
+} > $CHECKER_SERVICE_FILE
+
+sudo mv $CHECKER_SERVICE_FILE /etc/systemd/system/
+sudo systemctl enable $CHECKER_SERVICE_FILE
