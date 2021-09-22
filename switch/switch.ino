@@ -14,6 +14,7 @@
 #include "pinctrl.h"
 #include "ota.h"
 #include "pushbutton.h"
+#include "mqtt.h"
 
 static String statusMessage = "";         /* This is set and requested from other modules. */
 
@@ -36,6 +37,7 @@ void setup(void) {
   HTTP_init();
   WS_init();  
   UDPPING_init(); 
+  MQTT_init();
 }
 
 
@@ -48,5 +50,6 @@ void loop(void) {
     UDPPING_process();  
     WIFIC_process();     
     PUSHBUTTON_process(); 
+    MQTT_process();
   }
 }

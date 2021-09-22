@@ -38,7 +38,8 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
           //Serial.println("Setting new target");            
           PINCTRL_write(root["CURRENT"]);        
         } 
-        wsServer.broadcastTXT("{\"CURRENT\":" + String(PINCTRL_getCurrentVal()) + "}"); 
+        String currentStatus = "{\"CURRENT\":" + String(PINCTRL_getCurrentVal()) + "}";
+        wsServer.broadcastTXT(currentStatus); 
       }
       
       if(root.containsKey("ID")){

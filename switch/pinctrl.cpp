@@ -9,6 +9,7 @@
 #include "web_socket.h"
 #include "wifi_connection.h"
 #include "config.h"
+#include "mqtt.h"
 
 static int currentPinVal = 0;            /* Current LED level. used in forming HTML and id */
 static unsigned long PinWriteTimestamp = 0;
@@ -48,4 +49,6 @@ void PINCTRL_write(int val)
   }
 
   PinWriteTimestamp = millis();
+
+  MQTT_publishStatus();
 }

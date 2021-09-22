@@ -29,9 +29,9 @@ class MqttStatusReceiver:
         self.topic = topic
         self.rx_msg = None
 
-        self.client = mqtt.Client('Rcv')
+        self.client = mqtt.Client('IOT_Portal')
         try:
-            self.client.connect(host, port=port, keepalive=10)
+            self.client.connect(host, port=port)
             self.client.on_connect = self.on_connect
             self.client.on_message = self.on_message
             self.client.loop_start()
