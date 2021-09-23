@@ -10,14 +10,14 @@ import OPi.GPIO as GPIO
 import time
 from paho.mqtt import client as mqtt_client
 
-BTN_PIN = 7
+BTN_PIN = 12
 broker = 'localhost'
 port = 1883
-device_mac = "tobepopulated"
+device_mac = "CC50E32E88F3"
 client_id = "btn_" + device_mac
 
 
-def send_to_mqtt(msg):
+def send_to_mqtt(msg_to_send):
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected to MQTT Broker!")
@@ -28,8 +28,7 @@ def send_to_mqtt(msg):
     client.on_connect = on_connect
     client.connect(broker, port)
     client.loop_start()
-
-    result = client.publish(device_mac, msg)
+    result = client.publish(device_mac, msg_to_send)
     status = result[0]
     if status == 0:
         print("Sent")
@@ -52,7 +51,7 @@ try:
     while True:
         if not GPIO.input(BTN_PIN):
             # Send -1 to toggle
-            msg = {"current": [-1]}
+            msg = '{"current": [-1]}'
             send_to_mqtt(msg)
 
             # Wait for button release

@@ -6,10 +6,12 @@ sudo pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client web
 IOT_SERVICE_FILE=iotportal.service
 OLED_SERVICE_FILE=oled.service
 CHECKER_SERVICE_FILE=periodicchecker.service
+GPIO_BTN_SERVICE_FILE=gpiobtn.service
 # Disable all existing services if any
 sudo systemctl disable $IOT_SERVICE_FILE
 sudo systemctl disable $OLED_SERVICE_FILE
 sudo systemctl disable $CHECKER_SERVICE_FILE
+sudo systemctl disable $GPIO_BTN_SERVICE_FILE
 
 echo "installing IOT portal service"
 
@@ -73,3 +75,24 @@ echo WantedBy=multi-user.target
 
 sudo mv $CHECKER_SERVICE_FILE /etc/systemd/system/
 sudo systemctl enable $CHECKER_SERVICE_FILE
+
+echo "installing GPIO button service"
+
+{
+echo "[Unit]"
+echo Description=GPIO button reader service
+echo
+echo "[Service]"
+echo Type=simple
+echo User=root
+echo Restart=always
+echo RestartSec=5
+echo WorkingDirectory=$PWD
+echo ExecStart=$PWD/gpiobtn.py
+echo
+echo "[Install]"
+echo WantedBy=multi-user.target
+} > $CHECKER_SERVICE_FILE
+
+sudo mv $CHECKER_SERVICE_FILE /etc/systemd/system/
+sudo systemctl enable $GPIO_BTN_SERVICE_FILE
