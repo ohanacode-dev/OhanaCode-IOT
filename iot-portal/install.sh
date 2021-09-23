@@ -92,7 +92,7 @@ echo ExecStart=$PWD/gpiobtn.py
 echo
 echo "[Install]"
 echo WantedBy=multi-user.target
-} > $CHECKER_SERVICE_FILE
+} > $GPIO_BTN_SERVICE_FILE
 
-sudo mv $CHECKER_SERVICE_FILE /etc/systemd/system/
+sudo mv $GPIO_BTN_SERVICE_FILE /etc/systemd/system/
 sudo systemctl enable $GPIO_BTN_SERVICE_FILE
