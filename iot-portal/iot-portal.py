@@ -43,6 +43,7 @@ class MqttStatusReceiver:
 
     def on_message(self, client, userdata, msg):
         self.rx_msg = msg.payload.decode()
+        print("MSG:", self.rx_msg)
         if self.rx_msg is not None:
             write_status_to_db(self.rx_msg)
 
@@ -299,10 +300,9 @@ async def websocket_server(websocket: WebSocket):
 
                             device_db_data[key] = new_device_data[key]
 
-                    device['data'] = json.dumps(device_db_data)
-
+                    # device['data'] = json.dumps(device_db_data)
                     # Send updated data to device. Device will report the change which will be propagated to the UI.
-                    mqttSend(device['mac'], device['data'])
+                    mqttSend(device['mac'], str(new_device_data))
 
             elif data['topic'] == "notify_device_status":
                 id = data.get('id', None)

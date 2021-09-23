@@ -71,10 +71,11 @@ function addNewDevice(device){
         console.log("Unsupported device type:" + device.type);
     }
 
+    var onclickhref = 'goto("http://' + device.addr + '")';
     new_dev_html += "<div class='break'></div>";
     new_dev_html += "<p class='setup' onclick='setLabel(\"" + device.id + "\");' title='Set label'><i class='fas fa-wrench'></i></p>";
     new_dev_html += "<p class='label'>" + device.label + "</p>";
-    new_dev_html += "<p class='redirect' onclick='goto(\"href='http://" + device.addr + "\")' title='Open device UI'><i class='fas fa-arrow-circle-right'></i></p>";
+    new_dev_html += "<p class='redirect' onclick='" + onclickhref + "' title='Open device UI'><i class='fas fa-arrow-circle-right'></i></p>";
     new_dev_html += "</div>";
 
     document.getElementById('device_list').innerHTML += new_dev_html;

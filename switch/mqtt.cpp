@@ -35,7 +35,7 @@ static void resolve_mDNS(){
 
 void MQTT_setCurrentStatus(){
   IPAddress deviceIp = WIFIC_getStIP();
-  String device_status = "{\"mac\":\"" + macAddr + "\", \"type\":\"switch\", \"addr\":\"" + deviceIp.toString() + "\", \"CURRENT\":[" + String(PINCTRL_getCurrentVal()) + "]}";
+  String device_status = "{\"mac\":\"" + macAddr + "\", \"type\":\"switch\", \"addr\":\"" + deviceIp.toString() + "\", \"current\":[" + String(PINCTRL_getCurrentVal()) + "]}";
   device_status.toCharArray(msgBuffer, sizeof(msgBuffer));
 }
 
@@ -54,8 +54,8 @@ static void callback(char* topic, byte* payload, unsigned int length) {
   if (!error) {
     JsonObject root = doc.as<JsonObject>();
     
-    if(root.containsKey("CURRENT")){
-      JsonArray array = root["CURRENT"].as<JsonArray>();
+    if(root.containsKey("current")){
+      JsonArray array = root["current"].as<JsonArray>();
       for(JsonVariant v : array) {
           int value = v.as<int>();
           PINCTRL_write(value); 

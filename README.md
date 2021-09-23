@@ -11,6 +11,12 @@ Most projects are build using Arduino studio and an **ESP8266** device. I am usi
 NOTE: this is still work in progress. Most of the projects are functional, but I still want to improove them.
 Most projects support "Over The Air" update, but it does sometimes crash, so you will still ocasionally need the wired connection.
 
+## Latest Changes
+
+- Fixed "switch" project to use the iot-portal. Had to remove udp ping as it caused connection issues.
+
+- Added iot-portal to be ran on a computer like raspberry pi zero. All devices should report to it so it can be used as a central point of access. 
+
 ---
 
 ## Using the code
