@@ -1,19 +1,24 @@
+/* 
+ *  Author: Rada Berar
+ *  email: ujagaga@gmail.com
+ *  
+ *  WebSocket server provides realtime synchronization between all connected clients and accepts web browser commands.
+ */
 #include <ArduinoJson.h>
 #include <WebSocketsServer.h>
 #include "wifi_connection.h"
-#include "udp_ping.h"
 #include "http.h"
 #include "switch.h"
 #include "pinctrl.h"
 
 WebSocketsServer wsServer = WebSocketsServer(81);
 
-void WS_process(){
+void WS_process(){  
   wsServer.loop();   
 }
 
-void WS_ServerBroadcast(String msg){
-  wsServer.broadcastTXT(msg);
+void WS_broadcast(String msg){
+  wsServer.broadcastTXT(msg); 
 }
 
 static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
@@ -34,12 +39,20 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       
       if(root.containsKey("CURRENT")){
         String cmd = root["CURRENT"]; 
+        Serial.println(cmd);
+        
         if(cmd.length() > 0){
-          //Serial.println("Setting new target");            
-          PINCTRL_write(root["CURRENT"]);        
-        } 
-        String currentStatus = "{\"CURRENT\":" + String(PINCTRL_getCurrentVal()) + "}";
-        wsServer.broadcastTXT(currentStatus); 
+          JsonArray array = root["CURRENT"].as<JsonArray>();
+          for(JsonVariant v : array) {
+              
+              int value = v.as<int>();
+              Serial.println(value);
+              PINCTRL_write(value); 
+          }        
+        }else{
+          String msg = "{\"CURRENT\":[" + String(PINCTRL_getCurrentVal()) + "]}";      
+          wsServer.sendTXT(num, msg); 
+        }
       }
       
       if(root.containsKey("ID")){
@@ -53,11 +66,11 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       }
       
       if(root.containsKey("STATUS")){
-        String statusMsg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";               
-        wsServer.broadcastTXT(statusMsg);   
+        String msg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";      
+        wsServer.broadcastTXT(msg);          
       }      
     }      
-  }   
+  } 
 }
 
 void WS_init(){

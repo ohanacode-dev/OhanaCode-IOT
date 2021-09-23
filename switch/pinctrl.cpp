@@ -2,16 +2,15 @@
  *  Author: Rada Berar
  *  email: ujagaga@gmail.com
  *  
- *  LED control module.
+ *  GPIO management module
  */
 #include "http.h"
-#include "udp_ping.h"
 #include "web_socket.h"
 #include "wifi_connection.h"
 #include "config.h"
 #include "mqtt.h"
 
-static int currentPinVal = 0;            /* Current LED level. used in forming HTML and id */
+static int currentPinVal = 0; 
 static unsigned long PinWriteTimestamp = 0;
 
 
@@ -19,27 +18,35 @@ int PINCTRL_getCurrentVal( void ){
   return currentPinVal;
 }
 
-/* Set LED level in percentage */
 void PINCTRL_write(int val)
 {
    if((millis() - PinWriteTimestamp) < DEBOUNCE_TIMEOUT){
     return;
   }
-  Serial.print("LED:");
-  Serial.println(val);
-  double level = val;
-  
-  if(level <= 0){
+
+  if(val == 0){
     currentPinVal = 0;
+  }else if(val > 0){
+    currentPinVal = 100;    
+  }else{
+    if(currentPinVal == 0){
+      currentPinVal = 100;
+    }else{
+      currentPinVal = 0;
+    }
+  }
+
+  Serial.print("SW:");
+  Serial.println(currentPinVal);
+
+  if(currentPinVal == 0){
     #ifdef INVERT_OUTPUT
       /* Wemos D1 MNI onboard LED is reversed polarized. */
       digitalWrite(SWITCHPIN, HIGH);
     #else
       digitalWrite(SWITCHPIN, LOW);
     #endif 
-  }
-  if(level > 0){
-    currentPinVal = 100;
+  }else{
     #ifdef INVERT_OUTPUT
     /* Wemos D1 MNI onboard LED is reversed polarized. */
       digitalWrite(SWITCHPIN, LOW);
@@ -47,8 +54,11 @@ void PINCTRL_write(int val)
       digitalWrite(SWITCHPIN, HIGH);
     #endif 
   }
-
+    
   PinWriteTimestamp = millis();
 
-  MQTT_publishStatus();
+  MQTT_setCurrentStatus();
+  
+  String statusMsg = "{\"CURRENT\":[" + String(currentPinVal) + "]}";  
+  WS_broadcast(statusMsg);
 }

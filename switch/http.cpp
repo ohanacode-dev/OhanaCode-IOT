@@ -11,7 +11,6 @@
 #include <pgmspace.h>
 #include <LittleFS.h>
 #include "http.h"
-#include "udp_ping.h"
 #include "wifi_connection.h"
 #include "web_socket.h"
 #include "config.h"
@@ -82,12 +81,10 @@ String HTTP_getFeatures( void ){
   Serial.print("returnFeatures");
   String response = "{\"MAC\":\"";
   response += WiFi.macAddress();
-  response += ":";
-  response += DEV_ID;
-  response += "\",\"MODEL\":\"OC WiFi LED\"";
-  response += ",\"CURRENT\":";
+  response += "\",\"MODEL\":\"OC WiFi switch\"";
+  response += ",\"CURRENT\":[";
   response += String(PINCTRL_getCurrentVal());  
-  response += "}"; 
+  response += "]}"; 
   Serial.println(response); 
   return response;     
 }
@@ -105,7 +102,6 @@ static void showStatusPage() {
 
 static void startOtaUpdate(void){
   String statusMsg = "{\"STATUS\":\"Starting OTA update...\"}";               
-  WS_ServerBroadcast(statusMsg); 
   LittleFS.end();
   OTA_init();    
 }
@@ -170,11 +166,7 @@ static void saveWiFi(void){
     http_statusMessage += ssid; 
     http_statusMessage += " ,IP: ";
     
-    if(WIFIC_checkValidIp(newStationIP)){      
-      http_statusMessage += ipaddr;
-    }else{
-      http_statusMessage += "dynamically assigned by DHCP";
-    }
+    http_statusMessage += ipaddr;   
     
   }else{       
     http_statusMessage = "Saving settings and switching to AP mode only.";    

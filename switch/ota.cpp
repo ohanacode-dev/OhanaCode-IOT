@@ -10,7 +10,7 @@
 #include <ArduinoOTA.h>
 #include "wifi_connection.h"
 #include "config.h"
-#include "wifi_connection.h"
+
 
 static bool updateStartedFlag = false;
 

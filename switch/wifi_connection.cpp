@@ -1,30 +1,24 @@
+/* 
+ *  Author: Rada Berar
+ *  email: ujagaga@gmail.com
+ *  
+ *  WiFi connection module. At startup connects to a user configured access point. If none is configured, creates its own access point to provide a way to adjust settings.
+ */
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <EEPROM.h>
-#include <DNSServer.h>
 #include "web_socket.h"
 #include "config.h"
-#include "switch.h"
 
 
 static char myApName[32] = {0};    /* Array to form AP name based on read MAC */
 static char st_ssid[SSID_SIZE];    /* SSID to connect to */
 static char st_pass[WIFI_PASS_SIZE];    /* Password for the requested SSID */
-static bool connectedToAPFlag; 
 static unsigned long connectionTimeoutCheck = 0;
 static IPAddress stationIP;
 static IPAddress apIP(192, 168, 1, 1);
-static DNSServer dnsServer;
 
-char* WIFIC_getDeviceName(void){
-  return myApName;
-}
-
-IPAddress WIFIC_getApIp(void){
-  return apIP;
-}
-
-bool WIFIC_checkValidIp(IPAddress IP){
+static bool checkValidIp(IPAddress IP){
   /* check if they are all zero value */
   if((IP[0] == 0) && (IP[1] == 0) && (IP[2] == 0) && (IP[3] == 0)){
       return false;
@@ -35,27 +29,15 @@ bool WIFIC_checkValidIp(IPAddress IP){
       return false;
   }
     
-   return true;
+  return true;
 }
 
-static void resetConnectivityTimeout(void){
-  connectionTimeoutCheck = millis();
+char* WIFIC_getDeviceName(void){
+  return myApName;
 }
 
-/* Performs a wifi scan to check if requested AP is available */
-static bool checkApPresent(void){  
-  ESP.wdtFeed();
-  if(String(st_ssid).length() > 2){
-    int n = WiFi.scanNetworks();
-    ESP.wdtFeed();
-    while(n > 0){
-      n--;
-      if(WiFi.SSID(n).equals(st_ssid)){
-        return true;
-      }
-    }
-  }
-  return false; 
+IPAddress WIFIC_getApIp(void){
+  return apIP;
 }
 
 /* Returns wifi scan results */
@@ -93,16 +75,10 @@ void WIFIC_APMode(void){
   
   if(WiFi.softAP(myApName)){
     wifi_statusMessage = "Running in AP mode. SSID: " + String(myApName) + ", IP:" + apIP.toString();  
-
-    /* if DNSServer is started with "*" for domain name, it will reply with provided IP to all DNS request */
-    dnsServer.start(DNS_PORT, "*", apIP);
-
-    connectedToAPFlag = false;
   }else{
     wifi_statusMessage = "Failed to switch to AP mode.";
   }
   Serial.println(wifi_statusMessage);  
-  MAIN_setStatusMsg(wifi_statusMessage);
 
   /* Once you setup an AP for the device to connect to, and it is not found at startup, so AP mode is atempted,
   * the device remains unconnectable without the original AP. I have not been able to find why, 
@@ -111,15 +87,12 @@ void WIFIC_APMode(void){
 }
 
 
-void WIFIC_stationMode(void){ 
-  if(connectedToAPFlag){
-    WiFi.disconnect();
-  }
+void WIFIC_stationMode(void){   
   Serial.println("Trying STA mode."); 
   WiFi.mode(WIFI_STA);  
   WiFi.begin(st_ssid, st_pass);
 
-  if( WIFIC_checkValidIp(stationIP)){
+  if( checkValidIp(stationIP)){
     IPAddress gateway(stationIP[0], stationIP[1],stationIP[2], 1);
     IPAddress dns(8,8,8,8);
     WiFi.config(stationIP, dns, gateway, IPAddress(255, 255, 255, 0));
@@ -135,34 +108,17 @@ void WIFIC_stationMode(void){
   } 
   
   if(WiFi.status() == WL_CONNECTED){
-    connectedToAPFlag = true;
+    stationIP = WiFi.localIP();
+    
     String wifi_statusMessage = "Connected to: ";  
     wifi_statusMessage += st_ssid;
-    wifi_statusMessage += ". IP address: " + WiFi.localIP().toString();   
+    wifi_statusMessage += ". IP address: " + stationIP.toString();  
     
-    Serial.println(wifi_statusMessage);  
-    WS_ServerBroadcast("{\"STATUS\":\"" + wifi_statusMessage + "\"}");    
-    MAIN_setStatusMsg(wifi_statusMessage);
+    Serial.println(wifi_statusMessage);
   }else{    
     Serial.println("accessPointMode");
     WIFIC_APMode(); 
   } 
-}
-
-
-
-bool WIFIC_IPIsLocal(IPAddress clientIP){   
-  IPAddress local_ip = WiFi.localIP();
-
-  if(!connectedToAPFlag){  /* AP mode */
-    return true;
-  }
-  
-  if((local_ip[0] == clientIP[0]) && (local_ip[1] == clientIP[1]) && (local_ip[2] == clientIP[2])){   
-    return true;
-  }
-  
-  return false;
 }
 
 String WIFIC_getStSSID(void){
@@ -223,48 +179,6 @@ void WIFIC_setStIP(IPAddress newStationIP){
 }
 
 
-/* Timeout to check if configured AP exists and try to connect to it */
-static bool connectivityTimeoutPassed(void){
-  unsigned long timeSinceBoot = millis();
-
-  unsigned long largeSecondsPassed = (timeSinceBoot - connectionTimeoutCheck)/1000;  
-  
-  if(largeSecondsPassed > LARGE_TIMEOUT){
-    connectionTimeoutCheck = timeSinceBoot;
-    return true;
-  }
-  return false;
-}
-
-void WIFIC_process(void){
-  ESP.wdtFeed();
-  /* Handle AP and STA connecting */
-  if((String(st_ssid).length() > 2)){
-    if(connectedToAPFlag){
-      /* We seem to be connected to AP but we should check */ 
-      if(WiFi.status() != WL_CONNECTED){
-        connectedToAPFlag = false;
-        /* Lost connection to configured AP, so switch to AP mode */ 
-        WIFIC_APMode();
-      }
-      resetConnectivityTimeout();      
-    }
-
-    if(connectivityTimeoutPassed()){
-      //Serial.println("Timeout!");
-      /* Try again */
-      if(checkApPresent()){
-        WIFIC_stationMode();
-      }         
-    } 
-  }  
-
-  if(!connectedToAPFlag){
-    /* AP mode. Process DNS. */
-    dnsServer.processNextRequest();
-  }
-}
-
 void WIFIC_init(void){  
   ESP.wdtFeed();
    /* Read settings from EEPROM */
@@ -303,12 +217,7 @@ void WIFIC_init(void){
   mac.replace(":", "");
   String ApName = AP_NAME_PREFIX + mac;
   ApName.toCharArray(myApName, ApName.length() + 1);
-
-  WiFi.setAutoConnect(false);
   
-  if(checkApPresent()){
-    WIFIC_stationMode();   
-  }else{
-    WIFIC_APMode(); 
-  }  
+  WIFIC_stationMode();   
+  
 }

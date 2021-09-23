@@ -7,7 +7,7 @@ cn.onopen=function(){
 cn.onmessage=function(e){
 	var data=JSON.parse(e.data);
 	if(data.hasOwnProperty('CURRENT')){   
-		if(data.CURRENT == 0){
+		if(data.CURRENT[0] == 0){
 			document.getElementById('tgl').classList.add('lightBtnOff');
 			document.getElementById('tgl').classList.remove('lightBtnOn');
 			level = 0;
@@ -31,5 +31,5 @@ function toggle(){
 	}else{
 		level = 0;
 	}
-	cn.send('{"CURRENT":' + level + '}');
+	cn.send('{"CURRENT":[' + level + ']}');
 }
