@@ -65,24 +65,14 @@ static void LED_write()
     return;
   }  
 
-  int R = 0;
-  int G = 0;
-  int B = 0;
-
-  if(currentRVal > 0){
-    R = 1 << currentRVal;
-  }
-  if(currentGVal > 0){
-    G = 1 << currentGVal;
-  }
-  if(currentBVal > 0){
-    B = 1 << currentBVal;
-  }
+  int R = 255 * currentRVal / 100;
+  int G = 255 * currentGVal / 100;
+  int B = 255 * currentBVal / 100;
   
-  R = R * currentAVal/10; 
-  G = G * currentAVal/10; 
-  B = B * currentAVal/10; 
-  
+  R = R * currentAVal/100; 
+  G = G * currentAVal/100; 
+  B = B * currentAVal/100; 
+ 
   analogWrite(LED_R_PIN, R);
   analogWrite(LED_G_PIN, G);
   analogWrite(LED_B_PIN, B);
@@ -96,7 +86,7 @@ static void LED_write()
 //  Serial.println(".");
 
   /* Status pin is usually the onboard LED which is connected to Vcc and Pin2, so invert the value. */
-  int opacity = 255 * currentAVal / 10;  
+  int opacity = 255 - (255 * currentAVal / 100);  
   analogWrite(LED_STATUS_PIN, opacity);
 
   LedWriteTimestamp = millis();  
@@ -121,17 +111,17 @@ void LED_writeRGBA(uint8_t* val){
   currentBVal = val[2];
   currentAVal = val[3];
 
-  if(currentRVal > 8){
-    currentRVal = 8;
+  if(currentRVal > 100){
+    currentRVal = 100;
   }
-  if(currentGVal > 8){
-    currentGVal = 8;
+  if(currentGVal > 100){
+    currentGVal = 100;
   }
-  if(currentBVal > 8){
-    currentBVal = 8;
+  if(currentBVal > 100){
+    currentBVal = 100;
   }
-  if(currentAVal > 10){
-    currentAVal = 10;
+  if(currentAVal > 100){
+    currentAVal = 100;
   }
   
   LED_write();  
