@@ -91,6 +91,8 @@ static void LED_write()
 
   LedWriteTimestamp = millis();  
 
+  LED_saveColor();
+
   MQTT_setCurrentStatus();
 
   String statusMsg = "{\"CURRENT\":[" + String(currentRVal) + "," + String(currentGVal) + "," + String(currentBVal)+ "," + String(currentAVal) + "]}";  
