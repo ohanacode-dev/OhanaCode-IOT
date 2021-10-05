@@ -1,46 +1,24 @@
+/* 
+ *  Author: Rada Berar
+ *  email: ujagaga@gmail.com
+ *  
+ *  WebSocket server provides realtime synchronization between all connected clients and accepts web browser commands.
+ */
 #include <ArduinoJson.h>
 #include <WebSocketsServer.h>
 #include "wifi_connection.h"
-#include "udp_ping.h"
 #include "http.h"
 #include "LED_lamp_RGB.h"
 #include "led.h"
 
 WebSocketsServer wsServer = WebSocketsServer(81);
 
-static rgbValue_t strHexToRgb(String hexStr){
-    rgbValue_t retRgbVal;
-
-    char hexChrArr[8] = {0};
-    hexStr.toCharArray(hexChrArr, hexStr.length() + 1);    
-    long rgb;
-
-    if(hexStr[0] == '#'){
-      rgb=strtol(&hexChrArr[1], NULL, 16);
-    }else{
-      rgb=strtol(&hexChrArr[0], NULL, 16);
-    }
-    
-    retRgbVal.R=(uint8_t)(rgb>>16);
-    retRgbVal.G=(uint8_t)(rgb>>8);
-    retRgbVal.B=(uint8_t)rgb;
-
-    return retRgbVal;
-}
-
-static String rgbToHexStr(rgbValue_t Rgb){
-    char hexout[8];
-    sprintf(hexout,"#%02x%02x%02x",Rgb.R,Rgb.G,Rgb.B);
-
-    return String(hexout);
-}
-
 void WS_process(){
   wsServer.loop();   
 }
 
-void WS_ServerBroadcast(String msg){
-  wsServer.broadcastTXT(msg);
+void WS_broadcast(String msg){
+  wsServer.broadcastTXT(msg); 
 }
 
 static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
@@ -61,26 +39,26 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       
       if(root.containsKey("CURRENT")){
         String cmd = root["CURRENT"];    
-        rgbValue_t rgbClr;
+        uint8_t val[4];
         
         if(cmd.length() > 0){
-           
-          JsonObject curr = root["CURRENT"];
-          if(curr.containsKey("OPA")){              
-            int curVal = curr["OPA"]; 
-            LED_write(curVal);  
-            LED_saveColor();      
-          }
-          if(curr.containsKey("CLR")){  
-            rgbClr = strHexToRgb(curr["CLR"]);            
-            LED_writeRGB(rgbClr);   
-            LED_saveColor();    
-          }
+          JsonArray array = root["CURRENT"].as<JsonArray>();
+//         Serial.print("WS VAL: ");
+          for(int i=0; i < array.size(); i++) {
+                          
+              val[i] = array[i].as<int>();
+//              Serial.print(val[i]);  
+//              Serial.print(", ");            
+          }    
+          Serial.println("");
           
-        } 
-        rgbClr = LED_getCurrentRGB();
-        String msg = String("{\"CURRENT\":{\"OPA\":") + String(LED_getCurrentVal()) + String(",\"CLR\":\"") + String(rgbToHexStr(rgbClr)) + String("\"}}");
-        wsServer.broadcastTXT(msg); 
+          LED_writeRGBA(val);
+          
+        }else{ 
+        	LED_getCurrentRGBA(val);
+        	String msg = "{\"CURRENT\":[" + String(val[0]) + "," + String(val[1]) + "," + String(val[2])+ "," + String(val[3]) + "]}";
+        	wsServer.sendTXT(num, msg);
+	      } 
       }
       
       if(root.containsKey("ID")){
@@ -94,11 +72,11 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
       }
       
       if(root.containsKey("STATUS")){
-        String statusMsg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";               
-        wsServer.broadcastTXT(statusMsg);   
-      }
+        String msg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";      
+        wsServer.broadcastTXT(msg);          
+      }      
     }      
-  }   
+  } 
 }
 
 void WS_init(){

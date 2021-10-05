@@ -1,5 +1,5 @@
-#ifndef OTAU_H
-#define OTAU_H
+#ifndef OTAUPDATE_H
+#define OTAUPDATE_H
 
 extern void OTA_init();
 extern void OTA_process(void);

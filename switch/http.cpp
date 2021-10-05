@@ -101,7 +101,6 @@ static void showStatusPage() {
 }
 
 static void startOtaUpdate(void){
-  String statusMsg = "{\"STATUS\":\"Starting OTA update...\"}";               
   LittleFS.end();
   OTA_init();    
 }

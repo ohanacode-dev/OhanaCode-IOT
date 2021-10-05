@@ -4,114 +4,115 @@
  *  
  *  LED control module.
  */
+ #include <EEPROM.h>
 #include "http.h"
-#include "udp_ping.h"
 #include "web_socket.h"
 #include "wifi_connection.h"
 #include "config.h"
 #include "led.h"
-#include <EEPROM.h>
+#include "mqtt.h"
 
-static uint8_t currentOpacityVal = 0;            /* Current LED level. used in forming HTML and id */
+
 static unsigned long LedWriteTimestamp = 0;
-static uint16_t currentRVal = 0;
-static uint16_t currentGVal = 0;
-static uint16_t currentBVal = 0;
+static uint8_t currentRVal = 0;
+static uint8_t currentGVal = 0;
+static uint8_t currentBVal = 0;
+static uint8_t currentAVal = 0;
 
 void LED_saveColor(void){
   EEPROM.begin(EEPROM_SIZE);
    
-  EEPROM.write(COLOR_ADDR, (uint8_t)(currentRVal >> 8));
-  EEPROM.write(COLOR_ADDR + 1, (uint8_t)(currentRVal));
-  EEPROM.write(COLOR_ADDR + 2, (uint8_t)(currentGVal >> 8));
-  EEPROM.write(COLOR_ADDR + 3, (uint8_t)(currentGVal));
-  EEPROM.write(COLOR_ADDR + 4, (uint8_t)(currentBVal >> 8));
-  EEPROM.write(COLOR_ADDR + 5, (uint8_t)(currentBVal));
-  EEPROM.write(LED_VAL_ADDR, currentOpacityVal);
+  EEPROM.write(COLOR_ADDR, currentRVal);
+  EEPROM.write(COLOR_ADDR + 1, currentGVal);
+  EEPROM.write(COLOR_ADDR + 2, currentBVal);
+  EEPROM.write(COLOR_ADDR + 3, currentAVal);
   
   EEPROM.commit();
   EEPROM.end();
 
-  Serial.println("\nSaving RGBO:");
+  Serial.println("\nSaving RGBA:");
   Serial.print(currentRVal);
   Serial.print(",");
   Serial.print(currentGVal);
   Serial.print(",");
   Serial.print(currentBVal);
   Serial.print(",");
-  Serial.print(currentOpacityVal);
+  Serial.print(currentAVal);
 }
 
 static void readColor(void){
   EEPROM.begin(EEPROM_SIZE);  
-  currentRVal = (EEPROM.read(COLOR_ADDR) << 8) + EEPROM.read(COLOR_ADDR + 1);
-  currentGVal = (EEPROM.read(COLOR_ADDR + 2) << 8) + EEPROM.read(COLOR_ADDR + 3);
-  currentBVal = (EEPROM.read(COLOR_ADDR + 4) << 8) + EEPROM.read(COLOR_ADDR + 5);
-  currentOpacityVal = EEPROM.read(LED_VAL_ADDR);
+  currentRVal = EEPROM.read(COLOR_ADDR);
+  currentGVal = EEPROM.read(COLOR_ADDR + 1);
+  currentBVal = EEPROM.read(COLOR_ADDR + 2);
+  currentAVal = EEPROM.read(COLOR_ADDR + 3);
   EEPROM.end();
 
-  Serial.println("Reading RGB):");
+  Serial.println("Reading RGBA:");
   Serial.print(currentRVal);
   Serial.print(",");
   Serial.print(currentGVal);
   Serial.print(",");
   Serial.print(currentBVal);
   Serial.print(",");
-  Serial.print(currentOpacityVal);
-}
-
-int LED_getCurrentVal( void ){
-  return currentOpacityVal;
-}
-
-rgbValue_t LED_getCurrentRGB( void ){
-  rgbValue_t retVal;
-  
-  retVal.R = currentRVal / 4;
-  retVal.G = currentGVal / 4;
-  retVal.B = currentBVal / 4; 
-
-  return retVal;
-}
-
-void LED_writeRGB(rgbValue_t val){ 
-  currentRVal = val.R * 4;
-  currentGVal = val.G * 4;
-  currentBVal = val.B * 4;
-
-  /* Refresh */
-  LED_write(currentOpacityVal);
+  Serial.print(currentAVal);
 }
 
 /* Set LED level in percentage */
-void LED_write(int val)
+static void LED_write()
 {
   if((millis() - LedWriteTimestamp) < DEBOUNCE_TIMEOUT){
     return;
-  }
+  }  
   
-  if(val < 0){
-    val = 0;
-  }
-
-  if(val > 100){
-    val = 100;
-  }
-
-  currentOpacityVal = val;
-  
-  int R = (currentRVal * val)/100; 
-  int G = (currentGVal * val)/100; 
-  int B = (currentBVal * val)/100; 
+  int R = (currentRVal * currentAVal)/10; 
+  int G = (currentGVal * currentAVal)/10; 
+  int B = (currentBVal * currentAVal)/10; 
   
   analogWrite(LED_R_PIN, R);
   analogWrite(LED_G_PIN, G);
   analogWrite(LED_B_PIN, B);
-  
-  int opacity = 1024 - (val * 10);  
+
+  /* Status pin is usually the onboard LED which is connected to Vcc and Pin2, so invert the value. */
+  int opacity = 1000 - (currentAVal * 10);  
   analogWrite(LED_STATUS_PIN, opacity);
 
   LedWriteTimestamp = millis();  
+
+  MQTT_setCurrentStatus();
+
+  String statusMsg = "{\"CURRENT\":[" + String(currentRVal) + "," + String(currentGVal) + "," + String(currentBVal)+ "," + String(currentAVal) + "]}";  
+  WS_broadcast(statusMsg);  
+}
+
+void LED_getCurrentRGBA( uint8_t* val ){
+  
+  val[0] = currentRVal;
+  val[1] = currentGVal;
+  val[2] = currentBVal;
+  val[3] = currentAVal;
+}
+
+void LED_writeRGBA(uint8_t* val){ 
+  currentRVal = val[0];
+  currentGVal = val[1];
+  currentBVal = val[2];
+  currentAVal = val[3];
+
+  if(currentRVal > 100){
+    currentRVal = 100;
+  }
+  if(currentGVal > 100){
+    currentGVal = 100;
+  }
+  if(currentBVal > 100){
+    currentBVal = 100;
+  }
+  if(currentAVal > 100){
+    currentAVal = 100;
+  }
+  
+  LED_write();  
 }
 
 void LED_init(void){  
@@ -121,5 +122,5 @@ void LED_init(void){
   pinMode(LED_STATUS_PIN, OUTPUT);
    
   readColor();
-  LED_write(currentOpacityVal);
+  LED_write();
 }

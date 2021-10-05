@@ -11,7 +11,6 @@
 #include <pgmspace.h>
 #include <LittleFS.h>
 #include "http.h"
-#include "udp_ping.h"
 #include "wifi_connection.h"
 #include "web_socket.h"
 #include "config.h"
@@ -64,7 +63,7 @@ static bool handleFileRead(String path) { // send the right file to the client (
     
     retVal = true;
   }else{
-    Serial.println("FS ERROR: " + originalPath + " not found!");
+    Serial.println("LittleFS ERROR: " + originalPath + " not found!");
     
     retVal = false;
   }
@@ -79,15 +78,14 @@ static void showNotFound(void){
 }
 
 String HTTP_getFeatures( void ){
+  uint8_t val[4];
+  LED_getCurrentRGBA( val );
+  
   Serial.print("returnFeatures");
   String response = "{\"MAC\":\"";
   response += WiFi.macAddress();
-  response += ":";
-  response += DEV_ID;
-  response += "\",\"MODEL\":\"ujagaga WiFi LED\"";
-  response += ",\"CURRENT\":";
-  response += String(LED_getCurrentVal());  
-  response += "}"; 
+  response += "\",\"MODEL\":\"ujagaga WiFi RGBA LED\"";
+  response += ",\"CURRENT\":[" + String(val[0]) + "," + String(val[1]) + "," + String(val[2])+ "," + String(val[3]) + "]}"; 
   Serial.println(response); 
   return response;     
 }
@@ -104,9 +102,7 @@ static void showStatusPage() {
 }
 
 static void startOtaUpdate(void){
-  String statusMsg = "{\"STATUS\":\"Starting OTA update...\"}";               
-  WS_ServerBroadcast(statusMsg); 
-   
+  LittleFS.end();
   OTA_init();    
 }
 
@@ -170,11 +166,7 @@ static void saveWiFi(void){
     http_statusMessage += ssid; 
     http_statusMessage += " ,IP: ";
     
-    if(WIFIC_checkValidIp(newStationIP)){      
-      http_statusMessage += ipaddr;
-    }else{
-      http_statusMessage += "dynamically assigned by DHCP";
-    }
+    http_statusMessage += ipaddr;   
     
   }else{       
     http_statusMessage = "Saving settings and switching to AP mode only.";    
@@ -204,6 +196,7 @@ void HTTP_process(void){
 
 void HTTP_init(void){ 
   webServer.on("/id", showID);
+  webServer.on("/favicon.ico", showNotFound);
   webServer.on("/wifisave", saveWiFi);
   webServer.on("/start_ota_update", startOtaUpdate);
   
@@ -216,7 +209,7 @@ void HTTP_init(void){
   webServer.begin();
 
   if(!LittleFS.begin()){
-    Serial.println("SPIFFS Initialization failed. Did you enable SPIFFS in \"Tools/Flash size\"?");
+    Serial.println("LittleFS Initialization failed. Did you enable LittleFS in \"Tools/Flash size\"?");
   }
 
   Serial.println("\tListing files...");

@@ -9,11 +9,6 @@
 #define STATION_IP_SIZE         (4)
 #define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE)   
 
-#define LARGE_TIMEOUT           (60) /* Used to check if configured AP appeared and connect to it if possible */ 
-#define PING_RX_PORT            (4210u)  /* local port to listen on */
-#define PING_RESPONSE_PORT      (4211u)
-#define DNS_PORT                53
-
 /* 19 characters maximum. When we append MAC addr, it will be 31. 
 The device fails to create an AP if total AP name is longer than 31 character. */
 #define AP_NAME_PREFIX          "OC_Switch_"

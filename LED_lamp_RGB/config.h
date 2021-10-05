@@ -8,32 +8,21 @@
 #define STATION_IP_ADDR         (SSID_EEPROM_ADDR + SSID_SIZE)
 #define STATION_IP_SIZE         (4)
 #define COLOR_ADDR              (STATION_IP_ADDR + STATION_IP_SIZE)
-#define COLOR_SIZE              (6)
-#define LED_VAL_ADDR            (COLOR_ADDR + COLOR_SIZE)
-#define LED_VAL_SIZE            (1)
-#define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE + COLOR_SIZE + LED_VAL_SIZE)   
-
-#define LARGE_TIMEOUT           (60) /* Used to check if configured AP appeared and connect to it if possible */ 
-#define PING_RX_PORT            (4210u)  /* local port to listen on */
-#define PING_RESPONSE_PORT      (4211u)
-#define DEV_ID                  "05"
-#define DNS_PORT                53
+#define COLOR_SIZE              (4)
+#define EEPROM_SIZE             (WIFI_PASS_SIZE + SSID_SIZE + STATION_IP_SIZE + COLOR_SIZE)   
 
 /* 19 characters maximum. When we append MAC addr, it will be 31. 
 The device fails to create an AP if total AP name is longer than 31 character. */
-#define AP_NAME_PREFIX          "OC_rgb_"    
+#define AP_NAME_PREFIX          "OC_rgba_"    
 
 #define LED_G_PIN                     (14)    
 #define LED_R_PIN                     (12)   
 #define LED_B_PIN                     (13)        
-#define SENSPIN                       (16)  
+
 #define LED_STATUS_PIN                (2)   
 
 
 #define DEBOUNCE_TIMEOUT              (100u)
-#define LONG_TOUCH_TIMEOUT            (500u)
-#define LONG_TOUCH_LED_INCREMENT      (10u)
 #define LED_LEVEL_MAX                 (100u)
-#define SENSOR_IDLE_CHARGE_MIN_TIME   (1) /* If the touch sensor is not touched, this is the time in ms that takes to charge the capacitor. */
 
 #endif
