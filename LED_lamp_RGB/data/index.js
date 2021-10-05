@@ -27,10 +27,10 @@ cn.onmessage=function(e){
 
 	if(data.hasOwnProperty('CURRENT')){ 
 		if((Date.now() - ts) > 100){
-			clr_r.value = parseInt(data.CURRENT[0]) / 10;
-			clr_g.value = parseInt(data.CURRENT[1]) / 10; 
-			clr_b.value = parseInt(data.CURRENT[2]) / 10;
-			clr_a.value = parseInt(data.CURRENT[3]) / 10;
+			clr_r.value = parseInt(data.CURRENT[0]);
+			clr_g.value = parseInt(data.CURRENT[1]); 
+			clr_b.value = parseInt(data.CURRENT[2]);
+			clr_a.value = parseInt(data.CURRENT[3]);
 		}		
 	}
 	
@@ -43,6 +43,6 @@ cn.onmessage=function(e){
 
 function updateSlideColor(){
 	ts = Date.now();
-	cn.send('{"CURRENT":[' + (clr_r.value * 10) + ',' + (clr_g.value * 10) + ',' + (clr_b.value * 10) + ',' + (clr_a.value * 10) +']}');
+	cn.send('{"CURRENT":[' + clr_r.value + ',' + clr_g.value + ',' + clr_b.value + ',' + clr_a.value +']}');
 }
   
