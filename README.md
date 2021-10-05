@@ -10,8 +10,11 @@ Most projects are build using Arduino studio and an **ESP8266** device. I am usi
 
 NOTE: this is still work in progress. Most of the projects are functional, but I still want to improove them.
 Most projects support "Over The Air" update, but it does sometimes crash, so you will still ocasionally need the wired connection.
+The whole project is in the process if adding mqtt support in order to connect to the new addition "iot-portal". This way you can controll them all from a single device.
 
 ## Latest Changes
+
+- Fixed LED_lamp_RGB project to use the iot-portal.
 
 - Fixed "switch" project to use the iot-portal. Had to remove udp ping as it caused connection issues.
 
@@ -56,12 +59,6 @@ A stepper motor control using an NTP server for time sync. This will drive two c
 ## NTP_timer
 
 An NTP synchronized timer to activate a relay.
-
----
-
-## router
-
-A device intended to enable external access to your home networks **Ohana-IOT** devices.
 
 ---
 
