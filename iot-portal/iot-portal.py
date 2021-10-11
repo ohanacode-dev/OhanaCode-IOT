@@ -174,6 +174,21 @@ def get_devices_from_db(device_mac=None, id=None):
     return result
 
 
+def remove_device_from_db(device_mac=None, id=None):
+
+    sql = "DELETE FROM status"
+
+    if device_mac is not None:
+        sql += " WHERE mac='{}'".format(device_mac)
+    elif id is not None:
+        sql += " WHERE id='{}'".format(id)
+
+    db = sqlite3.connect(DATABASE)
+    db.execute(sql)
+    db.commit()
+    db.close()
+
+
 def set_device_label(device_mac, label):
     try:
         db = sqlite3.connect(LABELBASE)
@@ -265,6 +280,31 @@ async def websocket_server(websocket: WebSocket):
             data = json.loads(msg)
 
             if data['topic'] == "device_list":
+                devices = get_devices_from_db()
+
+                # Update labels
+                for i in range(0, len(devices)):
+                    data = json.loads(devices[i]['data'])
+                    data['label'] = get_device_label(devices[i]['mac'])
+                    devices[i]['data'] = json.dumps(data)
+
+                response = {'topic': 'device_list', 'data': devices}
+
+                await ws_manager.send_text(json.dumps(response), websocket)
+
+            if data['topic'] == "remove_device":
+                id = data.get('id', None)
+                mac = data.get('mac', None)
+
+                if id is not None:
+                    device = get_devices_from_db(id=id)
+                elif mac is not None:
+                    device = get_devices_from_db(device_mac=mac)
+                else:
+                    device = None
+
+                remove_device_from_db(device["id"])
+
                 devices = get_devices_from_db()
 
                 # Update labels

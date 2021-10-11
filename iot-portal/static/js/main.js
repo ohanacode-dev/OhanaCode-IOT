@@ -76,6 +76,7 @@ function addNewDevice(device){
     new_dev_html += "<p class='setup' onclick='setLabel(\"" + device.id + "\");' title='Set label'><i class='fas fa-wrench'></i></p>";
     new_dev_html += "<p class='label'>" + device.label + "</p>";
     new_dev_html += "<p class='redirect' onclick='" + onclickhref + "' title='Open device UI'><i class='fas fa-arrow-circle-right'></i></p>";
+    new_dev_html += "<p class='remove' onclick='remove(\"" + device.id + "\");'><i class='fas fa-trash-alt'></i></p>";
     new_dev_html += "</div>";
 
     document.getElementById('device_list').innerHTML += new_dev_html;
@@ -176,6 +177,11 @@ function setLabel(device_id){
         var msg = { topic: "set_device", id: device_id, data: {"label": label}};
         dev_ws.send(JSON.stringify(msg));
     }
+}
+
+function remove(device_id){
+    var msg = { topic: "remove_device", id: device_id };
+    dev_ws.send(JSON.stringify(msg));
 }
 
 function toggle(dev_id, value_id){
