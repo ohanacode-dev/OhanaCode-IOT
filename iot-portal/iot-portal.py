@@ -292,7 +292,7 @@ async def websocket_server(websocket: WebSocket):
 
                 await ws_manager.send_text(json.dumps(response), websocket)
 
-            if data['topic'] == "remove_device":
+            elif data['topic'] == "remove_device":
                 id = data.get('id', None)
                 mac = data.get('mac', None)
 
@@ -303,7 +303,7 @@ async def websocket_server(websocket: WebSocket):
                 else:
                     device = None
 
-                remove_device_from_db(device["id"])
+                remove_device_from_db(device_mac=device["mac"])
 
                 devices = get_devices_from_db()
 

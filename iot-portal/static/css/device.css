@@ -2,9 +2,9 @@
 .label{
     display: inline-block;
     text-align: center;
-    width: calc(100% - 4em);
+    width: calc(100% - 6em);
 }
-.setup, .redirect{
+.setup, .redirect, .remove{
     width: 1em;
     display: inline-block;
     cursor: pointer;
@@ -12,7 +12,7 @@
     margin-right: 0.5em;
 }
 
-.redirect{
+.redirect, .remove{
     float: right;
 }
 
