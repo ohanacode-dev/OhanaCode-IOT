@@ -34,9 +34,9 @@ Also needed to append to /etc/modules-load.d/modules.conf:
     w1-gpio
     w1-therm
 
-The probe is connected to pin D14. This required appending to /boot/armbianEnv.txt:
+The probe is connected to pin A14. This required appending to /boot/armbianEnv.txt:
 
-    param_w1_pin=PD14
+    param_w1_pin=PA14
     param_w1_pin_int_pullup=1
 
 Now reboot and you should have a folder with the sensor ID under /sys/bus/w1/devices/. More datails available on https://blog.ja-ke.tech/2019/01/21/DS18B20-armbian.html.
