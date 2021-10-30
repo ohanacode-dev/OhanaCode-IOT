@@ -40,10 +40,13 @@ port = 1883
 SENDER_WEATHER = "weather"
 SENDER_TEMP_AMBIENT = "temp_ambient"
 SENDER_TEMP_EXTERNAL = "temp_external"
-
+MSG_TIMEOUT = 60 * 60   # After an hour consider the message old and not valid
 weather_text = ""
 temp_ambient = "----- "
 temp_external = "----- "
+weather_timestamp = 0
+temp_amb_timestamp = 0
+temp_ext_timestamp = 0
 
 
 class MqttReceiver:
@@ -65,10 +68,25 @@ class MqttReceiver:
     def on_connect(self, client, userdata, flags, rc):
         client.subscribe(self.topic)
 
+    def validate_msg(self):
+        global weather_text
+        global temp_ambient
+        global temp_external
+
+        if time.time() - weather_timestamp > MSG_TIMEOUT:
+            weather_text = ""
+        if time.time() - temp_amb_timestamp > MSG_TIMEOUT:
+            temp_ambient = ""
+        if time.time() - temp_ext_timestamp > MSG_TIMEOUT:
+            temp_external = ""
+
     def on_message(self, client, userdata, msg):
         global weather_text
         global temp_ambient
         global temp_external
+        global temp_amb_timestamp
+        global temp_ext_timestamp
+        global weather_timestamp
 
         try:
             self.rx_msg = json.loads(msg.payload.decode())
@@ -76,10 +94,15 @@ class MqttReceiver:
             message = self.rx_msg.get("msg", "")
             if sender == SENDER_WEATHER:
                 weather_text = message
+                weather_timestamp = time.time()
             elif sender == SENDER_TEMP_AMBIENT:
                 temp_ambient = message
+                temp_amb_timestamp = time.time()
             elif sender == SENDER_TEMP_EXTERNAL:
                 temp_external = message
+                temp_ext_timestamp = time.time()
+
+            self.validate_msg()
 
         except Exception as ex:
             print("ERROR: ", ex)
