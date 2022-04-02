@@ -13,7 +13,7 @@ from paho.mqtt import client as mqtt_client
 BTN_PIN = 12
 broker = 'localhost'
 port = 1883
-device_mac = "CC50E32E88F3"
+device_mac = "3C71BF3A11D6"
 client_id = "btn_" + device_mac
 
 
