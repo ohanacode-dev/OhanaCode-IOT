@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt install -y python3-pip mosquitto mosquitto-clients python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev fonts-font-awesome fonts--dejavu
+sudo apt install -y python3-pip mosquitto mosquitto-clients python3-dev python3-smbus i2c-tools python3-libgpiod libfreetype6-dev fonts-font-awesome fonts-dejavu
 sudo pip3 install paho-mqtt fastapi uvicorn jinja2 aiofiles websocket-client websockets fontawesome OrangePi.GPIO pillow==2.8.2 luma.oled
 
 IOT_SERVICE_FILE=iotportal.service
