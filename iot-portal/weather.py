@@ -41,7 +41,8 @@ ASCII_ICON_NIGHT = {
 broker = 'localhost'
 port = 1883
 topic = "iot"
-client_id = "weather"
+client_id_w = "weather"
+client_id_t = "temp_external"
 
 
 def send_to_mqtt(msg):
@@ -89,17 +90,25 @@ def get_weather():
     else:
         icon = ASCII_ICON_DAY[weather_code]
 
-    msg = '{}{}C {} {}'.format(temp, u'\N{DEGREE SIGN}', description, icon)
-    return msg
+    t_msg = '{}{}C'.format(temp, u'\N{DEGREE SIGN}')
+    w_msg = '{} {}'.format(description, icon)
+
+    return t_msg, w_msg
 
 
 if __name__ == '__main__':
     # Get weather data
-    weather_msg = get_weather()
-    msg = {"name": client_id, "msg": weather_msg}
-    print(msg)
+    external_temp, weather_msg = get_weather()
 
     # Send to mqtt server.
     send_to_mqtt("Wake up")
+
+    msg = {"name": client_id_w, "msg": weather_msg}
+    print(msg)
+    mqtt_msg = json.dumps(msg)
+    send_to_mqtt(mqtt_msg)
+
+    msg = {"name": client_id_t, "msg": external_temp}
+    print(msg)
     mqtt_msg = json.dumps(msg)
     send_to_mqtt(mqtt_msg)
