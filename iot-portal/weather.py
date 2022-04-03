@@ -101,7 +101,7 @@ if __name__ == '__main__':
     external_temp, weather_msg = get_weather()
 
     # Send to mqtt server.
-    send_to_mqtt("Wake up")
+    send_to_mqtt("Wake up", client_id_w)
 
     msg = {"name": client_id_w, "msg": weather_msg}
     print(msg)
