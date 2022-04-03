@@ -45,7 +45,7 @@ client_id_w = "weather"
 client_id_t = "temp_external"
 
 
-def send_to_mqtt(msg):
+def send_to_mqtt(msg, client_id):
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected to MQTT Broker!")
@@ -106,9 +106,9 @@ if __name__ == '__main__':
     msg = {"name": client_id_w, "msg": weather_msg}
     print(msg)
     mqtt_msg = json.dumps(msg)
-    send_to_mqtt(mqtt_msg)
+    send_to_mqtt(mqtt_msg, client_id_w)
 
     msg = {"name": client_id_t, "msg": external_temp}
     print(msg)
     mqtt_msg = json.dumps(msg)
-    send_to_mqtt(mqtt_msg)
+    send_to_mqtt(mqtt_msg, client_id_t)
