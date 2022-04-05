@@ -79,7 +79,7 @@ def query_server():
 def get_weather():
     response = query_server()
     data = response['data'][0]
-    temp = data['temp']
+    temp = int(round(float(data['temp'])))
     weather = data['weather']
     description = weather['description']
     weather_code = '{}'.format(weather['code'])
