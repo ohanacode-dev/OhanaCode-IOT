@@ -24,7 +24,7 @@ state_t ds_state = state_init;
 int lastRead = DS_ERR;
 unsigned long lastStateTime = 0;
 
-/* Pind the probe to see if it is operational */
+/* Find the probe to see if it is operational */
 bool checkPresence( void )
 {
 	bool isPresent;
