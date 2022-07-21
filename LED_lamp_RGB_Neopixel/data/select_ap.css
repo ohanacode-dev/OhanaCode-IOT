@@ -1,0 +1,42 @@
+body{
+background-color: #210D03; font-family: Arial, Helvetica, Sans-Serif; color: #EDEBD1 ;
+}
+.contain{
+width: 100%;
+}
+.center_div{
+margin:0 auto; max-width: 400px;position:relative;
+}
+.c{
+text-align: center;
+}
+div,input{
+padding:5px;font-size:1em;
+}
+input{
+width:95%;
+background-color: black;
+border: 2px solid #210D03;
+color: #EDEBD1;
+}
+body{
+text-align: left;
+}
+button{
+width:100%;border:0;border-radius:0.3rem;color:black;line-height:2.4rem;
+font-size:1.2rem;height:40px;background-color:#8a8a5c;
+}
+.q{
+float: right;width: 64px;text-align: right;
+}
+.radio{
+width:2em;
+}
+#vm{
+width:100%;height:50vh;overflow-y:auto;margin-bottom:1em;
+}
+
+a, a:link, a:visited, a:hover, a:active {
+  color: #66ff66;  
+}
+
