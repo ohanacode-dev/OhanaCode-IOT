@@ -9,7 +9,6 @@
 #include <EEPROM.h>
 #include <ESP8266HTTPClient.h>
 #include <pgmspace.h>
-#include <LittleFS.h>
 #include "http.h"
 #include "wifi_connection.h"
 #include "web_socket.h"
@@ -17,64 +16,14 @@
 #include "LED_lamp_RGB_Neopixel.h"
 #include "led.h"
 #include "ota.h"
+#include "html_ui.h"
 
 
 /* Declaring a web server object. */
 static ESP8266WebServer webServer(80);
 
-static String getContentType(String filename) { // convert the file extension to the MIME type
-  String retType = "text/plain";
-  
-  if (filename.endsWith(".html")){
-    retType = "text/html";
-  }else if (filename.endsWith(".css")){
-    retType = "text/css";
-  }else if (filename.endsWith(".js")){
-    retType = "application/javascript";
-  }else if (filename.endsWith(".ico")){
-    retType = "image/x-icon";
-  }else if (filename.endsWith(".png")){
-    retType = "image/png";
-  }else if (filename.endsWith(".gif")){
-    retType = "image/gif";
-  }
-  return retType;
-}
-
-static bool handleFileRead(String path) { // send the right file to the client (if it exists)
-  bool retVal = false;
-  //Serial.println("handleFileRead: " + path);
-  String originalPath = path;
-  
-  if (path.endsWith("/")){
-    // If a folder is requested, send the index file
-    path += "index.html";         
-  }else if(path.equals("/generate_204") || path.equals("/gen_204")){
-    // Sign in request from smartphone
-    path = "/index.html";     
-  }
-  
-  String contentType = getContentType(path);            // Get the MIME type
-  
-  if (LittleFS.exists(path)) {                            // If the file exists
-    File file = LittleFS.open(path, "r");                 // Open it
-    size_t sent = webServer.streamFile(file, contentType); // And send it to the client
-    file.close();                                       // Then close the file again
-    
-    retVal = true;
-  }else{
-    Serial.println("LittleFS ERROR: " + originalPath + " not found!");
-    
-    retVal = false;
-  }
-  
-  return retVal;                                        
-}
-
 static void showNotFound(void){
-  if (!handleFileRead("/not_found.html")){
-    webServer.send(404, "text/plain", "Page not found!");      
-  }
+  webServer.send(404, "text/plain", "Sorry, no such item here!"); 
 }
 
 String HTTP_getFeatures( void ){
@@ -101,15 +50,20 @@ static void showStatusPage() {
   webServer.send(200, "text/plain", response);   
 }
 
-static void startOtaUpdate(void){
-  LittleFS.end();
+static void startOtaUpdate(void){  
   OTA_init();    
 }
 
 static void showRedirectPage(void){
-  if (!handleFileRead("/redirect.html")){
-     showNotFound();        
-  }   
+  webServer.send(200, "text/html", F(redirect_html));   
+}
+
+static void showHome(void){
+  webServer.send(200, "text/html", F(index_html));   
+}
+
+static void showSelectAP(void){
+  webServer.send(200, "text/html", F(select_ap_html));   
 }
 
 /* Saves wifi settings to EEPROM */
@@ -199,23 +153,13 @@ void HTTP_init(void){
   webServer.on("/favicon.ico", showNotFound);
   webServer.on("/wifisave", saveWiFi);
   webServer.on("/start_ota_update", startOtaUpdate);
+  webServer.on("/select_ap", showSelectAP);
+  webServer.on("/", showHome);
   
   webServer.onNotFound([]() {                             
-    if (!handleFileRead(webServer.uri())){
-       showNotFound();        
-    }      
+    showNotFound();      
   });
   
   webServer.begin();
-
-  if(!LittleFS.begin()){
-    Serial.println("LittleFS Initialization failed. Did you enable LittleFS in \"Tools/Flash size\"?");
-  }
-
-  Serial.println("\tListing files...");
-  Dir dir = LittleFS.openDir("/");
-  while (dir.next()) {
-      Serial.println(dir.fileName());      
-  }
-  Serial.println("\tEnd of file list...");
+ 
 }
