@@ -20,12 +20,9 @@ void setup(void) {
   //  ESP.eraseConfig(); 
   delay(100); /* Need to wait for background processes to complete. Otherwise trouble with gpio.*/
           
-  Serial.begin(115200);   
-  ESP.wdtFeed();
   LED_init();
   WIFIC_init();    
   WS_init();  
-  ESP.wdtFeed();
   HTTP_init();
 }
 

@@ -24,7 +24,6 @@ void WS_broadcast(String msg){
 static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 { 
   if(type == WStype_TEXT){
-    //Serial.printf("[%u] get Text: %s\r\n", num, payload);
     char textMsg[length];
     for(int i = 0; i < length; i++){
       textMsg[i] = payload[i];          
@@ -43,15 +42,10 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         
         if(cmd.length() > 0){
           JsonArray array = root["CURRENT"].as<JsonArray>();
-//         Serial.print("WS VAL: ");
-          for(int i=0; i < array.size(); i++) {
-                          
-              val[i] = array[i].as<int>();
-//              Serial.print(val[i]);  
-//              Serial.print(", ");            
+          for(int i=0; i < array.size(); i++) {                          
+              val[i] = array[i].as<int>();          
           }    
-          Serial.println("");
-          
+         
           LED_writeRGBA(val);
           
         }else{ 
@@ -60,21 +54,6 @@ static void serverEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t le
         	wsServer.sendTXT(num, msg);
 	      } 
       }
-      
-      if(root.containsKey("ID")){
-        String features = HTTP_getFeatures();
-        wsServer.sendTXT(num, features);             
-      }
-      
-      if(root.containsKey("APLIST")){  
-        String APList = "{\"APLIST\":\"" + WIFIC_getApList() + "\"}";
-        wsServer.sendTXT(num, APList);   
-      }
-      
-      if(root.containsKey("STATUS")){
-        String msg = "{\"STATUS\":\"" + MAIN_getStatusMsg() + "\"}";      
-        wsServer.broadcastTXT(msg);          
-      }      
     }      
   } 
 }

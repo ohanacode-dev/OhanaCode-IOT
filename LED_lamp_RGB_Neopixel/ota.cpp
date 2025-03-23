@@ -25,7 +25,7 @@ void OTA_init() {
   ArduinoOTA.setHostname(WIFIC_getDeviceName());
 
   // No authentication by default
-//  ArduinoOTA.setPassword((const char *)"pass123");
+  ArduinoOTA.setPassword(AP_PASS);
    
   ArduinoOTA.onStart([]() {
     String type;
